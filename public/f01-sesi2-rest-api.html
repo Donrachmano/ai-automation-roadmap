@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>REST API Fundamentals — AI Automation Bootcamp · Sesi 2</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+  :root {
+    --bg:#080c10; --bg2:#0d1117; --bg3:#161b22; --bg4:#21262d;
+    --border:#30363d; --cyan:#00e5ff; --cyan2:#00b8d4;
+    --green:#3fb950; --red:#f85149; --yellow:#e3b341;
+    --purple:#bc8cff; --orange:#ffa657; --text:#e6edf3; --muted:#8b949e;
+    --mono:'JetBrains Mono',monospace; --sans:'Space Grotesk',sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:100vh;overflow-x:hidden;}
+  body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,255,.03)1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,.03)1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+  header{position:sticky;top:0;z-index:100;background:rgba(8,12,16,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:52px;}
+  .logo{font-family:var(--sans);font-size:13px;font-weight:700;color:var(--cyan);letter-spacing:.08em;display:flex;align-items:center;gap:10px;}
+  .logo-badge{background:var(--cyan);color:var(--bg);font-size:9px;font-weight:700;padding:2px 7px;border-radius:3px;letter-spacing:.1em;}
+  .logo-sep{color:var(--border);}
+  .progress-wrap{display:flex;align-items:center;gap:10px;}
+  .progress-bar{width:120px;height:4px;background:var(--bg4);border-radius:2px;overflow:hidden;}
+  .progress-fill{height:100%;background:var(--cyan);border-radius:2px;transition:width .4s ease;}
+  .progress-label{font-size:10px;color:var(--muted);}
+  nav{display:flex;overflow-x:auto;gap:2px;padding:12px 24px 0;position:relative;z-index:1;scrollbar-width:none;}
+  nav::-webkit-scrollbar{display:none;}
+  .nav-btn{background:none;border:none;cursor:pointer;font-family:var(--mono);font-size:10px;color:var(--muted);padding:8px 14px;border-radius:6px 6px 0 0;border:1px solid transparent;border-bottom:none;white-space:nowrap;transition:all .2s;display:flex;flex-direction:column;align-items:flex-start;gap:2px;}
+  .nav-btn .nb-id{color:var(--border);font-size:9px;}
+  .nav-btn .nb-tag{font-size:9px;color:var(--bg4);background:var(--border);padding:1px 5px;border-radius:2px;}
+  .nav-btn.done{color:var(--green);}
+  .nav-btn.done .nb-id{color:var(--green);opacity:.6;}
+  .nav-btn.done .nb-tag{background:rgba(63,185,80,.15);color:var(--green);}
+  .nav-btn.active{color:var(--cyan);background:var(--bg2);border-color:var(--border);}
+  .nav-btn.active .nb-id{color:var(--cyan);opacity:.7;}
+  .nav-btn.active .nb-tag{background:rgba(0,229,255,.1);color:var(--cyan);}
+  main{max-width:880px;margin:0 auto;padding:28px 24px 120px;position:relative;z-index:1;}
+  .card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:28px 32px;margin-bottom:20px;animation:fadeIn .3s ease;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  .step-tag{font-size:10px;letter-spacing:.15em;color:var(--cyan);font-weight:600;margin-bottom:6px;}
+  .step-title{font-family:var(--sans);font-size:22px;font-weight:700;color:var(--text);margin-bottom:16px;line-height:1.3;}
+  .step-title span{color:var(--cyan);}
+  p{color:var(--muted);font-size:14px;line-height:1.8;margin-bottom:12px;}
+  p strong{color:var(--text);font-weight:600;}
+  p code{color:var(--cyan);background:rgba(0,229,255,.08);padding:1px 6px;border-radius:3px;font-size:13px;}
+  .diagram{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:20px;margin:16px 0;font-size:13px;line-height:1.9;}
+  .flow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:12px 0;}
+  .flow-box{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:8px 14px;font-size:12px;color:var(--text);text-align:center;}
+  .flow-box.cyan{border-color:var(--cyan);color:var(--cyan);}
+  .flow-box.green{border-color:var(--green);color:var(--green);}
+  .flow-arr{color:var(--muted);font-size:18px;}
+  .code-block{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:16px 20px;font-size:12.5px;line-height:1.7;overflow-x:auto;margin:14px 0;position:relative;}
+  .code-block .cb-header{font-size:10px;color:var(--muted);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+  .cb-dot{width:8px;height:8px;border-radius:50%;display:inline-block;}
+  .cb-dot.r{background:var(--red);} .cb-dot.y{background:var(--yellow);} .cb-dot.g{background:var(--green);}
+  .hl-key{color:var(--cyan);} .hl-str{color:var(--green);} .hl-num{color:var(--orange);}
+  .hl-punc{color:var(--muted);} .hl-kw{color:var(--purple);} .hl-url{color:var(--yellow);}
+  .hl-comment{color:var(--muted);font-style:italic;}
+  .method-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0;}
+  .method-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:16px 18px;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;gap:6px;}
+  .method-card:hover{border-color:var(--muted);}
+  .method-card.active{border-color:var(--cyan);background:rgba(0,229,255,.05);}
+  .method-card .mc-verb{font-size:15px;font-weight:700;letter-spacing:.1em;}
+  .mc-verb.get{color:var(--green);} .mc-verb.post{color:var(--cyan);} .mc-verb.put{color:var(--yellow);} .mc-verb.delete{color:var(--red);}
+  .method-card .mc-crud{font-size:11px;color:var(--muted);}
+  .method-card .mc-desc{font-size:12px;color:var(--text);line-height:1.5;}
+  .method-detail{background:var(--bg);border:1px solid var(--cyan);border-radius:8px;padding:18px 20px;margin-top:14px;font-size:13px;animation:fadeIn .2s ease;}
+  .method-detail .md-title{color:var(--cyan);font-size:11px;letter-spacing:.1em;margin-bottom:10px;}
+  .method-detail .md-row{display:flex;gap:16px;margin-bottom:8px;}
+  .method-detail .md-label{color:var(--muted);font-size:12px;width:90px;flex-shrink:0;}
+  .method-detail .md-val{color:var(--text);font-size:12px;line-height:1.5;}
+  .status-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin:16px 0;}
+  .status-pill{display:flex;align-items:center;gap:10px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:10px 14px;}
+  .status-code{font-size:14px;font-weight:700;min-width:36px;}
+  .status-pill .sp-text{font-size:11px;color:var(--muted);line-height:1.4;}
+  .status-pill .sp-name{color:var(--text);font-size:12px;}
+  .s2{color:var(--green);} .s3{color:var(--cyan);} .s4{color:var(--yellow);} .s5{color:var(--red);}
+  .tab-row{display:flex;gap:4px;margin-bottom:14px;}
+  .tab-btn{background:none;border:1px solid var(--border);border-radius:6px;padding:8px 18px;font-family:var(--mono);font-size:12px;color:var(--muted);cursor:pointer;transition:all .2s;}
+  .tab-btn.active{border-color:var(--cyan);color:var(--cyan);background:rgba(0,229,255,.05);}
+  .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0;}
+  .info-box{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:14px 16px;}
+  .info-box .ib-label{font-size:10px;color:var(--muted);letter-spacing:.1em;margin-bottom:6px;}
+  .info-box .ib-val{font-size:13px;color:var(--text);line-height:1.5;}
+  .info-box .ib-val code{color:var(--cyan);font-size:12px;}
+  .url-anatomy{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:16px 20px;margin:14px 0;font-size:12px;overflow-x:auto;}
+  .url-anatomy .ua-line{font-size:15px;margin-bottom:14px;line-height:2;}
+  .ua-scheme{color:var(--purple);} .ua-host{color:var(--cyan);} .ua-path{color:var(--green);} .ua-query{color:var(--yellow);}
+  .url-anatomy .ua-parts{display:flex;flex-wrap:wrap;gap:8px;}
+  .ua-part{padding:4px 10px;border-radius:4px;font-size:11px;}
+  .ua-part.scheme{background:rgba(188,140,255,.1);color:var(--purple);}
+  .ua-part.host{background:rgba(0,229,255,.08);color:var(--cyan);}
+  .ua-part.path{background:rgba(63,185,80,.1);color:var(--green);}
+  .ua-part.query{background:rgba(227,179,65,.1);color:var(--yellow);}
+  /* LIVE API */
+  .api-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:16px 20px;margin-bottom:12px;}
+  .api-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+  .api-name{font-family:var(--sans);font-size:14px;font-weight:600;color:var(--text);}
+  .api-method-tag{font-size:10px;font-weight:700;letter-spacing:.1em;padding:2px 8px;border-radius:3px;background:rgba(63,185,80,.15);color:var(--green);}
+  .api-url{font-size:11px;color:var(--yellow);word-break:break-all;margin-bottom:12px;}
+  .try-btn{background:none;border:1px solid var(--cyan);color:var(--cyan);font-family:var(--mono);font-size:12px;padding:7px 18px;border-radius:6px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;}
+  .try-btn:hover{background:rgba(0,229,255,.08);}
+  .try-btn:disabled{opacity:.5;cursor:not-allowed;}
+  .api-result{margin-top:12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:12px 16px;font-size:11.5px;max-height:200px;overflow-y:auto;line-height:1.7;display:none;}
+  .api-result.show{display:block;animation:fadeIn .2s ease;}
+  /* MISSIONS */
+  .mission-tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:16px;}
+  .mission-tab{background:none;border:1px solid var(--border);border-radius:6px;padding:6px 14px;font-family:var(--mono);font-size:11px;color:var(--muted);cursor:pointer;transition:all .2s;}
+  .mission-tab.active{border-color:var(--cyan);color:var(--cyan);}
+  .mission-tab.done{border-color:var(--green);color:var(--green);}
+  .mission-panel{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:20px 24px;}
+  .mission-title{font-family:var(--sans);font-size:16px;font-weight:700;color:var(--text);margin-bottom:4px;display:flex;align-items:center;gap:10px;}
+  .mission-num{color:var(--cyan);font-size:12px;}
+  .mission-desc{font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.7;}
+  .api-input-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+  .method-badge{font-size:11px;font-weight:700;letter-spacing:.08em;padding:8px 12px;border-radius:6px;background:rgba(63,185,80,.12);color:var(--green);border:1px solid rgba(63,185,80,.3);flex-shrink:0;}
+  .method-badge.post{background:rgba(0,229,255,.1);color:var(--cyan);border-color:rgba(0,229,255,.3);}
+  .url-input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-family:var(--mono);font-size:12px;color:var(--yellow);outline:none;transition:border-color .2s;}
+  .url-input:focus{border-color:var(--cyan);}
+  .body-textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:10px 14px;font-family:var(--mono);font-size:12px;color:var(--green);outline:none;resize:vertical;min-height:80px;margin-bottom:10px;transition:border-color .2s;}
+  .body-textarea:focus{border-color:var(--cyan);}
+  .body-label{font-size:11px;color:var(--muted);margin-bottom:6px;}
+  .send-btn{background:var(--cyan);color:var(--bg);border:none;border-radius:6px;font-family:var(--mono);font-size:12px;font-weight:700;padding:9px 22px;cursor:pointer;transition:all .2s;letter-spacing:.05em;}
+  .send-btn:hover{background:var(--cyan2);}
+  .send-btn:disabled{opacity:.5;cursor:not-allowed;}
+  .mission-result{margin-top:14px;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:14px 16px;font-size:12px;line-height:1.7;max-height:220px;overflow-y:auto;display:none;}
+  .mission-result.show{display:block;animation:fadeIn .2s ease;}
+  .mission-result.ok{border-color:var(--green);}
+  .mission-result.err{border-color:var(--red);}
+  .ok-banner{background:rgba(63,185,80,.1);border:1px solid var(--green);border-radius:6px;padding:12px 16px;font-size:13px;color:var(--green);margin-top:10px;display:flex;align-items:center;gap:10px;}
+  .all-done-banner{background:linear-gradient(135deg,rgba(0,229,255,.05),rgba(63,185,80,.05));border:1px solid var(--cyan);border-radius:10px;padding:28px 24px;text-align:center;margin-top:16px;}
+  .all-done-banner h2{font-family:var(--sans);font-size:20px;color:var(--cyan);margin-bottom:8px;}
+  /* QUIZ */
+  .quiz-box{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:20px 24px;margin-top:20px;}
+  .quiz-label{font-size:10px;color:var(--purple);letter-spacing:.15em;font-weight:600;margin-bottom:10px;}
+  .quiz-q{font-size:14px;color:var(--text);margin-bottom:14px;line-height:1.6;}
+  .quiz-opts{display:flex;flex-direction:column;gap:8px;margin-bottom:14px;}
+  .quiz-opt{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:10px 14px;font-family:var(--mono);font-size:13px;color:var(--text);cursor:pointer;transition:all .2s;text-align:left;}
+  .quiz-opt:hover:not(:disabled){border-color:var(--muted);}
+  .quiz-opt.correct{border-color:var(--green);color:var(--green);background:rgba(63,185,80,.08);}
+  .quiz-opt.wrong{border-color:var(--red);color:var(--red);background:rgba(248,81,73,.08);}
+  .quiz-feedback{font-size:12px;margin-top:8px;line-height:1.6;}
+  .quiz-feedback.ok{color:var(--green);} .quiz-feedback.err{color:var(--red);}
+  /* NAV BTNS */
+  .nav-btns{display:flex;justify-content:space-between;margin-top:24px;gap:10px;}
+  .btn-prev,.btn-next{background:none;border:1px solid var(--border);border-radius:8px;padding:10px 22px;font-family:var(--mono);font-size:13px;color:var(--muted);cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:8px;}
+  .btn-next{background:var(--bg2);border-color:var(--cyan);color:var(--cyan);margin-left:auto;}
+  .btn-prev:hover{border-color:var(--muted);color:var(--text);}
+  .btn-next:hover{background:rgba(0,229,255,.08);}
+  /* POSTMAN MOCK */
+  .pm-mock{background:#1c1c1c;border:1px solid #3d3d3d;border-radius:10px;overflow:hidden;margin:16px 0;font-size:12px;}
+  .pm-titlebar{background:#2c2c2c;padding:8px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #3d3d3d;font-size:11px;color:#888;}
+  .pm-dot{width:10px;height:10px;border-radius:50%;display:inline-block;}
+  .pm-req-row{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid #3d3d3d;background:#252525;}
+  .pm-msel{border-radius:4px;padding:6px 10px;font-size:12px;font-weight:700;letter-spacing:.05em;}
+  .pm-msel.get{background:rgba(63,185,80,.15);color:#3fb950;border:1px solid rgba(63,185,80,.4);}
+  .pm-msel.post{background:rgba(0,229,255,.12);color:#00e5ff;border:1px solid rgba(0,229,255,.3);}
+  .pm-url-f{flex:1;background:#1a1a1a;border:1px solid #3d3d3d;border-radius:4px;padding:7px 12px;color:#e6edf3;font-family:var(--mono);font-size:12px;}
+  .pm-send{background:#ff6b35;color:#fff;border:none;border-radius:4px;padding:7px 16px;font-weight:700;font-size:12px;cursor:pointer;}
+  .pm-tabs-row{display:flex;background:#252525;border-bottom:1px solid #3d3d3d;}
+  .pm-tab-item{padding:8px 14px;font-size:11px;color:#666;border-right:1px solid #3d3d3d;cursor:pointer;}
+  .pm-tab-item.active{color:#ff6b35;border-bottom:2px solid #ff6b35;}
+  .pm-tc{padding:14px;background:#1c1c1c;}
+  .pm-kv{display:flex;gap:8px;align-items:center;margin-bottom:6px;}
+  .pm-kv .k{color:var(--cyan);min-width:160px;font-size:12px;}
+  .pm-kv .v{color:var(--green);font-size:12px;}
+  .pm-kv .hint{color:#666;font-size:11px;font-style:italic;}
+  .pm-resp{border-top:1px solid #3d3d3d;padding:12px 14px;background:#1a1a1a;}
+  .pm-resp-status{color:var(--green);font-size:11px;margin-bottom:8px;}
+  /* TOOL CARDS */
+  .tool-row{display:flex;gap:12px;margin:14px 0;flex-wrap:wrap;}
+  .tool-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:16px 18px;flex:1;min-width:200px;}
+  .tool-card .tc-icon{font-size:28px;margin-bottom:8px;}
+  .tool-card .tc-name{font-family:var(--sans);font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px;}
+  .tool-card .tc-sub{font-size:11px;color:var(--muted);margin-bottom:8px;}
+  .tool-card .tc-tag{display:inline-block;font-size:10px;padding:2px 8px;border-radius:3px;background:rgba(0,229,255,.1);color:var(--cyan);border:1px solid rgba(0,229,255,.2);}
+  .step-list{display:flex;flex-direction:column;gap:10px;margin:14px 0;}
+  .step-item{display:flex;gap:12px;align-items:flex-start;}
+  .step-num{background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.2);color:var(--cyan);width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px;}
+  .step-text{font-size:13px;color:var(--text);line-height:1.6;}
+  .step-text span{color:var(--muted);}
+  /* AI TUTOR */
+  .ai-fab{position:fixed;bottom:28px;right:28px;z-index:200;background:var(--cyan);color:var(--bg);border:none;border-radius:50px;padding:13px 22px;font-family:var(--mono);font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 4px 24px rgba(0,229,255,.3);display:flex;align-items:center;gap:8px;transition:all .2s;letter-spacing:.04em;}
+  .ai-fab:hover{background:var(--cyan2);box-shadow:0 4px 32px rgba(0,229,255,.5);}
+  .ai-panel{position:fixed;bottom:90px;right:28px;z-index:200;width:360px;max-height:520px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;display:flex;flex-direction:column;box-shadow:0 8px 32px rgba(0,0,0,.5);overflow:hidden;display:none;}
+  .ai-panel.open{display:flex;animation:fadeIn .2s ease;}
+  .ai-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--bg);}
+  .ai-title{font-size:12px;font-weight:600;color:var(--cyan);display:flex;align-items:center;gap:8px;}
+  .ai-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;}
+  .ai-close:hover{color:var(--text);}
+  .ai-history{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px;}
+  .ai-msg{font-size:12.5px;line-height:1.7;padding:10px 14px;border-radius:8px;max-width:95%;}
+  .ai-msg.user{background:rgba(0,229,255,.08);color:var(--cyan);align-self:flex-end;}
+  .ai-msg.bot{background:var(--bg3);color:var(--text);align-self:flex-start;}
+  .ai-msg.loading{color:var(--muted);font-style:italic;}
+  .ai-input-row{padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px;background:var(--bg);}
+  .ai-input{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:9px 12px;font-family:var(--mono);font-size:12px;color:var(--text);outline:none;}
+  .ai-input:focus{border-color:var(--cyan);}
+  .ai-send{background:var(--cyan);color:var(--bg);border:none;border-radius:6px;font-family:var(--mono);font-size:12px;font-weight:700;padding:9px 16px;cursor:pointer;}
+  .ai-send:hover{background:var(--cyan2);}
+  .ai-send:disabled{opacity:.5;cursor:not-allowed;}
+  ::-webkit-scrollbar{width:4px;height:4px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+  ::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px;}
+  @media(max-width:600px){main{padding:16px 14px 100px;}.card{padding:18px 16px;}.method-grid{grid-template-columns:1fr;}.info-grid{grid-template-columns:1fr;}.status-grid{grid-template-columns:1fr;}.ai-panel{right:12px;left:12px;width:auto;}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <span class="logo-badge">F-01</span>
+    <span class="logo-sep">│</span>
+    REST API FUNDAMENTALS
+    <span style="color:var(--muted);font-size:11px;">— Sesi 2</span>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-bar"><div class="progress-fill" id="pFill" style="width:12.5%"></div></div>
+    <span class="progress-label" id="pLabel">1 / 8</span>
+  </div>
+</header>
+
+<nav id="navRow"></nav>
+<main id="main"></main>
+
+<button class="ai-fab" id="aiFab">⚡ AI Tutor</button>
+<div class="ai-panel" id="aiPanel">
+  <div class="ai-header">
+    <div class="ai-title">⚡ REST API Tutor</div>
+    <button class="ai-close" id="aiClose">✕</button>
+  </div>
+  <div class="ai-history" id="aiHistory">
+    <div class="ai-msg bot">Hai! Saya AI Tutor untuk REST API & Postman. Tanya apa saja — HTTP methods, status codes, auth, cara pakai Postman, atau cara hit API di n8n. 🚀</div>
+  </div>
+  <div class="ai-input-row">
+    <input class="ai-input" id="aiInput" placeholder="Tanya tentang REST API..."/>
+    <button class="ai-send" id="aiSend">→</button>
+  </div>
+</div>
+
+<script>
+// ─── DATA ────────────────────────────────────────────────────────────────────
+const STEPS = ['intro','methods','request','response','auth','tools','realapi','practice'];
+
+const NAV = [
+  { id:'intro',    num:'01', label:'INTRO',    tag:'KONSEP DASAR' },
+  { id:'methods',  num:'02', label:'METHODS',  tag:'VERB · CRUD' },
+  { id:'request',  num:'03', label:'REQUEST',  tag:'URL · HEADERS · BODY' },
+  { id:'response', num:'04', label:'RESPONSE', tag:'2xx · 4xx · 5xx' },
+  { id:'auth',     num:'05', label:'AUTH',     tag:'API KEY · BEARER' },
+  { id:'tools',    num:'06', label:'TOOLS',    tag:'POSTMAN · THUNDER' },
+  { id:'realapi',  num:'07', label:'LIVE API', tag:'5 PUBLIC APIS' },
+  { id:'practice', num:'08', label:'MISI',     tag:'HANDS-ON PRACTICE' },
+];
+
+const QZ = {
+  intro: {
+    q:'REST API bekerja dengan prinsip Stateless. Apa artinya?',
+    opts:['Server menyimpan semua data request sebelumnya','Setiap request berdiri sendiri, server tidak perlu ingat request lain','Hanya bisa dipakai sekali lalu mati','Tidak butuh koneksi internet'],
+    ans:1,
+    fb_ok:'✓ Stateless = setiap request mandiri. Server tidak menyimpan "memory" session. Ini yang bikin REST API bisa scale ke jutaan pengguna.',
+    fb_err:'✗ Stateless = server tidak menyimpan state client. Setiap request harus membawa semua info yang dibutuhkan (termasuk auth token).'
+  },
+  methods: {
+    q:'HTTP method apa yang digunakan untuk MEMBUAT data baru?',
+    opts:['GET','PUT','POST','PATCH'],
+    ans:2,
+    fb_ok:'✓ POST = Create. Ingat CRUD: Create→POST, Read→GET, Update→PUT/PATCH, Delete→DELETE.',
+    fb_err:'✗ POST untuk Create. GET=Read, PUT/PATCH=Update, DELETE=Delete.'
+  },
+  request: {
+    q:'Di URL `https://api.example.com/posts?userId=2`, bagian `userId=2` disebut...',
+    opts:['Path Parameter','URL Fragment','Query Parameter','Request Header'],
+    ans:2,
+    fb_ok:'✓ Query Parameter! Ditandai `?`, digunakan untuk filter/sort. Format: key=value, pisah `&` untuk banyak params.',
+    fb_err:'✗ Bagian setelah `?` disebut Query Parameter. Untuk filter, sort, pagination.'
+  },
+  response: {
+    q:'API mengembalikan status code `401`. Artinya?',
+    opts:['Resource tidak ditemukan','Server error internal','Perlu autentikasi — token tidak valid','Rate limit terlampaui'],
+    ans:2,
+    fb_ok:'✓ 401 = Unauthorized (perlu auth). Beda dengan 403 = Forbidden (sudah auth tapi tidak punya akses).',
+    fb_err:'✗ 401 = Unauthorized. 404=Not Found, 500=Internal Server Error, 429=Rate Limit.'
+  },
+  auth: {
+    q:'Bearer Token dikirim ke server melalui...',
+    opts:['Query parameter di URL','Request body (JSON)','Authorization header','Cookie khusus'],
+    ans:2,
+    fb_ok:'✓ Bearer Token via Authorization header: `Authorization: Bearer eyJhbGci...`. Jangan taruh di URL — terekspos di logs!',
+    fb_err:'✗ Bearer Token harus di Authorization header: `Authorization: Bearer <token>`.'
+  },
+  tools: {
+    q:'Di Postman, tab mana yang digunakan untuk set Bearer Token secara otomatis?',
+    opts:['Params','Headers (manual)','Authorization','Pre-request Script'],
+    ans:2,
+    fb_ok:'✓ Tab "Authorization" di Postman! Pilih type "Bearer Token", paste token, Postman auto-set header `Authorization: Bearer <token>`.',
+    fb_err:'✗ Gunakan tab "Authorization". Pilih "Bearer Token" dan Postman akan auto-generate headernya.'
+  }
+};
+
+const METHOD_DATA = {
+  GET:    { verb:'GET',    color:'get',    crud:'🔵 READ',        desc:'Mengambil data dari server.', safe:'Ya', idempotent:'Ya', body:'Tidak ada', example:'GET /api/users\nGET /api/users/123', returns:'200 OK' },
+  POST:   { verb:'POST',   color:'post',   crud:'🟢 CREATE',      desc:'Membuat resource baru.',      safe:'Tidak', idempotent:'Tidak', body:'Wajib JSON body', example:'POST /api/users\nBody: {"name":"Andi"}', returns:'201 Created' },
+  PUT:    { verb:'PUT',    color:'put',    crud:'🟡 UPDATE (full)',desc:'Mengganti seluruh resource.', safe:'Tidak', idempotent:'Ya', body:'Wajib (data lengkap)', example:'PUT /api/users/1\nBody: {"name":"Budi","email":"b@b.com"}', returns:'200 OK' },
+  DELETE: { verb:'DELETE', color:'delete', crud:'🔴 DELETE',       desc:'Menghapus resource.',         safe:'Tidak', idempotent:'Ya', body:'Biasanya tidak ada', example:'DELETE /api/users/123', returns:'200 OK / 204 No Content' },
+};
+
+const LIVE_APIS = [
+  { name:'JSONPlaceholder — User Detail',      url:'https://jsonplaceholder.typicode.com/users/1',                                                                  desc:'GET user id=1. API dummy paling populer untuk belajar REST. No auth.' },
+  { name:'Open-Meteo — Cuaca Jakarta',         url:'https://api.open-meteo.com/v1/forecast?latitude=-6.2&longitude=106.8&current=temperature_2m,weathercode',      desc:'GET suhu & weathercode realtime Jakarta. Gratis, no auth.' },
+  { name:'REST Countries — Indonesia',         url:'https://restcountries.com/v3.1/name/indonesia?fields=name,capital,population,currencies',                       desc:'GET info negara Indonesia: ibu kota, populasi, mata uang.' },
+  { name:'Frankfurter — Kurs Mata Uang',       url:'https://api.frankfurter.app/latest?from=USD',                                                                   desc:'GET kurs USD ke semua mata uang (data ECB). Gratis, no auth, CORS-enabled.' },
+  { name:'HackerNews Algolia — Top AI News',   url:'https://hn.algolia.com/api/v1/search?query=artificial+intelligence&hitsPerPage=3',                             desc:'GET 3 berita tech terbaru tentang AI dari HackerNews. REST API publik Algolia.' },
+];
+
+const MISSIONS = [
+  {
+    num:1, title:'JSONPlaceholder: Filter Query Param',
+    desc:'Ambil semua posts milik userId=2 dari JSONPlaceholder menggunakan query parameter.',
+    method:'GET', hasBody:false,
+    startUrl:'https://jsonplaceholder.typicode.com/posts?userId=2',
+    check:(d,s)=>{
+      if(s!==200) return {ok:false,msg:`Status ${s} — harusnya 200`};
+      if(!Array.isArray(d)) return {ok:false,msg:'Response harus array'};
+      const bad=d.find(p=>p.userId!==2);
+      if(bad) return {ok:false,msg:`Ada post dengan userId=${bad.userId} — filter belum benar`};
+      return {ok:true,msg:`✓ Berhasil! ${d.length} posts dari JSONPlaceholder, semua userId=2.`};
+    }
+  },
+  {
+    num:2, title:'Open-Meteo: Cuaca Jakarta',
+    desc:'GET suhu realtime Jakarta dari weather API gratis Open-Meteo.',
+    method:'GET', hasBody:false,
+    startUrl:'https://api.open-meteo.com/v1/forecast?latitude=-6.2&longitude=106.8&current=temperature_2m,weathercode',
+    check:(d,s)=>{
+      if(s!==200) return {ok:false,msg:`Status ${s} — harusnya 200`};
+      if(!d.current) return {ok:false,msg:'Tidak ada field "current"'};
+      if(d.current.temperature_2m===undefined) return {ok:false,msg:'Tidak ada temperature_2m'};
+      return {ok:true,msg:`✓ Berhasil! Suhu Jakarta: ${d.current.temperature_2m}°C 🌡️ (API #2 dari 5)`};
+    }
+  },
+  {
+    num:3, title:'REST Countries: Info Indonesia',
+    desc:'GET data Indonesia (ibu kota, populasi) dari REST Countries API.',
+    method:'GET', hasBody:false,
+    startUrl:'https://restcountries.com/v3.1/name/indonesia?fields=name,capital,population',
+    check:(d,s)=>{
+      if(s!==200) return {ok:false,msg:`Status ${s} — harusnya 200`};
+      if(!Array.isArray(d)||d.length===0) return {ok:false,msg:'Response harus array berisi data'};
+      const c=d[0];
+      if(!c.capital) return {ok:false,msg:'Tidak ada field capital'};
+      const cap=Array.isArray(c.capital)?c.capital[0]:c.capital;
+      return {ok:true,msg:`✓ Berhasil! Ibu kota: ${cap}, Populasi: ${(c.population/1e6).toFixed(1)}M (API #3)`};
+    }
+  },
+  {
+    num:4, title:'Frankfurter: Kurs USD Hari Ini',
+    desc:'GET kurs dollar AS ke berbagai mata uang dari Frankfurter API (data European Central Bank).',
+    method:'GET', hasBody:false,
+    startUrl:'https://api.frankfurter.app/latest?from=USD',
+    check:(d,s)=>{
+      if(s!==200) return {ok:false,msg:`Status ${s} — harusnya 200`};
+      if(!d.rates) return {ok:false,msg:'Tidak ada field "rates"'};
+      const n=Object.keys(d.rates).length;
+      if(n<3) return {ok:false,msg:`Terlalu sedikit mata uang: ${n}`};
+      const idr=d.rates.IDR?`1 USD = Rp ${Math.round(d.rates.IDR).toLocaleString()}`:`${n} mata uang tersedia`;
+      return {ok:true,msg:`✓ Berhasil! Kurs USD hari ini: ${idr}. (API #4)`};
+    }
+  },
+  {
+    num:5, title:'JSONPlaceholder: POST Resource Baru',
+    desc:'Kirim POST request untuk membuat post baru. Method pertama selain GET yang kamu gunakan!',
+    method:'POST', hasBody:true,
+    startUrl:'https://jsonplaceholder.typicode.com/posts',
+    startBody:'{"title":"Belajar REST API — 4 API berbeda sudah di-hit!","body":"GET, POST, query params, currency, weather semuanya berhasil.","userId":1}',
+    check:(d,s)=>{
+      if(s!==201) return {ok:false,msg:`Status ${s} — POST harusnya return 201 Created`};
+      if(!d.id) return {ok:false,msg:'Tidak ada id di response'};
+      if(!d.title) return {ok:false,msg:'Tidak ada title di response'};
+      return {ok:true,msg:`✓ POST berhasil! Resource baru id=${d.id}. Semua 5 misi selesai! 🎉`};
+    }
+  }
+];
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let step=0, qAnsw={}, actMethod=-1, authTab=0, missionI=0, doneMissions=new Set();
+let aiOpen=false, aiLoad=false, aiHist=[];
+
+// ─── HELPERS ─────────────────────────────────────────────────────────────────
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function hl(json){
+  if(typeof json!=='string') json=JSON.stringify(json,null,2);
+  return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,m=>{
+    if(/^"/.test(m)){if(/:$/.test(m))return`<span class="hl-key">${esc(m)}</span>`;return`<span class="hl-str">${esc(m)}</span>`;}
+    if(/true|false|null/.test(m))return`<span class="hl-kw">${m}</span>`;
+    return`<span class="hl-num">${m}</span>`;
+  });
+}
+
+// ─── UI ──────────────────────────────────────────────────────────────────────
+function updateNav(){
+  document.getElementById('navRow').innerHTML=NAV.map((n,i)=>{
+    const done=qAnsw[n.id]!==undefined||n.id==='realapi'||(n.id==='practice'&&doneMissions.size>0);
+    const cls=['nav-btn',i===step?'active':'',done&&i!==step?'done':''].filter(Boolean).join(' ');
+    return`<button class="${cls}" onclick="goStep(${i})"><span class="nb-id">${n.num}</span>${n.label}<span class="nb-tag">${n.tag}</span></button>`;
+  }).join('');
+  const pct=Math.round(((step+1)/STEPS.length)*100);
+  document.getElementById('pFill').style.width=pct+'%';
+  document.getElementById('pLabel').textContent=`${step+1} / ${STEPS.length}`;
+}
+
+function goStep(i){step=i;actMethod=-1;render();}
+
+// ─── RENDERS ─────────────────────────────────────────────────────────────────
+function render(){
+  updateNav();
+  const el=document.getElementById('main');
+  const s=STEPS[step];
+  const map={intro:rIntro,methods:rMethods,request:rRequest,response:rResponse,auth:rAuth,tools:rTools,realapi:rRealApi,practice:rPractice};
+  el.innerHTML=(map[s]||rIntro)();
+  window.scrollTo(0,0);
+}
+
+function rNavBtns(){
+  return`<div class="nav-btns">
+    ${step>0?`<button class="btn-prev" onclick="goStep(${step-1})">← ${NAV[step-1].label}</button>`:'<div></div>'}
+    ${step<STEPS.length-1?`<button class="btn-next" onclick="goStep(${step+1})">→ ${NAV[step+1].label}</button>`:''}
+  </div>`;
+}
+
+function rQuiz(id,q,ans){
+  const dis=ans!==undefined?'disabled':'';
+  const opts=q.opts.map((o,i)=>{
+    let cls='quiz-opt';
+    if(ans!==undefined){if(i===q.ans)cls+=' correct';else if(i===ans&&ans!==q.ans)cls+=' wrong';}
+    return`<button class="${cls}" ${dis} onclick="answerQuiz('${id}',${i})">${o}</button>`;
+  }).join('');
+  const fb=ans!==undefined?`<div class="quiz-feedback ${ans===q.ans?'ok':'err'}">${ans===q.ans?q.fb_ok:q.fb_err}</div>`:'';
+  return`<div class="quiz-box"><div class="quiz-label">▸ CEK PEMAHAMAN</div><div class="quiz-q">${q.q}</div><div class="quiz-opts">${opts}</div>${fb}</div>`;
+}
+
+// ─── STEP 01: INTRO ──────────────────────────────────────────────────────────
+function rIntro(){
+  return`<div class="card">
+    <div class="step-tag">▸ KONSEP DASAR</div>
+    <h1 class="step-title">Apa itu <span>REST API</span>?</h1>
+    <p>REST API (Representational State Transfer) adalah standar arsitektur untuk komunikasi antar sistem melalui <strong>HTTP</strong>. Ini adalah "bahasa" yang dipakai aplikasi untuk saling berbicara lewat internet.</p>
+    <div class="flow" style="margin:20px 0">
+      <div class="flow-box cyan">Client<br><small style="color:var(--muted)">Browser/App/n8n</small></div>
+      <div class="flow-arr">→</div>
+      <div class="flow-box" style="background:var(--bg4)">HTTP Request<br><small style="color:var(--yellow)">GET /api/users</small></div>
+      <div class="flow-arr">→</div>
+      <div class="flow-box" style="border-color:var(--green)">REST API<br><small style="color:var(--muted)">Server</small></div>
+      <div class="flow-arr">→</div>
+      <div class="flow-box" style="background:var(--bg4)">JSON Response<br><small style="color:var(--yellow)">{"users":[...]}</small></div>
+      <div class="flow-arr">→</div>
+      <div class="flow-box cyan">Client<br><small style="color:var(--muted)">Tampilkan data</small></div>
+    </div>
+    <div class="info-grid">
+      <div class="info-box"><div class="ib-label">🔑 STATELESS</div><div class="ib-val">Setiap request berdiri sendiri. Server tidak ingat request sebelumnya.</div></div>
+      <div class="info-box"><div class="ib-label">📦 FORMAT DATA</div><div class="ib-val">Hampir selalu <code>JSON</code>. Standar modern untuk semua API.</div></div>
+      <div class="info-box"><div class="ib-label">🌐 TRANSPORT</div><div class="ib-val">Protokol <code>HTTP/HTTPS</code>. URL = alamat resource.</div></div>
+      <div class="info-box"><div class="ib-label">⚡ KENAPA PENTING?</div><div class="ib-val">Slack, OpenAI, Tokopedia, Google — semuanya punya REST API!</div></div>
+    </div>
+    <div class="code-block">
+      <div class="cb-header"><span class="cb-dot r"></span><span class="cb-dot y"></span><span class="cb-dot g"></span>Contoh Request & Response</div>
+<span class="hl-kw">GET</span> <span class="hl-url">https://api.github.com/users/torvalds</span>
+
+<span class="hl-punc">{</span>
+  <span class="hl-key">"login"</span><span class="hl-punc">:</span> <span class="hl-str">"torvalds"</span><span class="hl-punc">,</span>
+  <span class="hl-key">"name"</span><span class="hl-punc">:</span> <span class="hl-str">"Linus Torvalds"</span><span class="hl-punc">,</span>
+  <span class="hl-key">"followers"</span><span class="hl-punc">:</span> <span class="hl-num">239145</span>
+<span class="hl-punc">}</span></div>
+    ${rQuiz('intro',QZ.intro,qAnsw.intro)}
+  </div>${rNavBtns()}`;
+}
+
+// ─── STEP 02: METHODS ────────────────────────────────────────────────────────
+function rMethods(){
+  const methods=['GET','POST','PUT','DELETE'];
+  const cards=methods.map((m,i)=>{
+    const d=METHOD_DATA[m];
+    return`<div class="method-card ${actMethod===i?'active':''}" onclick="selectMethod(${i})">
+      <div class="mc-verb ${d.color}">${d.verb}</div>
+      <div class="mc-crud">${d.crud}</div>
+      <div class="mc-desc">${d.desc}</div>
+    </div>`;
+  }).join('');
+  let detail='';
+  if(actMethod>=0){
+    const d=METHOD_DATA[methods[actMethod]];
+    detail=`<div class="method-detail">
+      <div class="md-title">▸ ${d.verb} — DETAIL</div>
+      <div class="md-row"><span class="md-label">CRUD</span><span class="md-val">${d.crud}</span></div>
+      <div class="md-row"><span class="md-label">Safe?</span><span class="md-val">${d.safe}</span></div>
+      <div class="md-row"><span class="md-label">Idempotent?</span><span class="md-val">${d.idempotent}</span></div>
+      <div class="md-row"><span class="md-label">Body?</span><span class="md-val">${d.body}</span></div>
+      <div class="md-row"><span class="md-label">Returns</span><span class="md-val">${d.returns}</span></div>
+      <div style="margin-top:10px"><div class="md-label" style="margin-bottom:6px">CONTOH:</div>
+        <div class="code-block" style="margin:0;padding:10px 14px"><pre style="margin:0">${esc(d.example)}</pre></div>
+      </div>
+    </div>`;
+  }
+  return`<div class="card">
+    <div class="step-tag">▸ HTTP METHODS · CRUD</div>
+    <h1 class="step-title">HTTP <span>Methods</span></h1>
+    <p>HTTP Methods mendefinisikan <strong>operasi apa</strong> yang dilakukan pada resource. Keempat method utama memetakan langsung ke CRUD.</p>
+    <div class="diagram" style="text-align:center">
+      <span style="color:var(--muted);font-size:12px">CRUD ↔ HTTP Methods ↔ SQL</span><br><br>
+      <span style="color:var(--green)">Create</span><span class="hl-punc"> → </span><strong style="color:var(--cyan)">POST</strong><span class="hl-punc"> → </span><span style="color:var(--muted)">INSERT</span>
+      &nbsp;&nbsp;<span style="color:var(--cyan2)">Read</span><span class="hl-punc"> → </span><strong style="color:var(--green)">GET</strong><span class="hl-punc"> → </span><span style="color:var(--muted)">SELECT</span>
+      &nbsp;&nbsp;<span style="color:var(--yellow)">Update</span><span class="hl-punc"> → </span><strong style="color:var(--yellow)">PUT</strong><span class="hl-punc"> → </span><span style="color:var(--muted)">UPDATE</span>
+      &nbsp;&nbsp;<span style="color:var(--red)">Delete</span><span class="hl-punc"> → </span><strong style="color:var(--red)">DELETE</strong><span class="hl-punc"> → </span><span style="color:var(--muted)">DELETE</span>
+    </div>
+    <p>Klik kartu untuk melihat detail:</p>
+    <div class="method-grid">${cards}</div>${detail}
+    ${rQuiz('methods',QZ.methods,qAnsw.methods)}
+  </div>${rNavBtns()}`;
+}
+
+// ─── STEP 03: REQUEST ────────────────────────────────────────────────────────
+function rRequest(){
+  return`<div class="card">
+    <div class="step-tag">▸ ANATOMY OF A REQUEST</div>
+    <h1 class="step-title">Anatomy <span>Request</span></h1>
+    <p>Setiap HTTP Request terdiri dari: <strong>URL</strong>, <strong>Headers</strong>, dan <strong>Body</strong>.</p>
+    <div style="margin:14px 0 20px">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:8px;letter-spacing:.08em">① URL — ALAMAT RESOURCE</div>
+      <div class="url-anatomy">
+        <div class="ua-line"><span class="ua-scheme">https://</span><span class="ua-host">api.example.com</span><span class="ua-path">/v1/posts/7</span><span class="ua-query">?userId=2&sort=desc</span></div>
+        <div class="ua-parts">
+          <span class="ua-part scheme">Scheme: https://</span>
+          <span class="ua-part host">Host: api.example.com</span>
+          <span class="ua-part path">Path: /v1/posts/7</span>
+          <span class="ua-part query">Query: ?userId=2&sort=desc</span>
+        </div>
+      </div>
+      <div class="info-grid" style="margin-top:10px">
+        <div class="info-box"><div class="ib-label">PATH PARAMETER</div><div class="ib-val">Bagian dari path: <code>/posts/7</code> — identify resource spesifik</div></div>
+        <div class="info-box"><div class="ib-label">QUERY PARAMETER</div><div class="ib-val">Setelah <code>?</code> — untuk filter, sort, pagination</div></div>
+      </div>
+    </div>
+    <div style="margin:20px 0">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:8px;letter-spacing:.08em">② HEADERS — METADATA</div>
+      <div class="code-block"><div class="cb-header"><span class="cb-dot r"></span><span class="cb-dot y"></span><span class="cb-dot g"></span>HTTP Request Headers</div>
+<span class="hl-key">Content-Type</span><span class="hl-punc">:</span>  <span class="hl-str">application/json</span>         <span class="hl-comment"># Format data yang dikirim</span>
+<span class="hl-key">Accept</span><span class="hl-punc">:</span>         <span class="hl-str">application/json</span>         <span class="hl-comment"># Format yang diinginkan</span>
+<span class="hl-key">Authorization</span><span class="hl-punc">:</span>  <span class="hl-str">Bearer eyJhbGciOiJIUzI1...</span>  <span class="hl-comment"># Token auth</span>
+<span class="hl-key">X-API-Key</span><span class="hl-punc">:</span>      <span class="hl-str">sk-abc123def456</span>           <span class="hl-comment"># API Key</span></div>
+    </div>
+    <div style="margin:20px 0">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:8px;letter-spacing:.08em">③ REQUEST BODY — DATA DIKIRIM (POST/PUT)</div>
+      <div class="code-block"><div class="cb-header"><span class="cb-dot r"></span><span class="cb-dot y"></span><span class="cb-dot g"></span>POST /api/users — Body</div>
+<span class="hl-punc">{</span>
+  <span class="hl-key">"name"</span><span class="hl-punc">:</span>   <span class="hl-str">"Siti Rahayu"</span><span class="hl-punc">,</span>
+  <span class="hl-key">"email"</span><span class="hl-punc">:</span>  <span class="hl-str">"siti@email.com"</span><span class="hl-punc">,</span>
+  <span class="hl-key">"active"</span><span class="hl-punc">:</span> <span class="hl-kw">true</span>
+<span class="hl-punc">}</span></div>
+      <p>GET request <strong>tidak punya body</strong>. POST, PUT, PATCH menggunakan body untuk data kompleks.</p>
+    </div>
+    ${rQuiz('request',QZ.request,qAnsw.request)}
+  </div>${rNavBtns()}`;
+}
+
+// ─── STEP 04: RESPONSE ───────────────────────────────────────────────────────
+function rResponse(){
+  const statuses=[
+    {code:'200',name:'OK',desc:'Request berhasil',cls:'s2'},
+    {code:'201',name:'Created',desc:'Resource dibuat (POST)',cls:'s2'},
+    {code:'204',name:'No Content',desc:'Berhasil, no data (DELETE)',cls:'s2'},
+    {code:'301',name:'Moved Permanently',desc:'URL resource berubah',cls:'s3'},
+    {code:'400',name:'Bad Request',desc:'Request tidak valid',cls:'s4'},
+    {code:'401',name:'Unauthorized',desc:'Perlu auth / token invalid',cls:'s4'},
+    {code:'403',name:'Forbidden',desc:'Auth ok tapi no akses',cls:'s4'},
+    {code:'404',name:'Not Found',desc:'Resource tidak ditemukan',cls:'s4'},
+    {code:'429',name:'Too Many Requests',desc:'Rate limit terlampaui',cls:'s4'},
+    {code:'500',name:'Internal Server Error',desc:'Error di sisi server',cls:'s5'},
+    {code:'502',name:'Bad Gateway',desc:'Upstream server error',cls:'s5'},
+    {code:'503',name:'Service Unavailable',desc:'Server down/overload',cls:'s5'},
+  ];
+  return`<div class="card">
+    <div class="step-tag">▸ RESPONSE & STATUS CODES</div>
+    <h1 class="step-title">HTTP <span>Response</span></h1>
+    <p>Setiap response: <strong>Status Code</strong> (3 digit), <strong>Headers</strong>, dan <strong>Body</strong>.</p>
+    <div class="diagram"><span style="font-size:12px;color:var(--muted)">Pattern:</span><br><br>
+      <span class="s2">2xx</span> → Sukses &nbsp;&nbsp;<span class="s3">3xx</span> → Redirect &nbsp;&nbsp;<span class="s4">4xx</span> → Error Client &nbsp;&nbsp;<span class="s5">5xx</span> → Error Server
+    </div>
+    <div class="status-grid">${statuses.map(s=>`<div class="status-pill"><span class="status-code ${s.cls}">${s.code}</span><div class="sp-text"><div class="sp-name">${s.name}</div>${s.desc}</div></div>`).join('')}</div>
+    <p>💡 <strong>Di n8n:</strong> Pakai node IF untuk cek status ≥ 400 sebagai trigger error handling.</p>
+    ${rQuiz('response',QZ.response,qAnsw.response)}
+  </div>${rNavBtns()}`;
+}
+
+// ─── STEP 05: AUTH ───────────────────────────────────────────────────────────
+function rAuth(){
+  const tab0=`<p style="font-size:13px;color:var(--muted);line-height:1.8;margin-bottom:14px">API Key adalah string unik untuk mengidentifikasi siapa yang melakukan request. Cara paling simpel.</p>
+    <div class="code-block"><div class="cb-header"><span class="cb-dot r"></span><span class="cb-dot y"></span><span class="cb-dot g"></span>API Key — Cara Pengiriman</div>
+<span class="hl-comment"># Cara 1: Custom Header (paling umum)</span>
+<span class="hl-key">X-API-Key</span><span class="hl-punc">:</span> <span class="hl-str">sk-ant-api03-abc123def456</span>
+
+<span class="hl-comment"># Cara 2: Authorization Header</span>
+<span class="hl-key">Authorization</span><span class="hl-punc">:</span> <span class="hl-str">ApiKey sk-ant-api03-abc123def456</span>
+
+<span class="hl-comment"># Cara 3: Query Param (TIDAK disarankan!)</span>
+<span class="hl-url">GET /data?api_key=sk-ant-api03-abc123</span></div>
+    <div class="info-grid"><div class="info-box"><div class="ib-label">✅ PROS</div><div class="ib-val">Simple, tidak perlu login flow, cocok server-to-server</div></div><div class="info-box"><div class="ib-label">⚠️ CONS</div><div class="ib-val">Tidak ada expiry otomatis. Jika bocor, harus regenerate.</div></div></div>
+    <p style="margin-top:12px">Contoh: <strong>OpenAI, Anthropic, Google Maps, Airtable</strong></p>`;
+
+  const tab1=`<p style="font-size:13px;color:var(--muted);line-height:1.8;margin-bottom:14px">Bearer Token (JWT) didapat setelah login/OAuth. Lebih aman karena punya expiry dan bisa di-revoke.</p>
+    <div class="code-block"><div class="cb-header"><span class="cb-dot r"></span><span class="cb-dot y"></span><span class="cb-dot g"></span>Bearer Token — Flow</div>
+<span class="hl-comment"># Step 1: Login → dapat token</span>
+<span class="hl-kw">POST</span> <span class="hl-url">/api/auth/login</span>
+<span class="hl-punc">{</span><span class="hl-key">"email"</span><span class="hl-punc">:</span><span class="hl-str">"user@mail.com"</span><span class="hl-punc">,</span><span class="hl-key">"password"</span><span class="hl-punc">:</span><span class="hl-str">"***"</span><span class="hl-punc">}</span>
+<span class="hl-punc">{</span><span class="hl-key">"token"</span><span class="hl-punc">:</span><span class="hl-str">"eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjQyfQ.abc"</span><span class="hl-punc">}</span>
+
+<span class="hl-comment"># Step 2: Pakai token di setiap request</span>
+<span class="hl-key">Authorization</span><span class="hl-punc">:</span> <span class="hl-str">Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjQyfQ.abc</span></div>
+    <div class="info-grid"><div class="info-box"><div class="ib-label">✅ PROS</div><div class="ib-val">Bisa di-revoke, punya expiry, bisa encode user info</div></div><div class="info-box"><div class="ib-label">⚠️ CONS</div><div class="ib-val">Perlu login flow dulu. Token expired = perlu refresh.</div></div></div>
+    <p style="margin-top:12px">Contoh: <strong>Slack, Notion, GitHub, Spotify, semua OAuth2 API</strong></p>`;
+
+  return`<div class="card">
+    <div class="step-tag">▸ AUTHENTICATION</div>
+    <h1 class="step-title">API <span>Authentication</span></h1>
+    <p>Dua metode auth paling umum: <strong>API Key</strong> (simpel) dan <strong>Bearer Token</strong> (lebih aman).</p>
+    <div class="tab-row">
+      <button class="tab-btn ${authTab===0?'active':''}" onclick="setAuthTab(0)">🔑 API KEY</button>
+      <button class="tab-btn ${authTab===1?'active':''}" onclick="setAuthTab(1)">🎫 BEARER TOKEN</button>
+    </div>
+    <div id="authContent">${authTab===0?tab0:tab1}</div>
+    <div style="margin-top:20px;padding:16px;background:rgba(248,81,73,.05);border:1px solid rgba(248,81,73,.2);border-radius:8px">
+      <div style="font-size:11px;color:var(--red);letter-spacing:.1em;margin-bottom:8px">⚠️ SECURITY RULES</div>
+      <ul style="color:var(--muted);font-size:13px;line-height:2;padding-left:16px">
+        <li><strong style="color:var(--text)">Jangan hardcode</strong> key di code — pakai environment variable</li>
+        <li><strong style="color:var(--text)">Jangan expose</strong> di URL — key bisa masuk server logs</li>
+        <li><strong style="color:var(--text)">Di n8n:</strong> simpan di menu "Credentials", bukan hardcode di node</li>
+      </ul>
+    </div>
+    ${rQuiz('auth',QZ.auth,qAnsw.auth)}
+  </div>${rNavBtns()}`;
+}
+
+// ─── STEP 06: TOOLS (NEW) ─────────────────────────────────────────────────────
+function rTools(){
+  return`<div class="card">
+    <div class="step-tag">▸ TOOLS — POSTMAN & THUNDER CLIENT</div>
+    <h1 class="step-title">Testing API dengan <span>Postman</span></h1>
+    <p>Postman adalah GUI tool standar industri untuk test dan eksplorasi REST API. Sebelum build automation di n8n, biasanya developer test API di Postman dulu untuk memahami request/response-nya.</p>
+
+    <div class="tool-row">
+      <div class="tool-card">
+        <div class="tc-icon">📬</div>
+        <div class="tc-name">Postman</div>
+        <div class="tc-sub">postman.com · App / Web</div>
+        <span class="tc-tag">Industry Standard</span>
+      </div>
+      <div class="tool-card">
+        <div class="tc-icon">⚡</div>
+        <div class="tc-name">Thunder Client</div>
+        <div class="tc-sub">VS Code Extension</div>
+        <span class="tc-tag" style="background:rgba(188,140,255,.1);color:var(--purple);border-color:rgba(188,140,255,.2)">Lightweight Alt</span>
+      </div>
+    </div>
+
+    <div style="font-size:12px;color:var(--muted);letter-spacing:.08em;margin:20px 0 10px">ANATOMY POSTMAN — INTERFACE UTAMA</div>
+
+    <!-- Postman Mock UI -->
+    <div class="pm-mock">
+      <div class="pm-titlebar">
+        <span class="pm-dot" style="background:#ff5f57"></span>
+        <span class="pm-dot" style="background:#febc2e"></span>
+        <span class="pm-dot" style="background:#28c840"></span>
+        <span style="margin-left:8px">Postman — New Request</span>
+      </div>
+      <div class="pm-req-row">
+        <span class="pm-msel get" id="pm-method-disp">GET ▾</span>
+        <span class="pm-url-f">https://api.frankfurter.app/latest?from=USD</span>
+        <span class="pm-send">Send</span>
+      </div>
+      <div class="pm-tabs-row">
+        <span class="pm-tab-item">Params</span>
+        <span class="pm-tab-item active">Authorization</span>
+        <span class="pm-tab-item">Headers</span>
+        <span class="pm-tab-item">Body</span>
+        <span class="pm-tab-item">Pre-req Script</span>
+      </div>
+      <div class="pm-tc">
+        <div style="font-size:11px;color:#888;margin-bottom:10px">TYPE: Bearer Token</div>
+        <div class="pm-kv"><span class="k">Token</span><span class="v">eyJhbGciOiJIUzI1NiJ9...</span><span class="hint">← paste Bearer Token di sini</span></div>
+        <div style="font-size:11px;color:#555;margin-top:8px">Auto-generated header: <span style="color:#00e5ff">Authorization: Bearer eyJ...</span></div>
+      </div>
+      <div class="pm-resp">
+        <div class="pm-resp-status">✓ 200 OK · 142 ms · 1.24 KB</div>
+        <div style="font-size:11px;color:#8b949e;line-height:1.8">
+          <span style="color:var(--cyan)">"amount"</span>: <span style="color:var(--orange)">1.0</span>,<br>
+          <span style="color:var(--cyan)">"base"</span>: <span style="color:var(--green)">"USD"</span>,<br>
+          <span style="color:var(--cyan)">"rates"</span>: <span style="color:var(--muted)">{ "IDR": 16245.29, "SGD": 1.344, ... }</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0">
+      <div class="info-box"><div class="ib-label">① METHOD DROPDOWN</div><div class="ib-val">Pilih GET/POST/PUT/DELETE. Warna berubah sesuai method.</div></div>
+      <div class="info-box"><div class="ib-label">② URL BAR</div><div class="ib-val">Ketik URL endpoint. Tab Params auto-parse query string.</div></div>
+      <div class="info-box"><div class="ib-label">③ TAB AUTHORIZATION</div><div class="ib-val">Pilih type (API Key / Bearer), Postman auto-set header.</div></div>
+      <div class="info-box"><div class="ib-label">④ TAB BODY</div><div class="ib-val">Pilih "raw → JSON", ketik JSON body untuk POST/PUT.</div></div>
+    </div>
+
+    <div style="font-size:12px;color:var(--muted);letter-spacing:.08em;margin:20px 0 10px">STEP-BY-STEP: GET REQUEST DI POSTMAN</div>
+    <div class="step-list">
+      <div class="step-item"><div class="step-num">1</div><div class="step-text">Buka Postman → klik <strong>New</strong> → <strong>HTTP Request</strong></div></div>
+      <div class="step-item"><div class="step-num">2</div><div class="step-text">Set method ke <strong>GET</strong> di dropdown kiri</div></div>
+      <div class="step-item"><div class="step-num">3</div><div class="step-text">Ketik URL: <code>https://api.frankfurter.app/latest?from=USD</code></div></div>
+      <div class="step-item"><div class="step-num">4</div><div class="step-text">Klik <strong>Send</strong> → lihat response di panel bawah <span>(status 200, JSON rates)</span></div></div>
+      <div class="step-item"><div class="step-num">5</div><div class="step-text">Klik <strong>Save</strong> (Ctrl+S) → beri nama → simpan ke Collection</div></div>
+    </div>
+
+    <div style="font-size:12px;color:var(--muted);letter-spacing:.08em;margin:20px 0 10px">STEP-BY-STEP: POST REQUEST DI POSTMAN</div>
+    <div class="step-list">
+      <div class="step-item"><div class="step-num">1</div><div class="step-text">Set method ke <strong>POST</strong></div></div>
+      <div class="step-item"><div class="step-num">2</div><div class="step-text">URL: <code>https://jsonplaceholder.typicode.com/posts</code></div></div>
+      <div class="step-item"><div class="step-num">3</div><div class="step-text">Klik tab <strong>Body</strong> → pilih <strong>raw</strong> → format <strong>JSON</strong></div></div>
+      <div class="step-item"><div class="step-num">4</div><div class="step-text">Ketik JSON body: <code>{"title":"Test","body":"Isi","userId":1}</code></div></div>
+      <div class="step-item"><div class="step-num">5</div><div class="step-text">Klik <strong>Send</strong> → harusnya dapat <span>201 Created dengan id baru</span></div></div>
+    </div>
+
+    <div style="margin-top:18px;padding:14px 16px;background:rgba(188,140,255,.05);border:1px solid rgba(188,140,255,.2);border-radius:8px">
+      <div style="font-size:11px;color:var(--purple);letter-spacing:.1em;margin-bottom:8px">⚡ THUNDER CLIENT — VS Code Alternative</div>
+      <p style="font-size:13px;color:var(--muted);line-height:1.7;margin:0">Install extension <strong style="color:var(--text)">Thunder Client</strong> di VS Code. Interface mirip Postman tapi lebih ringan, langsung di dalam editor. Cocok jika kamu sudah pakai VS Code untuk coding. Shortcut: Ctrl+Shift+P → "Thunder Client: New Request"</p>
+    </div>
+
+    ${rQuiz('tools',QZ.tools,qAnsw.tools)}
+  </div>${rNavBtns()}`;
+}
+
+// ─── STEP 07: LIVE API ───────────────────────────────────────────────────────
+function rRealApi(){
+  const cards=LIVE_APIS.map((api,i)=>`
+    <div class="api-card">
+      <div class="api-card-head">
+        <div class="api-name">${api.name}</div>
+        <span class="api-method-tag">GET</span>
+      </div>
+      <div class="api-url">${esc(api.url)}</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:12px">${api.desc}</div>
+      <button class="try-btn" id="tryBtn${i}" onclick="runApi(${i})"><span>▶</span> COBA SEKARANG</button>
+      <div class="api-result" id="lr${i}"></div>
+    </div>`).join('');
+
+  return`<div class="card">
+    <div class="step-tag">▸ LIVE API EXPLORER — 5 PUBLIC APIS</div>
+    <h1 class="step-title">Hit <span>5 API Berbeda</span></h1>
+    <p>Lima API publik gratis di bawah mencakup domain yang berbeda: <strong>dummy data, cuaca, data negara, kurs mata uang, dan berita tech</strong>. Klik ▶ untuk hit langsung dari browser!</p>
+    ${cards}
+    <p style="margin-top:16px">✅ Kamu baru saja hit <strong>5 public API berbeda</strong> — persis yang diminta roadmap F-01 project! Di n8n, ini setara dengan 5 node HTTP Request ke endpoint yang berbeda.</p>
+  </div>${rNavBtns()}`;
+}
+
+// ─── STEP 08: PRACTICE ──────────────────────────────────────────────────────
+function rPractice(){
+  if(doneMissions.size>=5){
+    return`<div class="card">
+      <div class="step-tag">▸ SEMUA MISI SELESAI!</div>
+      <h1 class="step-title">🎉 <span>Sesi 2 Complete!</span></h1>
+      <div class="all-done-banner">
+        <div style="font-size:48px;margin-bottom:12px">🏆</div>
+        <h2>REST API Fundamentals — LULUS!</h2>
+        <p style="margin-top:8px;color:var(--muted)">5 API berbeda berhasil di-hit:</p>
+        <div style="display:flex;flex-direction:column;gap:6px;margin:16px 0;text-align:left;max-width:380px;margin-left:auto;margin-right:auto">
+          ${MISSIONS.map(m=>`<div style="font-size:13px;color:var(--green)">✓ Misi ${m.num}: ${m.title}</div>`).join('')}
+        </div>
+        <p style="color:var(--muted)">GET (query param), GET (weather), GET (country), GET (currency), POST — semua dikuasai. Siap Sesi 3: Webhooks! 🚀</p>
+      </div>
+      <div class="nav-btns"><button class="btn-prev" onclick="goStep(6)">← Kembali ke Live API</button></div>
+    </div>`;
+  }
+
+  const m=MISSIONS[missionI];
+  const tabs=MISSIONS.map((ms,i)=>{
+    const isDone=doneMissions.has(i);
+    const isActive=i===missionI;
+    return`<button class="mission-tab ${isActive?'active':''} ${isDone?'done':''}" onclick="selectMission(${i})">${isDone?'✓':ms.num} MISI ${ms.num}</button>`;
+  }).join('');
+  const isPost=m.method==='POST';
+  const encUrl=m.startUrl.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+
+  return`<div class="card">
+    <div class="step-tag">▸ HANDS-ON PRACTICE — 5 API BERBEDA</div>
+    <h1 class="step-title">5 <span>Misi</span> API</h1>
+    <p>Setiap misi menggunakan API yang berbeda — sesuai project roadmap "konsumsi 5 public API berbeda."</p>
+    <div style="font-size:12px;color:var(--green);margin-bottom:16px">✓ ${doneMissions.size}/5 misi selesai (${['JSONPlaceholder','Open-Meteo','REST Countries','Frankfurter','POST'].slice(0,doneMissions.size).join(', ')||'belum ada'})</div>
+    <div class="mission-tabs">${tabs}</div>
+    <div class="mission-panel">
+      <div class="mission-title"><span class="mission-num">MISI ${m.num}</span>${m.title}</div>
+      <div class="mission-desc">${m.desc}</div>
+      <div class="api-input-row">
+        <span class="method-badge ${isPost?'post':''}">${m.method}</span>
+        <input class="url-input" id="mUrl" type="text" value="${encUrl}" spellcheck="false"/>
+      </div>
+      ${isPost?`<div class="body-label">REQUEST BODY (JSON):</div><textarea class="body-textarea" id="mBody" spellcheck="false">${esc(m.startBody)}</textarea>`:''}
+      <button class="send-btn" id="sendBtn" onclick="sendMission()">▶ SEND REQUEST</button>
+      <div class="mission-result" id="mResult"></div>
+      ${doneMissions.has(missionI)?`<div class="ok-banner"><span style="font-size:18px">✓</span><span>Misi selesai! Lanjut ke misi berikutnya.</span></div>`:''}
+    </div>
+  </div>${rNavBtns()}`;
+}
+
+// ─── EVENT HANDLERS ───────────────────────────────────────────────────────────
+function selectMethod(i){actMethod=actMethod===i?-1:i;render();}
+function setAuthTab(i){authTab=i;render();}
+function answerQuiz(id,opt){if(qAnsw[id]!==undefined)return;qAnsw[id]=opt;render();}
+function selectMission(i){missionI=i;render();}
+
+async function runApi(idx){
+  const btn=document.getElementById('tryBtn'+idx);
+  const div=document.getElementById('lr'+idx);
+  if(!btn||!div)return;
+  btn.disabled=true;btn.innerHTML='<span>⏳</span> Loading...';
+  div.innerHTML='<span style="color:var(--muted)">Fetching...</span>';div.classList.add('show');
+  try{
+    const res=await fetch(LIVE_APIS[idx].url);
+    const data=await res.json();
+    div.innerHTML=hl(data);
+  }catch(e){div.innerHTML=`<span style="color:var(--red)">Error: ${esc(e.message)}</span>`;}
+  btn.disabled=false;btn.innerHTML='<span>▶</span> COBA LAGI';
+}
+
+async function sendMission(){
+  const m=MISSIONS[missionI];
+  const urlEl=document.getElementById('mUrl');
+  const btn=document.getElementById('sendBtn');
+  const res=document.getElementById('mResult');
+  if(!urlEl||!btn||!res)return;
+  btn.disabled=true;btn.textContent='⏳ Sending...';
+  res.className='mission-result show';res.innerHTML='<span style="color:var(--muted)">Calling API...</span>';
+  const opts={method:m.method,headers:{'Content-Type':'application/json'}};
+  if(m.hasBody){const b=document.getElementById('mBody');if(b)opts.body=b.value;}
+  try{
+    const r=await fetch(urlEl.value.trim(),opts);
+    const status=r.status;
+    let data;try{data=await r.json();}catch(e){data={};}
+    const check=m.check(data,status);
+    res.innerHTML=`<div style="margin-bottom:10px;font-size:11px;color:var(--muted)">STATUS: <span style="color:${status<400?'var(--green)':'var(--red)'}">${status}</span></div>
+      <div style="margin-bottom:10px;font-size:13px;color:${check.ok?'var(--green)':'var(--red)'}"><strong>${check.msg}</strong></div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:6px">RESPONSE:</div>${hl(data)}`;
+    res.className='mission-result show '+(check.ok?'ok':'err');
+    if(check.ok){
+      doneMissions.add(missionI);
+      const tabs2=document.querySelectorAll('.mission-tab');
+      if(tabs2[missionI])tabs2[missionI].classList.add('done');
+      if(doneMissions.size>=5)setTimeout(render,2000);
+    }
+  }catch(e){
+    res.innerHTML=`<span style="color:var(--red)">Fetch error: ${esc(e.message)}</span>`;
+    res.className='mission-result show err';
+  }
+  btn.disabled=false;btn.textContent='▶ SEND REQUEST';
+}
+
+// ─── AI TUTOR ─────────────────────────────────────────────────────────────────
+document.getElementById('aiFab').onclick=()=>{aiOpen=!aiOpen;document.getElementById('aiPanel').className='ai-panel'+(aiOpen?' open':'');};
+document.getElementById('aiClose').onclick=()=>{aiOpen=false;document.getElementById('aiPanel').className='ai-panel';};
+document.getElementById('aiInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendAI();}});
+document.getElementById('aiSend').onclick=sendAI;
+
+function renderHistory(){
+  const hist=document.getElementById('aiHistory');
+  hist.innerHTML=aiHist.map(h=>`<div class="ai-msg ${h.role}">${h.content}</div>`).join('');
+  if(aiLoad)hist.innerHTML+=`<div class="ai-msg bot loading">⏳ Thinking...</div>`;
+  hist.scrollTop=hist.scrollHeight;
+}
+
+async function sendAI(){
+  const inp=document.getElementById('aiInput');
+  const msg=inp.value.trim();
+  if(!msg||aiLoad)return;
+  inp.value='';
+  aiHist.push({role:'user',content:msg});
+  aiLoad=true;document.getElementById('aiSend').disabled=true;
+  renderHistory();
+  const messages=aiHist.slice(-8).map(h=>({role:h.role==='user'?'user':'assistant',content:h.content}));
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        system:`Kamu adalah AI Tutor untuk REST API Fundamentals (Sesi 2) di AI Automation Bootcamp. Bantu peserta memahami REST API untuk dipakai di n8n dan automation workflow.
+
+Topik yang bisa ditanya: HTTP methods, URL anatomy, headers/body, status codes, authentication (API Key & Bearer), cara pakai Postman & Thunder Client, dan cara hit API dari n8n Code Node atau HTTP Request node.
+
+Jawab Bahasa Indonesia, ramah dan praktis. Max 3 paragraf pendek. Gunakan contoh konkret relevan dengan automation. Jika ada kode, gunakan backtick. Jangan terlalu teoritis — fokus "bagaimana cara pakainya di n8n atau Postman."`,
+        messages
+      })
+    });
+    const data=await res.json();
+    const reply=data.content&&data.content[0]?data.content[0].text:'Maaf, tidak dapat merespons saat ini.';
+    aiHist.push({role:'bot',content:reply});
+  }catch(e){aiHist.push({role:'bot',content:`Error: ${e.message}`});}
+  aiLoad=false;document.getElementById('aiSend').disabled=false;
+  renderHistory();
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>

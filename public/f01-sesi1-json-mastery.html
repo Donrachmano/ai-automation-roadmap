@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JSON Mastery — Kurikulum Lengkap F-01</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #080c10; font-family: 'Courier New', monospace; color: #c9d1d9; min-height: 100vh; }
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: #080c10; }
+::-webkit-scrollbar-thumb { background: #1e3a4a; border-radius: 2px; }
+
+/* HEADER */
+.hdr { background: #0d1f2d; border-bottom: 1px solid #1e3a4a; padding: 14px 18px; position: sticky; top: 0; z-index: 100; }
+.hdr-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+.prog-bar { height: 3px; background: #1e3a4a; border-radius: 2px; }
+.prog-fill { height: 100%; background: linear-gradient(90deg,#00e5ff,#3fb950); border-radius: 2px; transition: width .4s; }
+
+/* NAV */
+.nav-strip { display: flex; gap: 5px; padding: 10px 14px; overflow-x: auto; border-bottom: 1px solid #1e3a4a; background: #0a0f14; }
+.nav-strip::-webkit-scrollbar { display: none; }
+.nbtn { padding: 5px 10px; white-space: nowrap; border-radius: 4px; cursor: pointer; font-size: 9px; letter-spacing: 1px; font-family: 'Courier New',monospace; flex-shrink: 0; border: 1px solid #1e3a4a; background: #0d1f2d; color: #6e7681; transition: all .15s; }
+.nbtn.on { background: #00e5ff22; border-color: #00e5ff; color: #00e5ff; }
+.nbtn.done { border-color: #3fb95044; color: #3fb950; background: #3fb95011; }
+
+/* CONTENT */
+.content { padding: 18px 18px 100px; max-width: 700px; margin: 0 auto; }
+.stag { font-size: 9px; color: #00e5ff; letter-spacing: 3px; margin-bottom: 4px; }
+.stitle { font-size: 20px; font-weight: 700; color: #e6edf3; margin-bottom: 16px; }
+
+/* CODE */
+pre.cb { background: #020608; border: 1px solid #1e3a4a; border-radius: 6px; padding: 16px 18px; margin-top: 14px; line-height: 1.9; font-size: 16px; font-family: 'Courier New',monospace; overflow-x: auto; white-space: pre-wrap; word-break: break-word; }
+.clabel { margin: 16px 0 6px; font-size: 11px; color: #6e7681; letter-spacing: 1px; }
+
+/* BOX */
+.box { border-radius: 6px; padding: 12px 14px; margin-top: 14px; border-left-width: 3px; border-left-style: solid; border-width: 1px; border-style: solid; }
+.btitle { font-size: 11px; letter-spacing: 2px; font-weight: 700; margin-bottom: 8px; }
+.bbody { font-size: 15px; color: #c9d1d9; line-height: 1.7; }
+.bbody ul { padding-left: 18px; } .bbody li { margin-bottom: 5px; }
+.bbody code { background: #1a2d3a; padding: 1px 5px; border-radius: 3px; font-size: 13px; }
+
+/* TYPES */
+.tgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px; }
+.tcard { background: #0d1f2d; border: 1px solid #1e3a4a; border-radius: 6px; padding: 10px 12px; cursor: pointer; transition: all .15s; }
+.tname { font-size: 13px; font-weight: 700; letter-spacing: 1px; margin-bottom: 4px; }
+.tex { font-size: 14px; color: #e6edf3; }
+.tdetail { margin-top: 8px; font-size: 13px; line-height: 1.5; border-top: 1px solid; padding-top: 6px; }
+
+/* TABS (realworld) */
+.tabrow { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 4px; }
+.tbtn { padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 10px; letter-spacing: 1px; font-family: 'Courier New',monospace; }
+
+/* RULES */
+.rrow { display: flex; gap: 10px; padding: 9px 0; border-bottom: 1px solid #1e3a4a; font-size: 15px; }
+.rmk { font-size: 13px; flex-shrink: 0; margin-top: 1px; }
+
+/* PATH TABLE */
+.prow { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #1e2040; font-size: 14px; }
+
+/* QUIZ */
+.qbox { margin-top: 20px; padding: 14px; background: #0a0f14; border: 1px solid #1e3a4a; border-radius: 8px; }
+.qlabel { font-size: 10px; color: #6e7681; letter-spacing: 2px; margin-bottom: 8px; }
+.qq { font-size: 15px; color: #e6edf3; line-height: 1.5; margin: 0 0 12px; }
+.qopts { display: flex; flex-direction: column; gap: 6px; }
+.qopt { text-align: left; padding: 9px 13px; background: #0d1f2d; border: 1px solid #1e3a4a; color: #c9d1d9; border-radius: 5px; cursor: pointer; font-size: 14px; font-family: 'Courier New',monospace; transition: all .15s; width: 100%; }
+.qopt.ok { background: #0d2a1a; border-color: #3fb950; color: #3fb950; cursor: default; }
+.qopt.bad { background: #1a0505; border-color: #f85149; color: #f85149; cursor: default; }
+.qopt.gray { cursor: default; }
+.qfb { margin-top: 8px; font-size: 14px; }
+
+/* EXERCISE */
+.exsel { display: flex; gap: 6px; margin-bottom: 14px; }
+.exbtn { width: 40px; height: 40px; flex-shrink: 0; background: #0d1f2d; border: 1px solid #1e3a4a; color: #6e7681; border-radius: 6px; cursor: pointer; font-size: 12px; font-family: 'Courier New',monospace; transition: all .15s; }
+.exbtn.on { background: #00e5ff22; border-color: #00e5ff; color: #00e5ff; }
+.exbtn.done { background: #3fb95022; border-color: #3fb950; color: #3fb950; font-size: 14px; }
+.excard { background: #0d1f2d; border: 1px solid #1e3a4a; border-radius: 8px; padding: 14px; margin-bottom: 12px; }
+.extag { font-size: 11px; color: #00e5ff; letter-spacing: 2px; margin-bottom: 6px; }
+.exdesc { font-size: 15px; color: #e6edf3; line-height: 1.5; margin-bottom: 10px; }
+.exhint { font-size: 14px; color: #ffeb3b; }
+#editor { width: 100%; min-height: 160px; background: #020608; border: 1px solid #1e3a4a; border-radius: 6px; padding: 12px 14px; color: #e6edf3; font-family: 'Courier New',monospace; font-size: 16px; line-height: 1.9; resize: vertical; outline: none; transition: border-color .15s; }
+#editor:focus { border-color: #00e5ff66; }
+.res { padding: 10px 14px; margin-top: 8px; border-radius: 6px; font-size: 14px; line-height: 1.5; }
+.res.ok { background: #0d2a1a; border: 1px solid #3fb95033; color: #3fb950; }
+.res.err { background: #1a0505; border: 1px solid #f8514933; color: #f85149; }
+.btnrow { display: flex; gap: 8px; margin-top: 10px; }
+.btn { padding: 10px; border-radius: 6px; cursor: pointer; font-size: 11px; font-family: 'Courier New',monospace; transition: opacity .15s; border: 1px solid; }
+.btn:hover { opacity: .8; } .btn:active { opacity: .6; }
+.bp { flex: 2; background: #00e5ff22; border-color: #00e5ff66; color: #00e5ff; }
+.bs { flex: 1; background: #0d1f2d; border-color: #1e3a4a; color: #8b949e; }
+.bm { flex: 1; background: #0d1f2d; border-color: #1e3a4a; color: #6e7681; }
+
+/* NAV FOOTER */
+.navft { display: flex; gap: 8px; margin-top: 24px; }
+.nprev { flex: 1; padding: 10px; background: #0d1f2d; border: 1px solid #1e3a4a; color: #c9d1d9; border-radius: 6px; cursor: pointer; font-size: 11px; font-family: 'Courier New',monospace; }
+.nnext { flex: 2; padding: 10px; background: #00e5ff22; border: 1px solid #00e5ff66; color: #00e5ff; border-radius: 6px; cursor: pointer; font-size: 11px; font-family: 'Courier New',monospace; }
+.ndone { flex: 2; padding: 10px; background: #3fb95022; border: 1px solid #3fb950; color: #3fb950; border-radius: 6px; font-size: 11px; text-align: center; }
+.cbanner { background: #0d2a1a; border: 1px solid #3fb950; border-radius: 8px; padding: 16px; margin-bottom: 16px; text-align: center; }
+
+/* ── PARSE/STRINGIFY DEMO ─────────────────────────── */
+.demo-area { background: #0a0f14; border: 1px solid #1e3a4a; border-radius: 8px; padding: 16px; margin: 14px 0; }
+.demo-label { font-size: 10px; color: #6e7681; letter-spacing: 2px; margin-bottom: 8px; }
+textarea.demo-in { width: 100%; min-height: 120px; background: #020608; border: 1px solid #1e3a4a; border-radius: 6px; padding: 12px 14px; color: #e6edf3; font-family: 'Courier New',monospace; font-size: 15px; line-height: 1.8; resize: vertical; outline: none; }
+textarea.demo-in:focus { border-color: #00e5ff66; }
+.dbtn { margin-top: 10px; margin-right: 8px; padding: 9px 16px; background: #00e5ff22; border: 1px solid #00e5ff66; color: #00e5ff; border-radius: 6px; cursor: pointer; font-size: 12px; font-family: 'Courier New',monospace; }
+.dbtn.yw { background: #ffeb3b22; border-color: #ffeb3b66; color: #ffeb3b; }
+.dbtn.rd { background: #f8514922; border-color: #f8514966; color: #f85149; }
+.demo-out { margin-top: 10px; display: none; }
+.demo-out.show { display: block; }
+.out-ok { background: #020608; border: 1px solid #3fb95033; border-radius: 6px; padding: 12px 14px; }
+.out-err { background: #1a0505; border: 1px solid #f8514933; border-radius: 6px; padding: 12px 14px; color: #f85149; font-size: 14px; }
+.out-result { font-size: 14px; line-height: 1.8; font-family: 'Courier New',monospace; white-space: pre-wrap; word-break: break-word; }
+.divider { height: 1px; background: #1e3a4a; margin: 24px 0; }
+.sub-h { font-size: 13px; font-weight: 700; color: #e6edf3; letter-spacing: 2px; margin: 20px 0 10px; }
+
+/* ── TEMPLATES ────────────────────────────────────── */
+.tmpl-card { background: #0d1f2d; border: 1px solid #1e3a4a; border-radius: 8px; overflow: hidden; margin-bottom: 10px; }
+.tmpl-hdr { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; cursor: pointer; }
+.tmpl-body { display: none; padding: 0 16px 16px; }
+.tmpl-body.open { display: block; }
+.tmpl-chev { color: #6e7681; font-size: 16px; transition: transform .2s; flex-shrink: 0; }
+.tmpl-chev.open { transform: rotate(180deg); color: #00e5ff; }
+.tmpl-note { font-size: 13px; color: #8b949e; line-height: 1.6; margin-bottom: 10px; background: #0a0f14; padding: 10px 12px; border-radius: 6px; border-left: 3px solid #1e3a4a; }
+.copy-btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; background: #0a0f14; border: 1px solid #1e3a4a; color: #8b949e; border-radius: 5px; cursor: pointer; font-size: 11px; font-family: 'Courier New',monospace; margin-bottom: 8px; }
+.copy-btn:hover { border-color: #00e5ff66; color: #00e5ff; }
+.copy-btn.copied { border-color: #3fb950; color: #3fb950; }
+
+/* ── TOOLS ────────────────────────────────────────── */
+.tool-card { background: #0d1f2d; border: 1px solid #1e3a4a; border-radius: 10px; padding: 18px; margin-bottom: 14px; }
+.step-row { display: flex; gap: 12px; padding: 8px 0; border-bottom: 1px solid #1e3a4a; font-size: 13px; align-items: flex-start; }
+.step-row:last-child { border-bottom: none; }
+.step-n { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; flex-shrink: 0; margin-top: 1px; }
+
+/* ── AI TUTOR ─────────────────────────────────────── */
+.aifab { position: fixed; bottom: 20px; right: 16px; padding: 10px 18px; background: #0d1f2d; border: 1px solid #00e5ff66; color: #00e5ff; border-radius: 24px; cursor: pointer; font-size: 11px; font-family: 'Courier New',monospace; box-shadow: 0 4px 20px #00e5ff22; z-index: 150; }
+.aipanel { position: fixed; bottom: 0; left: 0; right: 0; height: 60vh; background: #080c10; border-top: 1px solid #1e3a4a; border-radius: 16px 16px 0 0; z-index: 200; display: flex; flex-direction: column; }
+.aihdr { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid #1e3a4a; background: #0d1f2d; border-radius: 16px 16px 0 0; flex-shrink: 0; }
+.aimsg-area { flex: 1; overflow-y: auto; padding: 12px 16px; display: flex; flex-direction: column; gap: 10px; }
+.amsg { max-width: 85%; padding: 10px 12px; font-size: 12px; color: #c9d1d9; line-height: 1.6; white-space: pre-wrap; word-break: break-word; border-radius: 12px; }
+.amsg.user { align-self: flex-end; background: #00e5ff22; border: 1px solid #00e5ff44; border-radius: 12px 12px 2px 12px; }
+.amsg.bot  { align-self: flex-start; background: #0d1f2d; border: 1px solid #1e3a4a; border-radius: 12px 12px 12px 2px; }
+.aiinrow { padding: 10px 12px; border-top: 1px solid #1e3a4a; display: flex; gap: 8px; flex-shrink: 0; }
+#aiin { flex: 1; background: #0d1f2d; border: 1px solid #1e3a4a; border-radius: 6px; padding: 10px 12px; color: #c9d1d9; font-family: 'Courier New',monospace; font-size: 12px; outline: none; }
+#aiin:focus { border-color: #00e5ff66; }
+.aisend { padding: 10px 14px; background: #00e5ff22; border: 1px solid #00e5ff66; color: #00e5ff; border-radius: 6px; cursor: pointer; font-size: 11px; font-family: 'Courier New',monospace; flex-shrink: 0; }
+.hidden { display: none; }
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-top">
+    <div>
+      <div style="font-size:9px;color:#00e5ff;letter-spacing:3px;margin-bottom:2px">F-01 · MINGGU 1–2 · KURIKULUM LENGKAP</div>
+      <div style="font-size:18px;font-weight:700;color:#e6edf3">JSON MASTERY</div>
+    </div>
+    <div style="text-align:right">
+      <div id="pct" style="font-size:18px;font-weight:700;color:#00e5ff">10%</div>
+      <div style="font-size:9px;color:#6e7681">PROGRESS</div>
+    </div>
+  </div>
+  <div class="prog-bar"><div class="prog-fill" id="pfill" style="width:10%"></div></div>
+</div>
+
+<div class="nav-strip" id="navs"></div>
+<div class="content" id="mc"></div>
+
+<button class="aifab" id="aifab" onclick="openAi()">◈ AI TUTOR</button>
+<div class="aipanel hidden" id="aip">
+  <div class="aihdr">
+    <div>
+      <div style="font-size:9px;color:#00e5ff;letter-spacing:3px">◈ AI TUTOR</div>
+      <div style="font-size:14px;color:#e6edf3;font-weight:700">JSON Assistant</div>
+    </div>
+    <button onclick="closeAi()" style="background:none;border:1px solid #1e3a4a;color:#6e7681;padding:5px 12px;border-radius:4px;cursor:pointer;font-size:11px;font-family:'Courier New',monospace">✕ TUTUP</button>
+  </div>
+  <div class="aimsg-area" id="aimsgs">
+    <div class="amsg bot">Halo! 👋 Saya AI Tutor untuk kurikulum JSON Mastery lengkap ini.
+
+Tanya apapun — konsep JSON, Object/Array/Nested, Parse/Stringify, template bisnis, atau cara pakai tools. Bisa juga paste JSON untuk saya cek!</div>
+  </div>
+  <div class="aiinrow">
+    <input id="aiin" placeholder="Tanya tentang JSON... atau paste JSON untuk dicek" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAi()}">
+    <button class="aisend" id="aisend" onclick="sendAi()">KIRIM</button>
+  </div>
+</div>
+
+<script>
+// ─── STEPS (10 total) ─────────────────────────────────────────────────────
+const STEPS=[
+  {id:'intro',    nav:'01·INTRO',      title:'Apa itu JSON?',        tag:'KONSEP DASAR'},
+  {id:'types',    nav:'02·TIPE DATA',  title:'Tipe Data JSON',       tag:'6 BUILDING BLOCKS'},
+  {id:'object',   nav:'03·OBJECT',     title:'JSON Object',          tag:'STRUKTUR UTAMA'},
+  {id:'array',    nav:'04·ARRAY',      title:'JSON Array',           tag:'DAFTAR TERURUT'},
+  {id:'nested',   nav:'05·NESTED',     title:'Nested JSON',          tag:'STRUKTUR KOMPLEKS'},
+  {id:'realworld',nav:'06·REAL API',   title:'JSON di Dunia Nyata',  tag:'API RESPONSE'},
+  {id:'practice', nav:'07·LATIHAN',    title:'Latihan JSON',         tag:'HANDS-ON'},
+  {id:'parsestrf',nav:'08·PARSE/STRF', title:'Parsing & Stringify',  tag:'WAJIB DIKUASAI'},
+  {id:'templates',nav:'09·TEMPLATE',   title:'10 Template Bisnis',   tag:'PROJECT ROADMAP'},
+  {id:'tools',    nav:'10·TOOLS',      title:'Tools Wajib JSON',     tag:'SETUP ENVIRONMENT'},
+];
+
+const QZ={
+  intro:  {q:'JSON adalah singkatan dari...',opts:['JavaScript Object Notation','JavaScript Online Network','Java Script Option Node','JavaScript Output Notation'],ans:0},
+  types:  {q:'Mana yang VALID sebagai nilai boolean di JSON?',opts:['True','TRUE','true','"true"'],ans:2},
+  object: {q:'Aturan mana yang BENAR untuk JSON Object?',opts:['Key boleh tanpa tanda kutip','Key harus string dengan kutip ganda','Boleh ada trailing comma di akhir','Key tidak perlu dipisah dari value'],ans:1},
+  array:  {q:'Array of Objects umum di API karena...',opts:['Lebih hemat bandwidth','Mewakili daftar data seperti baris tabel','Lebih mudah dibaca manusia','Diharuskan standar REST'],ans:1},
+  nested: {q:'Akses "kota" dari object "alamat" di n8n adalah...',opts:['{{$json.kota}}','{{$json["alamat.kota"]}}','{{$json.alamat.kota}}','{{$json->alamat->kota}}'],ans:2},
+  parsestrf:{q:'JSON.stringify({a:1, b:undefined, c:null}) menghasilkan?',opts:['{"a":1,"b":undefined,"c":null}','{"a":1,"c":null}','{"a":1,"b":null,"c":null}','SyntaxError'],ans:1},
+};
+
+const RW=[
+  {label:'Weather API',code:'{\n  "kota": "Jakarta",\n  "suhu": {\n    "celsius": 32,\n    "feelsLike": 36\n  },\n  "kondisi": "Cerah Berawan",\n  "kelembaban": 78,\n  "angin": {\n    "kecepatan": 15,\n    "arah": "Barat"\n  }\n}',note:'suhu adalah nested object. Di n8n: {{$json.suhu.celsius}} → 32'},
+  {label:'Payment API',code:'{\n  "status": "success",\n  "transactionId": "TRX-abc123",\n  "amount": 150000,\n  "currency": "IDR",\n  "payer": {\n    "name": "Ahmad Fauzi",\n    "bank": "BCA"\n  },\n  "timestamp": "2024-01-15T14:22:31Z"\n}',note:'payer adalah nested object. Nama: {{$json.payer.name}}'},
+  {label:'Form Webhook',code:'{\n  "event": "form.submitted",\n  "submittedAt": "2024-01-15T09:15:00Z",\n  "data": {\n    "nama": "Rina Kusuma",\n    "email": "rina@startup.id",\n    "budget": "5-10 juta"\n  },\n  "source": {\n    "page": "/contact"\n  }\n}',note:'data adalah nested object. Email: {{$json.data.email}}'},
+];
+
+const EX=[
+  {n:1,title:'Profil Diri',desc:'Buat JSON untuk profil dirimu: nama, umur, kota, pekerjaan',hint:'Nama dan kota pakai string "...", umur pakai angka tanpa kutip',start:'{\n  "nama": "",\n  "umur": 0,\n  "kota": "",\n  "pekerjaan": ""\n}',
+   check(d){if(typeof d.nama!=='string'||!d.nama.trim())return'"nama" harus string yang diisi';if(typeof d.umur!=='number'||d.umur<1)return'"umur" harus number yang valid';if(typeof d.kota!=='string'||!d.kota.trim())return'"kota" harus string yang diisi';if(typeof d.pekerjaan!=='string'||!d.pekerjaan.trim())return'"pekerjaan" harus string yang diisi';return null;}},
+  {n:2,title:'Array Skills',desc:'Buat JSON dengan "nama" dan "skills" (array minimal 3 item)',hint:'Array string: ["skill1", "skill2", "skill3"]',start:'{\n  "nama": "nama kamu",\n  "skills": []\n}',
+   check(d){if(!Array.isArray(d.skills))return'"skills" harus Array []';if(d.skills.length<3)return'Tambahkan minimal 3 skill';if(!d.skills.every(s=>typeof s==='string'&&s.trim()))return'Semua item harus string';return null;}},
+  {n:3,title:'Nested Address',desc:'Buat JSON dengan "nama" dan "alamat" berupa nested object (jalan, kota, provinsi, kodePos)',hint:'"alamat": { "jalan": "...", "kota": "..." }',start:'{\n  "nama": "nama kamu",\n  "alamat": {\n    \n  }\n}',
+   check(d){if(!d.alamat||typeof d.alamat!=='object'||Array.isArray(d.alamat))return'"alamat" harus Object {}';const m=['jalan','kota','provinsi','kodePos'].filter(f=>!d.alamat[f]);if(m.length)return'Field kurang di "alamat": '+m.join(', ');return null;}},
+  {n:4,title:'List Produk',desc:'Buat JSON dengan array "produk" berisi 3 produk (nama, harga, stok)',hint:'"produk": [{...}, {...}, {...}] — array of objects',start:'{\n  "toko": "Nama Toko",\n  "produk": [\n    \n  ]\n}',
+   check(d){if(!Array.isArray(d.produk))return'"produk" harus Array';if(d.produk.length<3)return'Minimal 3 produk';for(let i=0;i<d.produk.length;i++){const p=d.produk[i];if(!p.nama)return'Produk #'+(i+1)+' kurang "nama"';if(typeof p.harga!=='number')return'Produk #'+(i+1)+': "harga" harus number';if(typeof p.stok!=='number')return'Produk #'+(i+1)+': "stok" harus number';}return null;}},
+  {n:5,title:'CRM Lead',desc:'Buat JSON untuk lead: nama, kontak (nested object: email & phone), sumber, nilai_deal, status',hint:'"kontak": { "email": "...", "phone": "..." }',start:'{\n  \n}',
+   check(d){const req=['nama','kontak','sumber','nilai_deal','status'];const m=req.filter(f=>d[f]===undefined||d[f]===null||d[f]==='');if(m.length)return'Field kurang: '+m.join(', ');if(typeof d.kontak!=='object'||Array.isArray(d.kontak))return'"kontak" harus Object {}';if(!d.kontak.email&&!d.kontak.phone)return'"kontak" perlu email atau phone';if(typeof d.nilai_deal!=='number')return'"nilai_deal" harus number';return null;}},
+];
+
+const TEMPLATES=[
+  {n:1,icon:'👤',name:'Lead / Prospek CRM',usecase:'Form website → Simpan ke CRM → Notifikasi Slack',note:'Dipakai saat n8n menerima webhook dari form kontak. Field <strong>prioritas</strong> untuk lead budget tinggi.',json:'{\n  "lead_id": "LEAD-2024-001",\n  "nama": "Dewi Rahayu",\n  "email": "dewi@startup.id",\n  "telepon": "08123456789",\n  "perusahaan": "PT Maju Digital",\n  "sumber": "Website Form",\n  "budget_idr": 50000000,\n  "status": "baru",\n  "prioritas": true,\n  "kontak": {\n    "waktu_terbaik": "pagi",\n    "zona_waktu": "WIB"\n  },\n  "catatan": "Tertarik paket enterprise",\n  "dibuat": "2024-01-15T09:00:00Z"\n}'},
+  {n:2,icon:'🛒',name:'Order E-Commerce',usecase:'Order masuk → Update stok → Email konfirmasi → Notif kurir',note:'Template standar order. Array <strong>items</strong> berisi tiap produk. <strong>total</strong> = kalkulasi dari semua items.',json:'{\n  "order_id": "ORD-2024-00142",\n  "status": "confirmed",\n  "pelanggan": {\n    "nama": "Ahmad Fauzi",\n    "email": "ahmad@email.com",\n    "telepon": "08198765432"\n  },\n  "pengiriman": {\n    "alamat": "Jl. Sudirman No. 15",\n    "kota": "Jakarta Selatan",\n    "kurir": "JNE",\n    "estimasi_hari": 2\n  },\n  "items": [\n    {"id": "SKU-001", "nama": "Laptop ASUS", "qty": 1, "harga": 12000000},\n    {"id": "SKU-045", "nama": "Mouse Wireless", "qty": 2, "harga": 250000}\n  ],\n  "subtotal": 12500000,\n  "ongkir": 35000,\n  "total": 12535000,\n  "dibayar": true,\n  "dibuat": "2024-01-15T14:22:00Z"\n}'},
+  {n:3,icon:'🧾',name:'Invoice / Faktur',usecase:'Generate invoice PDF → Email ke klien → Update akuntansi',note:'Template invoice B2B. Field <strong>jatuh_tempo</strong> penting untuk reminder otomatis.',json:'{\n  "invoice_id": "INV-2024-0089",\n  "status": "dikirim",\n  "jatuh_tempo": "2024-02-15",\n  "vendor": {\n    "nama": "CV Solusi Digital",\n    "email": "billing@solusidigital.id"\n  },\n  "klien": {\n    "nama": "PT Berkah Nusantara",\n    "email": "finance@berkah.co.id"\n  },\n  "items": [\n    {"deskripsi": "Jasa Setup n8n", "qty": 1, "harga": 15000000},\n    {"deskripsi": "Training (3 sesi)", "qty": 3, "harga": 2000000}\n  ],\n  "subtotal": 21000000,\n  "pajak_pct": 11,\n  "pajak": 2310000,\n  "total": 23310000,\n  "sudah_bayar": false\n}'},
+  {n:4,icon:'💳',name:'Webhook Payment',usecase:'Payment masuk → Update order → Kirim receipt → Trigger fulfillment',note:'Yang dikirim Midtrans/Xendit ke n8n saat ada pembayaran. <strong>transaction_status</strong> menentukan flow.',json:'{\n  "event": "payment.success",\n  "transaction_id": "TRX-20240115-8834",\n  "order_id": "ORD-2024-00142",\n  "transaction_status": "settlement",\n  "jumlah": 12535000,\n  "mata_uang": "IDR",\n  "metode": "bank_transfer",\n  "bank": "BCA",\n  "pelanggan": {\n    "nama": "Ahmad Fauzi",\n    "email": "ahmad@email.com"\n  },\n  "waktu_bayar": "2024-01-15T16:45:22Z",\n  "fraud_status": "accept"\n}'},
+  {n:5,icon:'👥',name:'User / Member Profile',usecase:'Register → Welcome email → Assign segmen → Setup akses',note:'Template user untuk SaaS atau membership. <strong>subscription</strong> = nested object data langganan.',json:'{\n  "user_id": "USR-a8f3k2",\n  "nama": "Siti Rahayu",\n  "email": "siti@perusahaan.com",\n  "role": "admin",\n  "aktif": true,\n  "email_verified": true,\n  "subscription": {\n    "plan": "professional",\n    "mulai": "2024-01-01",\n    "selesai": "2024-12-31",\n    "auto_renew": true\n  },\n  "preferensi": {\n    "bahasa": "id",\n    "notifikasi_email": true\n  },\n  "dibuat": "2024-01-01T08:00:00Z"\n}'},
+  {n:6,icon:'📦',name:'Produk Katalog',usecase:'Produk baru → Update katalog → Sinkron marketplace → Update harga',note:'Template satu produk. Field <strong>varian</strong> = array untuk produk dengan pilihan warna/ukuran.',json:'{\n  "produk_id": "PRD-2024-0891",\n  "nama": "Kemeja Batik Modern",\n  "sku": "KBM-NAVY-L",\n  "kategori": ["pakaian", "batik", "pria"],\n  "harga": 285000,\n  "harga_coret": 350000,\n  "stok": 45,\n  "aktif": true,\n  "varian": [\n    {"warna": "Navy", "ukuran": "L", "stok": 20},\n    {"warna": "Navy", "ukuran": "XL", "stok": 15}\n  ],\n  "spesifikasi": {\n    "bahan": "katun premium",\n    "berat_gram": 250,\n    "buatan": "Indonesia"\n  }\n}'},
+  {n:7,icon:'🎫',name:'Support Ticket',usecase:'Tiket masuk → Assign agen → SLA reminder → Update status',note:'Template helpdesk. <strong>sla_jam</strong> penting untuk automation reminder. Status: baru → ditangani → selesai.',json:'{\n  "tiket_id": "TKT-2024-4421",\n  "judul": "Tidak bisa login setelah reset password",\n  "status": "baru",\n  "prioritas": "tinggi",\n  "sla_jam": 4,\n  "pelanggan": {\n    "nama": "Budi Santoso",\n    "email": "budi@klien.com",\n    "plan": "enterprise"\n  },\n  "agen": null,\n  "tag": ["login", "authentication", "urgent"],\n  "dibuat": "2024-01-15T10:15:00Z",\n  "selesai_pada": null\n}'},
+  {n:8,icon:'📧',name:'Email Campaign',usecase:'Segment user → Kirim email → Track open rate → Follow up',note:'Template blast email campaign. <strong>segmen</strong> menentukan penerima. <strong>statistik</strong> diupdate setelah terkirim.',json:'{\n  "campaign_id": "CAM-2024-012",\n  "nama": "Promo Akhir Tahun",\n  "subjek": "Diskon 50% — hari ini saja!",\n  "status": "terjadwal",\n  "segmen": ["pelanggan_aktif", "cart_abandoned"],\n  "jadwal_kirim": "2024-01-20T07:00:00Z",\n  "pengirim": {\n    "nama": "Tim Marketing",\n    "email": "promo@toko.id"\n  },\n  "konten": {\n    "template_id": "TMPL-promo-001",\n    "kode_kupon": "HEMAT50"\n  },\n  "statistik": {\n    "terkirim": 0,\n    "dibuka": 0,\n    "diklik": 0\n  }\n}'},
+  {n:9,icon:'📊',name:'Laporan Harian',usecase:'Tiap pukul 23:00 → Kumpul data → Generate laporan → Kirim ke WhatsApp',note:'Template yang dikirim n8n tiap malam. <strong>ringkasan</strong> berisi angka kunci bisnis.',json:'{\n  "laporan_id": "RPT-20240115",\n  "tanggal": "2024-01-15",\n  "ringkasan": {\n    "total_penjualan": 48750000,\n    "total_order": 134,\n    "rata_rata_order": 363806,\n    "pelanggan_baru": 28\n  },\n  "top_produk": [\n    {"nama": "Laptop ASUS", "terjual": 8},\n    {"nama": "Mouse Wireless", "terjual": 42},\n    {"nama": "Keyboard Mech", "terjual": 31}\n  ],\n  "perbandingan_kemarin": {\n    "penjualan_delta_pct": 12.5\n  },\n  "ada_masalah": false\n}'},
+  {n:10,icon:'🤖',name:'Konfigurasi AI Chatbot',usecase:'Setup chatbot → Deploy ke WhatsApp/website → Monitor performa',note:'Template konfigurasi AI chatbot di n8n. <strong>tools</strong> = array kemampuan yang diaktifkan.',json:'{\n  "bot_id": "BOT-cs-alpha-01",\n  "nama": "Asisten Toko Online",\n  "aktif": true,\n  "model": "claude-sonnet-4-20250514",\n  "max_token": 1000,\n  "instruksi_sistem": "Kamu adalah asisten toko online yang ramah. Bantu pelanggan dengan info produk dan status order.",\n  "bahasa": ["Indonesia", "English"],\n  "tools": ["cek_status_order", "cari_produk", "eskalasi_ke_agen"],\n  "fallback": {\n    "aktif": true,\n    "pesan": "Saya hubungkan ke agen kami ya."\n  },\n  "versi": "1.0.0"\n}'},
+];
+
+const TOOLS=[
+  {name:'JSONFormatter',icon:'{}',bg:'#00e5ff22',col:'#00e5ff',url:'jsonformatter.curiousconcept.com',link:'https://jsonformatter.curiousconcept.com',role:'Validasi & format JSON — TOOLS NO.1',desc:'Tools paling sering dipakai. Paste JSON apapun, langsung tahu valid atau tidak. Error ditampilkan di baris mana.',steps:['Buka jsonformatter.curiousconcept.com','Paste JSON di kotak kiri','Klik "Process" — valid/error muncul di kanan','Error: lihat baris & karakter yang ditandai merah','Klik "Format" untuk pretty print, "Compact" untuk minify']},
+  {name:'Hoppscotch',icon:'🌐',bg:'#3fb95022',col:'#3fb950',url:'hoppscotch.io',link:'https://hoppscotch.io',role:'API testing gratis berbasis web — alternatif Postman',desc:'Mencoba REST API dari browser tanpa install apapun. Sangat berguna di Sesi 2 saat mulai konsumsi API.',steps:['Buka hoppscotch.io — langsung pakai, tidak perlu daftar','Pilih method HTTP (GET, POST, dll)','Masukkan URL endpoint API','Tambah Headers jika diperlukan (misal: Authorization)','Klik Send — response JSON tampil dengan syntax highlight']},
+  {name:'Postman',icon:'📮',bg:'#f9826c22',col:'#f9826c',url:'postman.com',link:'https://www.postman.com',role:'API testing profesional — standar industri',desc:'Versi lebih lengkap dari Hoppscotch. Bisa simpan koleksi API, buat environment variable, share dengan tim.',steps:['Download Postman di postman.com atau pakai web version','Buat "New Request"','Pilih method, masukkan URL, set Headers','Untuk POST: tab "Body" → "raw" → pilih "JSON"','Paste JSON body dan klik Send']},
+  {name:'Webhook.site',icon:'🔗',bg:'#da77f222',col:'#da77f2',url:'webhook.site',link:'https://webhook.site',role:'Test & inspect webhook — wajib untuk n8n',desc:'Generate URL unik untuk menerima webhook. Test format data sebelum setup di n8n yang sebenarnya.',steps:['Buka webhook.site — URL unik langsung dibuat otomatis','Copy URL yang diberikan (format: webhook.site/xxxx)','Gunakan URL itu sebagai endpoint webhook di aplikasi','Setiap request yang masuk terlihat real-time','Lihat headers, body JSON, method — semua tampil lengkap']},
+];
+
+// ─── STATE ────────────────────────────────────────────────────────────────
+let step=0, qAnsw={}, rwT=0, actType=-1, exI=0, doneEx=new Set();
+let aiOpen=false, aiLoad=false, aiHist=[];
+const stepDone=new Set();
+
+// ─── HELPERS ─────────────────────────────────────────────────────────────
+function hl(j){
+  return j.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,function(m){
+      let c='#79b8ff';
+      if(/^"/.test(m))c=/:$/.test(m)?'#00e5ff':'#a8d8a8';
+      else if(/true|false/.test(m))c='#f9826c';
+      else if(/null/.test(m))c='#8b949e';
+      return'<span style="color:'+c+'">'+m+'</span>';
+    });
+}
+function cb(code,lbl){return(lbl?'<p class="clabel">'+lbl+'</p>':'')+'<pre class="cb">'+hl(code)+'</pre>';}
+function bx(title,body,col,bg){bg=bg||'#0d1f2d';return'<div class="box" style="background:'+bg+';border-color:'+col+'33;border-left-color:'+col+'">'+
+  (title?'<div class="btitle" style="color:'+col+'">'+title+'</div>':'')+'<div class="bbody">'+body+'</div></div>';}
+
+// ─── STEP RENDERERS (01–07) ───────────────────────────────────────────────
+function rIntro(){return'<p style="font-size:16px;line-height:1.75;color:#c9d1d9"><strong style="color:#e6edf3">JSON</strong> (JavaScript Object Notation) adalah format teks ringan untuk menyimpan dan mengirim data. Meski namanya mengandung "JavaScript", JSON digunakan oleh hampir semua bahasa pemrograman.</p>'+
+bx('💡 ANALOGINYA','Bayangkan kirim biodata via SMS: <em>"Nama: Budi, Umur: 28"</em>. JSON adalah cara yang lebih terstruktur — sama-sama teks, tapi bisa dibaca mesin.','#ffeb3b','#111000')+
+cb('{\n  "nama": "Budi Santoso",\n  "umur": 28,\n  "kota": "Jakarta"\n}','Contoh JSON sederhana:')+
+bx('⚡ KENAPA JSON WAJIB DIKUASAI?','<ul><li>Semua <strong style="color:#00e5ff">REST API modern</strong> berbicara dalam JSON</li><li><strong style="color:#00e5ff">n8n</strong> membaca &amp; menulis JSON secara native</li><li>AI models (Claude, GPT) mengirim response dalam JSON</li><li style="color:#f85149;margin-top:4px">Tanpa bisa baca JSON = tidak bisa automation</li></ul>','#00e5ff')+
+bx('📌 CATATAN','JSON bukan code — ini hanya <strong style="color:#e6edf3">teks terstruktur</strong>. Tidak perlu install apapun. Buka browser console, langsung bisa dicoba.','#3fb950','#051a0a');}
+
+function rTypes(){
+  const T=[
+    {n:'String', c:'#a8d8a8',e:'"Hello World"',   note:'Selalu tanda kutip ganda "..."',     w:"'hello' atau hello tanpa kutip"},
+    {n:'Number', c:'#79b8ff',e:'42 / 3.14 / -100',note:'Tanpa kutip, bisa desimal & negatif',w:'"42" ini jadi string bukan number'},
+    {n:'Boolean',c:'#f9826c',e:'true / false',     note:'Lowercase! Tidak ada True atau False',w:'True, TRUE, atau "true"'},
+    {n:'Null',   c:'#8b949e',e:'null',             note:'Nilai kosong / tidak ada data',      w:'Null, NULL, atau "null"'},
+    {n:'Object', c:'#00e5ff',e:'{"key":"val"}',    note:'Kumpulan key-value dalam { }',       w:'{key:val} tanpa kutip pada key'},
+    {n:'Array',  c:'#ffeb3b',e:'[1, 2, 3]',        note:'Daftar terurut dalam [ ]',           w:'(1,2,3) atau {1,2,3}'},
+  ];
+  let cards=T.map((t,i)=>{const on=actType===i;const det=on?'<div class="tdetail" style="border-top-color:'+t.c+'33"><div style="color:#c9d1d9;margin-bottom:3px">✓ '+t.note+'</div><div style="color:#f85149">✗ Bukan: '+t.w+'</div></div>':'';return'<div class="tcard" style="'+(on?'background:'+t.c+'18;border-color:'+t.c:'')+'" onclick="toggleT('+i+')">'+'<div class="tname" style="color:'+t.c+'">'+t.n+'</div><code class="tex">'+t.e+'</code>'+det+'</div>';}).join('');
+  return'<p style="font-size:15px;color:#8b949e;margin-bottom:14px;line-height:1.7">JSON hanya mengenal <strong style="color:#00e5ff">6 tipe data</strong>. Hafalkan ini — semua API hanya memakai tipe-tipe berikut.</p><div class="tgrid">'+cards+'</div><p style="font-size:10px;color:#6e7681;margin-top:6px">↑ Klik kartu untuk detail &amp; contoh kesalahan umum</p>'+
+  cb('{\n  "nama": "Siti Rahayu",\n  "umur": 25,\n  "menikah": false,\n  "foto": null,\n  "hobi": ["membaca", "coding", "travel"],\n  "alamat": {\n    "kota": "Surabaya",\n    "kodePos": "60111"\n  }\n}','Semua 6 tipe dalam satu JSON:');}
+
+function rObject(){
+  const rules=[['✓','Key HARUS string (tanda kutip ganda)','"nama": "Budi"','#3fb950'],['✓','Dipisah tanda titik dua (:)','"umur": 28','#3fb950'],['✓','Antar pasangan dipisah koma','"a": 1, "b": 2','#3fb950'],['✗','JANGAN trailing comma di akhir','"b": 2,  ← ERROR','#f85149'],['✗','JANGAN key tanpa tanda kutip','nama: "Budi"  ← ERROR','#f85149']];
+  return'<p style="font-size:16px;color:#c9d1d9;line-height:1.75"><strong style="color:#e6edf3">Object</strong> adalah struktur paling umum di JSON. Berisi pasangan <strong style="color:#00e5ff">key: value</strong> yang dibungkus dalam kurung kurawal { }.</p><div style="margin-top:14px"><p style="font-size:10px;color:#6e7681;letter-spacing:2px;margin-bottom:8px">ATURAN OBJECT:</p>'+
+  rules.map(([m,r,e,c])=>'<div class="rrow"><span class="rmk" style="color:'+c+'">'+m+'</span><div><span style="color:#c9d1d9">'+r+'</span><code style="display:block;color:'+c+';font-size:10px;margin-top:2px">'+e+'</code></div></div>').join('')+'</div>'+
+  cb('{\n  "id": "PRD-001",\n  "nama": "Laptop ASUS VivoBook",\n  "harga": 8500000,\n  "tersedia": true,\n  "stok": 15,\n  "diskon": null\n}','Object untuk data produk:')+
+  bx('🔍 DI N8N','<code style="color:#00e5ff">{{$json.nama}}</code> <span style="color:#8b949e">→ "Laptop ASUS VivoBook"</span><br><code style="color:#00e5ff">{{$json.harga}}</code> <span style="color:#8b949e">→ 8500000</span>','#00e5ff');}
+
+function rArray(){return'<p style="font-size:16px;color:#c9d1d9;line-height:1.75"><strong style="color:#e6edf3">Array</strong> adalah daftar nilai terurut dalam tanda kurung siku [ ]. Elemen dipisah koma, bisa berisi tipe apapun — bahkan campur-campur.</p>'+
+  cb('{\n  "angka": [1, 2, 3, 4, 5],\n  "nama": ["Alice", "Bob", "Charlie"],\n  "campur": [1, "dua", true, null],\n  "kosong": []\n}','Berbagai bentuk Array:')+
+  bx('⭐ POLA PALING PENTING: Array of Objects','Array berisi objects adalah pola paling umum di API dunia nyata. Setiap object = satu baris data — mirip tabel spreadsheet dalam JSON.','#ffeb3b','#111000')+
+  cb('{\n  "users": [\n    { "id": 1, "nama": "Alice", "role": "admin" },\n    { "id": 2, "nama": "Bob", "role": "editor" },\n    { "id": 3, "nama": "Charlie", "role": "viewer" }\n  ],\n  "total": 3\n}','Array of Objects — pola API nyata:')+
+  bx('🔍 DI N8N','n8n otomatis loop melalui array of objects. Setiap iterasi:<br><code style="color:#00e5ff">{{$json.nama}}</code> <span style="color:#8b949e">→ "Alice", lalu "Bob", lalu "Charlie"</span>','#00e5ff');}
+
+function rNested(){
+  const paths=[['order.id','"ORD-2024-001"'],['order.pelanggan.nama','"Dewi Lestari"'],['order.pengiriman.kurir','"JNE"']];
+  return'<p style="font-size:16px;color:#c9d1d9;line-height:1.75">Nested JSON = JSON di dalam JSON. Object bisa berisi Object lain, dan seterusnya. Sangat umum di API production.</p>'+
+  cb('{\n  "order": {\n    "id": "ORD-2024-001",\n    "status": "shipped",\n    "pelanggan": {\n      "id": "USR-123",\n      "nama": "Dewi Lestari",\n      "email": "dewi@email.com"\n    },\n    "pengiriman": {\n      "kurir": "JNE",\n      "resi": "JNE123456"\n    },\n    "total": 150000\n  }\n}','API Response e-commerce — nested 3 level:')+
+  bx('🗺 CARA BACA: GUNAKAN TITIK (.)',paths.map(([p,v])=>'<div class="prow"><code style="color:#da77f2">$json.'+p+'</code><code style="color:#a8d8a8">'+v+'</code></div>').join('')+'<div style="font-size:13px;color:#8b949e;margin-top:8px">Di n8n: <code style="color:#da77f2">{{$json.order.pelanggan.nama}}</code></div>','#da77f2');}
+
+function rRealWorld(){
+  const tabs=RW.map((t,i)=>'<button class="tbtn" style="'+(rwT===i?'background:#00e5ff22;border:1px solid #00e5ff;color:#00e5ff':'background:#0a0f14;border:1px solid #1e3a4a;color:#6e7681')+'" onclick="setRwT('+i+')">'+t.label+'</button>').join('');
+  return'<p style="font-size:16px;color:#c9d1d9;line-height:1.75;margin-bottom:12px">JSON mengalir di balik layar setiap kali kamu pakai aplikasi. Ini 3 contoh API response nyata yang akan kamu temui saat automation.</p><div class="tabrow">'+tabs+'</div>'+cb(RW[rwT].code)+bx('','💡 '+RW[rwT].note,'#00e5ff');}
+
+function rPractice(){
+  const ex=EX[exI],allDone=doneEx.size===EX.length;
+  const banner=allDone?'<div class="cbanner"><div style="font-size:28px;margin-bottom:6px">🎉</div><div style="font-size:14px;font-weight:700;color:#3fb950;margin-bottom:4px">LATIHAN SELESAI!</div><div style="font-size:11px;color:#8b949e">Lanjut ke topik Parse & Stringify →</div></div>':'<p style="font-size:15px;color:#8b949e;margin-bottom:14px;line-height:1.7">5 latihan untuk sesi ini. Tulis JSON di editor, klik Validasi.</p>';
+  const exBtns=EX.map((e,i)=>{const cls=doneEx.has(i)?'done':exI===i?'on':'';return'<button class="exbtn '+cls+'" onclick="setExI('+i+')">'+(doneEx.has(i)?'✓':e.n)+'</button>';}).join('');
+  return banner+'<div class="exsel">'+exBtns+'</div><div class="excard"><div class="extag">LATIHAN '+ex.n+' · '+ex.title+'</div><div class="exdesc">'+ex.desc+'</div><div class="exhint">💡 Hint: '+ex.hint+'</div></div><textarea id="editor" spellcheck="false">'+ex.start+'</textarea><div id="res"></div><div class="btnrow"><button class="btn bp" onclick="doValidate()">▶ VALIDASI JSON</button><button class="btn bs" onclick="doFormat()">⊞ FORMAT</button><button class="btn bm" onclick="doReset()">↺ RESET</button></div>';}
+
+// ─── STEP RENDERERS (08–10) ───────────────────────────────────────────────
+function rParseStringify(){
+  return'<p style="font-size:16px;color:#c9d1d9;line-height:1.75;margin-bottom:14px">API mengirim data sebagai <strong style="color:#e6edf3">teks/string</strong>. Sebelum bisa diakses, teks itu harus diubah menjadi JavaScript object. Itulah fungsi <code style="background:#1a2d3a;padding:2px 6px;border-radius:3px;color:#00e5ff;font-size:14px">JSON.parse()</code>.</p>'+
+  bx('💡 ANALOGINYA','JSON string seperti surat dalam amplop. <code>JSON.parse()</code> adalah membuka amplopnya — setelah itu kamu bisa baca dan akses isinya.','#ffeb3b','#111000')+
+  cb('// SEBELUM parse — ini cuma teks\nconst raw = \'{"nama": "Budi", "umur": 28}\';\nconsole.log(raw.nama);   // undefined!\n\n// SESUDAH parse — bisa diakses\nconst data = JSON.parse(raw);\nconsole.log(data.nama);  // "Budi"\nconsole.log(data.umur);  // 28','Perbedaan sebelum & sesudah parse:')+
+  '<div class="demo-area"><div class="demo-label">◈ DEMO INTERAKTIF — JSON.parse()</div><div style="font-size:13px;color:#8b949e;margin-bottom:8px">Edit JSON, klik Parse untuk lihat hasilnya:</div><textarea class="demo-in" id="parseInput" spellcheck="false">{"nama": "Siti Rahayu", "umur": 25, "aktif": true, "hobi": ["coding", "membaca"]}</textarea><div style="margin-top:10px"><button class="dbtn" onclick="doparse()">▶ PARSE</button><button class="dbtn rd" onclick="doParseErr()">⚠ Coba Error</button></div><div class="demo-out" id="parseOut"></div></div>'+
+  bx('⚠ WAJIB PAKAI TRY/CATCH','JSON.parse() akan <strong style="color:#f85149">melempar error</strong> jika string tidak valid. Selalu bungkus dengan try/catch di production!','#f85149','#1a0505')+
+  cb('try {\n  const data = JSON.parse(rawString);\n  console.log(data.nama);\n} catch (error) {\n  console.log("JSON tidak valid:", error.message);\n}','')+
+  '<div class="divider"></div><div class="sub-h">② JSON.stringify() — Object → String</div>'+
+  '<p style="font-size:16px;color:#c9d1d9;line-height:1.75;margin-bottom:14px">Saat mau <strong style="color:#e6edf3">mengirim data ke API</strong>, JavaScript object harus diubah kembali menjadi string JSON. Itulah <code style="background:#1a2d3a;padding:2px 6px;border-radius:3px;color:#00e5ff;font-size:14px">JSON.stringify()</code>.</p>'+
+  cb('const user = { nama: "Budi", umur: 28, aktif: true };\n\n// Kompak — untuk dikirim ke API\nJSON.stringify(user);\n// -> \'{"nama":"Budi","umur":28,"aktif":true}\'\n\n// Pretty print — mudah dibaca manusia\nJSON.stringify(user, null, 2);\n// -> \'{\n//   "nama": "Budi",\n//   "umur": 28\n// }\'','')+
+  '<div class="demo-area"><div class="demo-label">◈ DEMO INTERAKTIF — JSON.stringify()</div><div style="font-size:13px;color:#8b949e;margin-bottom:8px">Edit JSON, lihat 3 variasi output:</div><textarea class="demo-in" id="strInput" spellcheck="false">{"nama": "Dewi Lestari", "kota": "Jakarta", "hobi": ["coding", "travel"], "aktif": true}</textarea><div style="margin-top:10px"><button class="dbtn yw" onclick="doStringify()">▶ STRINGIFY (3 variasi)</button></div><div class="demo-out" id="strOut"></div></div>'+
+  '<div class="divider"></div><div class="sub-h">③ Parse & Stringify di n8n</div>'+
+  bx('🔍 KAPAN DIPAKAI DI N8N?','<ul><li><strong style="color:#e6edf3">n8n otomatis parse</strong> response dari HTTP Request node — tidak perlu manual</li><li><strong style="color:#e6edf3">Parse manual</strong> perlu jika ada field berisi JSON string: <code>{"data": "{\\"nama\\":\\"Budi\\"}"}</code></li><li><strong style="color:#e6edf3">Stringify perlu</strong> saat simpan object ke field teks atau kirim sebagai body string</li><li>Di Code Node: <code>JSON.parse($json.raw)</code> atau <code>JSON.stringify(obj, null, 2)</code></li></ul>','#00e5ff')+
+  cb('// Di n8n Code Node\nconst items = $input.all();\nreturn items.map(item => {\n  const parsed = JSON.parse(item.json.raw_payload);\n  return {\n    json: {\n      nama: parsed.nama,\n      email: parsed.email,\n      backup: JSON.stringify(parsed, null, 2)\n    }\n  };\n});','Contoh di n8n Code Node:');}
+
+function rTemplates(){
+  const cards=TEMPLATES.map((t,i)=>`<div class="tmpl-card"><div class="tmpl-hdr" onclick="toggleTmpl(${i})"><div><div style="font-size:11px;color:#00e5ff;font-weight:700;margin-bottom:2px">${t.icon} TEMPLATE ${t.n}</div><div style="font-size:15px;color:#e6edf3;font-weight:700">${t.name}</div><div style="font-size:11px;color:#6e7681">→ ${t.usecase}</div></div><div class="tmpl-chev" id="chev${i}">▼</div></div><div class="tmpl-body" id="tbody${i}"><div class="tmpl-note">${t.note}</div><button class="copy-btn" id="cpbtn${i}" onclick="copyTmpl(${i},event)">⊞ Copy JSON</button><pre class="cb">${hl(t.json)}</pre></div></div>`).join('');
+  return'<p style="font-size:15px;color:#8b949e;line-height:1.7;margin-bottom:16px">Template siap pakai untuk automation. Klik untuk expand, copy JSON, dan modifikasi di n8n.</p>'+cards;}
+
+function rTools(){
+  const cards=TOOLS.map(t=>`<div class="tool-card"><div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:14px"><div style="width:44px;height:44px;border-radius:10px;background:${t.bg};color:${t.col};display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">${t.icon}</div><div><div style="font-size:16px;font-weight:700;color:#e6edf3">${t.name}</div><div style="font-size:12px;margin-top:2px"><a href="${t.link}" target="_blank" style="color:#00e5ff;text-decoration:none">${t.url} ↗</a></div><div style="font-size:12px;color:#ffeb3b;margin-top:4px">→ ${t.role}</div></div></div><div style="font-size:14px;color:#c9d1d9;line-height:1.7;margin-bottom:12px">${t.desc}</div><div style="font-size:10px;color:${t.col};letter-spacing:2px;margin-bottom:8px">◈ CARA PAKAI:</div><div style="border-top:1px solid #1e3a4a">${t.steps.map((s,i)=>`<div class="step-row"><div class="step-n" style="background:${t.bg};border:1px solid ${t.col}44;color:${t.col}">${i+1}</div><div>${s}</div></div>`).join('')}</div></div>`).join('');
+  return'<p style="font-size:15px;color:#8b949e;line-height:1.7;margin-bottom:16px">4 tools yang disebutkan di roadmap. Kenali sekarang — kamu akan pakai ini setiap hari.</p>'+cards+
+  '<div style="background:linear-gradient(135deg,#0d2a1a,#0d1f2d);border:1px solid #3fb950;border-radius:12px;padding:24px;text-align:center;margin-top:20px"><div style="font-size:36px;margin-bottom:10px">🎉</div><div style="font-size:16px;font-weight:700;color:#3fb950;margin-bottom:8px">JSON MASTERY — 100% SELESAI!</div><div style="font-size:13px;color:#8b949e;line-height:1.7">✓ 7 Topik Materi &nbsp;·&nbsp; ✓ Parse & Stringify &nbsp;·&nbsp; ✓ 10 Template Bisnis &nbsp;·&nbsp; ✓ 4 Tools<br><br><strong style="color:#3fb950">Kamu siap lanjut ke Sesi 2: REST API Fundamentals! 🚀</strong></div></div>';}
+
+// ─── QUIZ + NAV ───────────────────────────────────────────────────────────
+function qHTML(id){
+  const q=QZ[id];if(!q)return'';
+  const a=qAnsw[id];
+  const opts=q.opts.map((o,i)=>{let cls=a!==undefined?(i===q.ans?'ok':(a===i?'bad':'gray')):'';return'<button class="qopt '+cls+'" onclick="ansQ(\''+id+'\','+i+')">'+['A','B','C','D'][i]+'. '+o+'</button>';}).join('');
+  const fb=a!==undefined?'<p class="qfb" style="color:'+(a===q.ans?'#3fb950':'#f85149')+'">'+(a===q.ans?'✓ Benar! Lanjut ke step berikutnya →':'✗ Yang benar: '+q.opts[q.ans])+'</p>':'';
+  return'<div class="qbox"><div class="qlabel">◈ QUICK CHECK</div><p class="qq">'+q.q+'</p><div class="qopts">'+opts+'</div>'+fb+'</div>';}
+
+function navHTML(){
+  let h='<div class="navft">';
+  if(step>0) h+='<button class="nprev" onclick="go('+(step-1)+')">← SEBELUMNYA</button>';
+  if(step<STEPS.length-1){
+    const labels={5:'MULAI LATIHAN →',6:'LANJUT: PARSE/STRINGIFY →',7:'LANJUT: TEMPLATE BISNIS →',8:'LANJUT: TOOLS →'};
+    h+='<button class="nnext" onclick="go('+(step+1)+')">'+(labels[step]||'LANJUT →')+'</button>';
+  }else{
+    h+='<div class="ndone">✓ JSON MASTERY 100% SELESAI!</div>';
+  }
+  return h+'</div>';}
+
+// ─── RENDER ───────────────────────────────────────────────────────────────
+function render(){
+  const s=STEPS[step];
+  const p=Math.round(((step+1)/STEPS.length)*100);
+  document.getElementById('pct').textContent=p+'%';
+  document.getElementById('pfill').style.width=p+'%';
+  document.getElementById('navs').innerHTML=STEPS.map((x,i)=>'<button class="nbtn '+(i===step?'on':stepDone.has(i)?'done':'')+'" onclick="go('+i+')">'+x.nav+'</button>').join('');
+  let c='<div class="stag">'+s.tag+'</div><div class="stitle">'+s.title+'</div>';
+  const fn={intro:rIntro,types:rTypes,object:rObject,array:rArray,nested:rNested,realworld:rRealWorld,practice:rPractice,parsestrf:rParseStringify,templates:rTemplates,tools:rTools};
+  c+=(fn[s.id]||function(){return '';})();
+  c+=qHTML(s.id);c+=navHTML();
+  document.getElementById('mc').innerHTML=c;
+  document.body.style.paddingBottom=aiOpen?'60vh':'0';
+  window.scrollTo(0,0);}
+
+// ─── NAVIGATION HANDLERS ─────────────────────────────────────────────────
+function go(i){
+  if(step!==i) stepDone.add(step);
+  step=i; actType=-1; render();
+}
+function toggleT(i){actType=actType===i?-1:i;render();}
+function ansQ(id,i){if(qAnsw[id]!==undefined)return;qAnsw[id]=i;render();}
+function setRwT(i){rwT=i;render();}
+function setExI(i){exI=i;render();}
+
+// ─── EXERCISE HANDLERS ────────────────────────────────────────────────────
+function doValidate(){
+  const v=document.getElementById('editor').value,ex=EX[exI];
+  try{const d=JSON.parse(v);const err=ex.check(d);
+    if(err){document.getElementById('res').innerHTML='<div class="res err">✗ '+err+'</div>';}
+    else{doneEx.add(exI);document.getElementById('res').innerHTML='<div class="res ok">✓ Latihan '+ex.n+' selesai!'+(ex.n===5?' 🎉 Semua latihan tuntas!':' Lanjut →')+'</div>';
+      document.querySelectorAll('.exbtn').forEach(function(b,i){if(doneEx.has(i)){b.className='exbtn done';b.textContent='✓';}else if(i===exI){b.className='exbtn on';}});
+      if(doneEx.size===EX.length)setTimeout(render,1200);}
+  }catch(e){document.getElementById('res').innerHTML='<div class="res err">✗ JSON tidak valid: '+e.message+'</div>';}
+}
+function doFormat(){const ed=document.getElementById('editor');try{ed.value=JSON.stringify(JSON.parse(ed.value),null,2);document.getElementById('res').innerHTML='';}catch(e){document.getElementById('res').innerHTML='<div class="res err">✗ JSON tidak valid, tidak bisa diformat</div>';}}
+function doReset(){document.getElementById('editor').value=EX[exI].start;document.getElementById('res').innerHTML='';}
+
+// ─── PARSE/STRINGIFY HANDLERS ─────────────────────────────────────────────
+function doparse(){
+  const inp=document.getElementById('parseInput').value.trim(),out=document.getElementById('parseOut');
+  try{const d=JSON.parse(inp);const pretty=JSON.stringify(d,null,2);
+    out.innerHTML='<div class="out-ok"><div style="font-size:10px;color:#3fb950;letter-spacing:2px;margin-bottom:8px">✓ PARSE BERHASIL — bisa diakses sebagai object:</div><div class="out-result">'+hl(pretty)+'</div><div style="margin-top:10px;font-size:12px;color:#6e7681">'+Object.keys(d).map(k=>'<code style="color:#00e5ff">data.'+k+'</code> → <span style="color:#a8d8a8">'+JSON.stringify(d[k])+'</span>').join(' &nbsp; ')+'</div></div>';
+  }catch(e){out.innerHTML='<div class="out-err">✗ Parse gagal: '+e.message+'<br><span style="font-size:12px;color:#8b949e;margin-top:4px;display:block">Cek trailing comma, kutip tunggal, atau key tanpa kutip.</span></div>';}
+  out.className='demo-out show';}
+
+function doParseErr(){document.getElementById('parseInput').value='{nama: "Budi", umur: 28,}';doparse();}
+
+function doStringify(){
+  const inp=document.getElementById('strInput').value.trim(),out=document.getElementById('strOut');
+  try{const d=JSON.parse(inp);
+    out.innerHTML='<div style="margin-top:10px"><p style="font-size:10px;color:#6e7681;letter-spacing:1px;margin-bottom:4px">JSON.stringify(data) — KOMPAK (untuk kirim ke API):</p><div class="out-ok"><div class="out-result" style="color:#a8d8a8;word-break:break-all">'+JSON.stringify(d).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</div></div></div><div style="margin-top:12px"><p style="font-size:10px;color:#6e7681;letter-spacing:1px;margin-bottom:4px">JSON.stringify(data, null, 2) — PRETTY PRINT 2 SPASI:</p><div class="out-ok"><div class="out-result">'+hl(JSON.stringify(d,null,2))+'</div></div></div><div style="margin-top:12px"><p style="font-size:10px;color:#6e7681;letter-spacing:1px;margin-bottom:4px">JSON.stringify(data, null, 4) — PRETTY PRINT 4 SPASI:</p><div class="out-ok"><div class="out-result">'+hl(JSON.stringify(d,null,4))+'</div></div></div>';
+  }catch(e){out.innerHTML='<div class="out-err" style="margin-top:10px">✗ Gagal: '+e.message+'</div>';}
+  out.className='demo-out show';}
+
+// ─── TEMPLATE HANDLERS ────────────────────────────────────────────────────
+function toggleTmpl(i){
+  const body=document.getElementById('tbody'+i),chev=document.getElementById('chev'+i),isOpen=body.classList.contains('open');
+  body.className='tmpl-body'+(isOpen?'':' open');chev.className='tmpl-chev'+(isOpen?'':' open');}
+
+function copyTmpl(i,e){
+  e.stopPropagation();const btn=document.getElementById('cpbtn'+i);
+  const txt=TEMPLATES[i].json.trim();
+  const fallback=()=>{const ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);};
+  try{navigator.clipboard.writeText(txt).then(()=>{}).catch(fallback);}catch{fallback();}
+  btn.textContent='✓ Tersalin!';btn.className='copy-btn copied';
+  setTimeout(()=>{btn.textContent='⊞ Copy JSON';btn.className='copy-btn';},2000);}
+
+// ─── AI TUTOR ─────────────────────────────────────────────────────────────
+function openAi(){aiOpen=true;document.getElementById('aip').classList.remove('hidden');document.getElementById('aifab').classList.add('hidden');document.body.style.paddingBottom='60vh';}
+function closeAi(){aiOpen=false;document.getElementById('aip').classList.add('hidden');document.getElementById('aifab').classList.remove('hidden');document.body.style.paddingBottom='0';}
+function addMsg(cls,txt){const a=document.getElementById('aimsgs');const d=document.createElement('div');d.className='amsg '+cls;d.textContent=txt;a.appendChild(d);a.scrollTop=a.scrollHeight;return d;}
+async function sendAi(){
+  if(aiLoad)return;const inp=document.getElementById('aiin');const t=inp.value.trim();if(!t)return;
+  addMsg('user',t);aiHist.push({role:'user',content:t});inp.value='';
+  aiLoad=true;document.getElementById('aisend').style.opacity='0.5';
+  const ld=addMsg('bot','● ● ●');
+  try{const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,
+      system:'Kamu adalah tutor JSON untuk peserta bootcamp AI Automation Indonesia. Kurikulum mencakup: konsep JSON, Object/Array/Nested, JSON.parse/stringify, 10 template bisnis, dan tools (JSONFormatter, Hoppscotch, Postman, Webhook.site).\n\nCara menjawab:\n- Bahasa Indonesia santai dan ramah\n- Jawaban ringkas, max 3 paragraf, langsung ke inti\n- Gunakan contoh JSON konkret dalam backtick\n- Analisis JSON yang dikirim dan tunjukkan errornya\n- Kaitkan dengan n8n atau automation ketika relevan\n- Fokus pada pemahaman praktis',
+      messages:aiHist.slice(-10)})});
+    const data=await res.json();const rep=(data.content&&data.content[0]&&data.content[0].text)||'Maaf ada gangguan. Coba lagi ya!';
+    aiHist.push({role:'assistant',content:rep});ld.textContent=rep;
+  }catch(e){ld.textContent='⚠️ Koneksi error. Coba lagi ya.';}
+  aiLoad=false;document.getElementById('aisend').style.opacity='1';}
+
+render();
+</script>
+</body>
+</html>

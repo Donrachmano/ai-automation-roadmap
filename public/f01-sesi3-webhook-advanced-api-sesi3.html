@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Webhook & Advanced API - AI Automation Bootcamp - Sesi 3</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+:root{--bg:#080c10;--bg2:#0d1117;--bg3:#161b22;--bg4:#21262d;--border:#30363d;--cy:#00e5ff;--cy2:#00b8d4;--gn:#3fb950;--rd:#f85149;--yw:#e3b341;--pu:#bc8cff;--or:#ffa657;--tx:#e6edf3;--mt:#8b949e;--fn:'JetBrains Mono',monospace;--fs:'Space Grotesk',sans-serif}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--tx);font-family:var(--fn);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(0,229,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,.025) 1px,transparent 1px);background-size:40px 40px}
+header{position:sticky;top:0;z-index:100;background:rgba(8,12,16,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 24px;height:52px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:var(--fs);font-size:13px;font-weight:700;color:var(--cy);display:flex;align-items:center;gap:10px}
+.lbadge{background:var(--cy);color:var(--bg);font-size:9px;font-weight:700;padding:2px 7px;border-radius:3px;letter-spacing:.1em}
+.lsep{color:var(--border)}
+.pwrap{display:flex;align-items:center;gap:10px}
+.pbar{width:120px;height:4px;background:var(--bg4);border-radius:2px;overflow:hidden}
+.pfill{height:100%;background:var(--cy);border-radius:2px;transition:width .4s}
+.plbl{font-size:10px;color:var(--mt)}
+nav{display:flex;overflow-x:auto;gap:2px;padding:12px 24px 0;position:relative;z-index:1;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+.nb{background:none;border:none;cursor:pointer;font-family:var(--fn);font-size:10px;color:var(--mt);padding:8px 12px;border-radius:6px 6px 0 0;border:1px solid transparent;border-bottom:none;white-space:nowrap;transition:all .2s;display:flex;flex-direction:column;align-items:flex-start;gap:2px}
+.nb .nid{color:var(--border);font-size:9px}
+.nb .ntag{font-size:9px;color:var(--bg4);background:var(--border);padding:1px 5px;border-radius:2px}
+.nb.done{color:var(--gn)}.nb.done .nid{color:var(--gn);opacity:.6}.nb.done .ntag{background:rgba(63,185,80,.15);color:var(--gn)}
+.nb.active{color:var(--cy);background:var(--bg2);border-color:var(--border)}.nb.active .nid{color:var(--cy);opacity:.7}.nb.active .ntag{background:rgba(0,229,255,.1);color:var(--cy)}
+main{max-width:880px;margin:0 auto;padding:28px 24px 120px;position:relative;z-index:1}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:28px 32px;margin-bottom:20px;animation:fIn .3s ease}
+@keyframes fIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.stag{font-size:10px;letter-spacing:.15em;color:var(--cy);font-weight:600;margin-bottom:6px}
+.stitle{font-family:var(--fs);font-size:22px;font-weight:700;color:var(--tx);margin-bottom:16px;line-height:1.3}
+.stitle span{color:var(--cy)}
+p{color:var(--mt);font-size:14px;line-height:1.8;margin-bottom:12px}
+p strong{color:var(--tx)}
+h3{font-family:var(--fs);font-size:15px;color:var(--tx);margin:18px 0 10px;font-weight:600}
+.cmp2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0}
+.cbox{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:16px 18px}
+.cbox-poll{border-top:3px solid var(--yw)}.cbox-hook{border-top:3px solid var(--cy)}
+.chead{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.cion{font-size:20px}.clbl{font-family:var(--fs);font-size:14px;font-weight:700}
+.csub{font-size:11px;color:var(--mt);margin-bottom:8px}
+.csteps{font-size:11.5px;color:var(--mt);line-height:2}
+.ccode{margin-top:10px;background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:5px 10px;font-size:11px;color:var(--cy)}
+.ctbl{width:100%;border-collapse:collapse;font-size:12px;margin:14px 0}
+.ctbl th{background:var(--bg3);color:var(--mt);font-size:10px;letter-spacing:.1em;text-align:left;padding:8px 12px;border:1px solid var(--border)}
+.ctbl td{padding:8px 12px;border:1px solid var(--border);color:var(--tx);line-height:1.5}
+.ctbl tr:nth-child(even) td{background:rgba(13,17,23,.5)}
+.tpoll{color:var(--yw);font-weight:600}.thook{color:var(--cy);font-weight:600}
+.demo-box{background:var(--bg);border:1px solid var(--border);border-radius:8px;margin:16px 0;overflow:hidden}
+.demo-hdr{background:var(--bg3);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;gap:8px}
+.dbtn{background:none;border:1px solid var(--border);border-radius:5px;padding:6px 14px;font-family:var(--fn);font-size:11px;color:var(--mt);cursor:pointer;transition:all .2s}
+.dbtn:hover{border-color:var(--mt);color:var(--tx)}.dbtn.cy{border-color:var(--cy);color:var(--cy)}.dbtn.yw{border-color:var(--yw);color:var(--yw)}
+.darea{padding:14px 16px;min-height:140px;max-height:200px;overflow-y:auto;display:flex;flex-direction:column;gap:6px}
+.dmsg{font-size:12px;line-height:1.5;padding:3px 0;animation:fIn .2s ease}
+.dout{color:var(--yw)}.din{color:var(--mt)}.dok{color:var(--gn)}.devt{color:var(--pu);font-style:italic}.dhk{color:var(--cy)}
+.dstat{padding:8px 16px;border-top:1px solid var(--border);font-size:11px;color:var(--mt)}
+.seq-list{display:flex;flex-direction:column;gap:8px;margin:14px 0}
+.seqi{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px 16px;cursor:pointer;transition:all .2s;display:flex;gap:12px;align-items:flex-start}
+.seqi:hover{border-color:var(--mt)}.seqi.on{border-color:var(--cy);background:rgba(0,229,255,.04)}
+.snum{width:26px;height:26px;border-radius:50%;background:var(--bg4);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--mt);flex-shrink:0}
+.seqi.on .snum{background:rgba(0,229,255,.15);border-color:var(--cy);color:var(--cy)}
+.sbody{flex:1}.sttl{font-size:13px;font-weight:600;color:var(--tx);margin-bottom:3px}
+.sdet{font-size:12px;color:var(--mt);line-height:1.6;display:none}.seqi.on .sdet{display:block}
+.cb{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:16px 20px;font-size:12px;line-height:1.7;overflow-x:auto;margin:12px 0}
+.cbh{font-size:10px;color:var(--mt);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center}
+.cbd{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cbr{background:var(--rd)}.cby{background:var(--yw)}.cbg{background:var(--gn)}
+.kw{color:var(--pu)}.ky{color:var(--cy)}.ks{color:var(--gn)}.kn{color:var(--or)}.kc{color:var(--mt);font-style:italic}.kh{color:var(--pu)}.kv{color:var(--yw)}
+.err-tbl{width:100%;border-collapse:collapse;font-size:12px;margin:12px 0}
+.err-tbl th{background:var(--bg3);color:var(--mt);font-size:10px;letter-spacing:.1em;padding:8px 12px;text-align:left;border:1px solid var(--border)}
+.err-tbl td{padding:8px 12px;border:1px solid var(--border);color:var(--tx);font-size:12px}
+.err-tbl tr:nth-child(even) td{background:rgba(13,17,23,.5)}
+.ecode{font-weight:700;font-size:13px}.e2xx{color:var(--gn)}.e4xx{color:var(--yw)}.e5xx{color:var(--rd)}.e429{color:var(--or)}
+.rl-box{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:18px 22px;margin:14px 0}
+.rl-meter{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.rl-bw{flex:1;height:10px;background:var(--bg4);border-radius:5px;overflow:hidden}
+.rl-bar{height:100%;background:var(--gn);border-radius:5px;transition:all .4s}
+.rl-cnt{font-size:13px;font-weight:700;color:var(--tx);white-space:nowrap;min-width:70px}
+.rl-log{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:10px 14px;max-height:150px;overflow-y:auto;display:flex;flex-direction:column;gap:4px;margin-top:12px}
+.rle{font-size:11px;line-height:1.5}.rle-ok{color:var(--gn)}.rle-wn{color:var(--yw)}.rle-er{color:var(--rd)}
+.doc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
+.doc-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:14px 16px}
+.dc-icon{font-size:22px;margin-bottom:8px}
+.dc-name{font-family:var(--fs);font-size:14px;font-weight:700;color:var(--tx);margin-bottom:4px}
+.dc-desc{font-size:11.5px;color:var(--mt);line-height:1.6}
+.dc-badge{display:inline-block;font-size:9px;font-weight:700;padding:2px 7px;border-radius:3px;letter-spacing:.06em;margin-top:8px}
+.badge-free{background:rgba(63,185,80,.12);color:var(--gn)}.badge-pop{background:rgba(0,229,255,.1);color:var(--cy)}
+.yamlbox{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:12px 14px;font-family:var(--fn);font-size:11.5px;color:var(--gn);outline:none;resize:vertical;min-height:220px;margin:10px 0;line-height:1.6;transition:border-color .2s}
+.yamlbox:focus{border-color:var(--cy)}
+.jinp{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:9px 12px;font-family:var(--fn);font-size:12px;color:var(--tx);outline:none;margin-bottom:8px;transition:border-color .2s}
+.jinp:focus{border-color:var(--cy)}
+.jlbl{font-size:10px;color:var(--mt);letter-spacing:.1em;margin-bottom:5px}
+.json-preview{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:12px 14px;font-size:11px;line-height:1.7;max-height:200px;overflow-y:auto;margin-top:10px}
+.proj-tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:14px}
+.ptab{background:none;border:1px solid var(--border);border-radius:6px;padding:6px 16px;font-family:var(--fn);font-size:11px;color:var(--mt);cursor:pointer;transition:all .2s}
+.ptab.on{border-color:var(--cy);color:var(--cy)}.ptab.dn{border-color:var(--gn);color:var(--gn)}.ptab.dn.on{background:rgba(63,185,80,.07)}
+.proj-panel{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:22px 26px}
+.proj-hint{background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.2);border-radius:6px;padding:10px 14px;font-size:12px;color:var(--cy);margin-bottom:16px;line-height:1.6}
+.ep-block{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:14px 16px;margin-bottom:10px}
+.ep-num{font-size:10px;color:var(--cy);letter-spacing:.1em;margin-bottom:8px}
+.ep-row{display:flex;gap:8px;margin-bottom:8px}
+.method-sel{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-family:var(--fn);font-size:12px;color:var(--yw);outline:none;cursor:pointer;flex-shrink:0}
+.doc-preview{background:var(--bg);border:1px solid var(--cy);border-radius:8px;padding:18px 22px;margin-top:16px;display:none}
+.doc-preview.show{display:block;animation:fIn .3s ease}
+.send-btn{background:var(--cy);color:var(--bg);border:none;border-radius:6px;font-family:var(--fn);font-size:12px;font-weight:700;padding:9px 22px;cursor:pointer;transition:all .2s}
+.send-btn:hover{background:var(--cy2)}.send-btn:disabled{opacity:.5;cursor:not-allowed}
+.copy-btn{background:none;border:1px solid var(--border);border-radius:6px;font-family:var(--fn);font-size:11px;color:var(--mt);padding:6px 14px;cursor:pointer;transition:all .2s;margin-left:8px}
+.copy-btn:hover{border-color:var(--cy);color:var(--cy)}
+.qbox{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:18px 22px;margin-top:18px}
+.qlbl{font-size:10px;color:var(--pu);letter-spacing:.15em;font-weight:600;margin-bottom:10px}
+.qq{font-size:14px;color:var(--tx);margin-bottom:12px;line-height:1.6}
+.qopts{display:flex;flex-direction:column;gap:7px;margin-bottom:12px}
+.qopt{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:9px 14px;font-family:var(--fn);font-size:13px;color:var(--tx);cursor:pointer;transition:all .2s;text-align:left;width:100%}
+.qopt:hover:not([disabled]){border-color:var(--mt)}
+.qopt.cor{border-color:var(--gn);color:var(--gn);background:rgba(63,185,80,.08)}
+.qopt.wrg{border-color:var(--rd);color:var(--rd);background:rgba(248,81,73,.08)}
+.qfb{font-size:12px;margin-top:8px;line-height:1.6}.qfb.ok{color:var(--gn)}.qfb.err{color:var(--rd)}
+.nvbtns{display:flex;justify-content:space-between;margin-top:22px;gap:10px}
+.btnp,.btnn{background:none;border:1px solid var(--border);border-radius:8px;padding:10px 20px;font-family:var(--fn);font-size:13px;color:var(--mt);cursor:pointer;transition:all .2s}
+.btnn{background:var(--bg2);border-color:var(--cy);color:var(--cy);margin-left:auto}
+.btnp:hover{border-color:var(--mt);color:var(--tx)}.btnn:hover{background:rgba(0,229,255,.08)}
+.done-banner{background:linear-gradient(135deg,rgba(0,229,255,.05),rgba(63,185,80,.05));border:1px solid var(--cy);border-radius:10px;padding:26px 22px;text-align:center;margin-top:16px}
+.done-banner h2{font-family:var(--fs);font-size:20px;color:var(--cy);margin-bottom:8px}
+.done-banner p{color:var(--mt);font-size:13px}
+.ai-fab{position:fixed;bottom:28px;right:28px;z-index:200;background:var(--cy);color:var(--bg);border:none;border-radius:50px;padding:13px 22px;font-family:var(--fn);font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 4px 24px rgba(0,229,255,.3);transition:all .2s}
+.ai-fab:hover{background:var(--cy2)}
+.ai-pan{position:fixed;bottom:90px;right:28px;z-index:200;width:360px;max-height:520px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;display:none;flex-direction:column;box-shadow:0 8px 32px rgba(0,0,0,.5);overflow:hidden}
+.ai-pan.open{display:flex;animation:fIn .2s ease}
+.ai-hdr{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--bg)}
+.ai-ttl{font-size:12px;font-weight:600;color:var(--cy)}
+.ai-x{background:none;border:none;color:var(--mt);cursor:pointer;font-size:16px}
+.ai-hist{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.ai-msg{font-size:12.5px;line-height:1.7;padding:10px 14px;border-radius:8px;max-width:95%}
+.ai-msg.user{background:rgba(0,229,255,.08);color:var(--cy);align-self:flex-end}
+.ai-msg.bot{background:var(--bg3);color:var(--tx);align-self:flex-start}
+.ai-msg.loading{color:var(--mt);font-style:italic}
+.ai-irow{padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px;background:var(--bg)}
+.ai-inp{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:9px 12px;font-family:var(--fn);font-size:12px;color:var(--tx);outline:none}
+.ai-inp:focus{border-color:var(--cy)}
+.ai-snd{background:var(--cy);color:var(--bg);border:none;border-radius:6px;font-family:var(--fn);font-size:12px;font-weight:700;padding:9px 16px;cursor:pointer}
+.ai-snd:hover{background:var(--cy2)}.ai-snd:disabled{opacity:.5;cursor:not-allowed}
+::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px}
+@media(max-width:600px){main{padding:16px 14px 100px}.card{padding:18px 16px}.cmp2{grid-template-columns:1fr}.doc-grid{grid-template-columns:1fr}.ai-pan{right:12px;left:12px;width:auto}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">
+    <span class="lbadge">F-01</span>
+    <span class="lsep">|</span>
+    WEBHOOK &amp; ADVANCED API
+    <span style="color:var(--mt);font-size:11px">- Sesi 3</span>
+  </div>
+  <div class="pwrap">
+    <div class="pbar"><div class="pfill" id="pFill" style="width:12%"></div></div>
+    <span class="plbl" id="pLbl">1 / 8</span>
+  </div>
+</header>
+<nav id="navRow"></nav>
+<main id="main"></main>
+<button class="ai-fab" id="aiFab">&#9889; AI Tutor</button>
+<div class="ai-pan" id="aiPanel">
+  <div class="ai-hdr">
+    <div class="ai-ttl">&#9889; Webhook &amp; API Docs Tutor</div>
+    <button class="ai-x" id="aiClose">&#10005;</button>
+  </div>
+  <div class="ai-hist" id="aiHist">
+    <div class="ai-msg bot">Halo! Saya siap bantu kamu memahami Webhook, Rate Limiting, Error Handling, dan Dokumentasi API (Swagger, Postman). Tanya apa saja!</div>
+  </div>
+  <div class="ai-irow">
+    <input type="text" class="ai-inp" id="aiInp" placeholder="Tanya tentang webhook atau API docs...">
+    <button class="ai-snd" id="aiSnd">&#10145;</button>
+  </div>
+</div>
+<script>
+var NAV=[
+  {id:'s0',num:'WH-01',label:'REST API vs Webhook',tag:'perbedaan'},
+  {id:'s1',num:'WH-02',label:'Trigger-based vs Polling',tag:'arsitektur'},
+  {id:'s2',num:'WH-03',label:'Testing Webhook.site',tag:'testing'},
+  {id:'s3',num:'WH-04',label:'Rate Limit & Error Handling',tag:'advanced'},
+  {id:'s4',num:'WH-05',label:'Dokumentasi API',tag:'docs'},
+  {id:'s5',num:'WH-06',label:'Swagger / OpenAPI',tag:'swagger'},
+  {id:'s6',num:'WH-07',label:'Postman Collections',tag:'postman'},
+  {id:'s7',num:'WH-08',label:'Project: Dok 3 API',tag:'project'}
+];
+
+var QZ=[
+  [{q:'Perbedaan utama antara REST API dan Webhook adalah...',opts:['Webhook lebih cepat dari REST API','REST API: client bertanya ke server; Webhook: server memberi tahu client','REST API hanya support JSON, Webhook support XML','Webhook tidak memerlukan internet'],c:1,fb:'Tepat! REST API bersifat request-response (client aktif bertanya). Webhook bersifat event-driven (server aktif memberi tahu). Ini perbedaan arsitektur yang fundamental.'},
+   {q:'Kapan kamu HARUS menggunakan Webhook dibanding REST API polling?',opts:['Saat server API lambat','Saat kamu butuh notifikasi real-time saat event terjadi di provider','Saat data berubah setiap jam secara terprediksi','Saat API tidak support JSON'],c:1,fb:'Benar! Webhook ideal saat kamu butuh notifikasi segera saat event terjadi - seperti pembayaran berhasil, email diterima, atau order dibuat. Menunggu dengan polling tidak efisien.'}],
+  [{q:'Apa yang dimaksud "trigger-based" pada webhook?',opts:['Webhook diaktifkan oleh tombol di dashboard','Webhook dikirim secara otomatis saat event spesifik terjadi di provider','Webhook harus di-trigger manual setiap hari','Trigger adalah format data JSON yang dipakai webhook'],c:1,fb:'Benar! Trigger-based berarti webhook dikirim otomatis HANYA saat event tertentu terjadi - bukan jadwal berkala. Event inilah yang men-trigger pengiriman POST request ke endpoint kamu.'},
+   {q:'Jika server kamu tidak membalas webhook dengan HTTP 200 dalam waktu cepat, apa yang terjadi?',opts:['Webhook hilang selamanya','Provider anggap berhasil karena sudah dikirim','Provider retry mengirim webhook beberapa kali','Server provider mati'],c:2,fb:'Tepat! Provider akan retry. Ini penting - server kamu harus segera balas 200 OK, lalu proses payload di background. Jika terlambat atau gagal, provider retry dengan exponential backoff.'}],
+  [{q:'webhook.site berguna untuk...',opts:['Deploy webhook server ke production','Inspect dan debug payload yang masuk tanpa butuh server','Enkripsi payload webhook','Membuat URL API baru'],c:1,fb:'Tepat! webhook.site generate URL unik yang langsung terima dan tampilkan semua webhook - headers, body, method. Sangat berguna saat kamu ingin lihat format payload dari Stripe, GitHub, dsb tanpa setup server.'},
+   {q:'ngrok digunakan untuk...',opts:['Monitor error di production','Expose localhost ke internet agar bisa terima webhook dari provider eksternal','Membuat mock API','Test performa server'],c:1,fb:'Benar! ngrok membuat tunnel dari internet ke localhost. Jadi kamu bisa jalankan server di laptop dan daftarkan URL ngrok (misalnya abc.ngrok.io) ke Stripe - webhook Stripe akan masuk ke laptop kamu.'}],
+  [{q:'HTTP status code 429 berarti...',opts:['Data tidak ditemukan','Autentikasi gagal','Terlalu banyak request - rate limit tercapai','Server error internal'],c:2,fb:'Tepat! 429 Too Many Requests artinya kamu melampaui batas request dalam periode waktu tertentu. Cek header Retry-After untuk tahu berapa detik harus menunggu sebelum request lagi.'},
+   {q:'Strategi terbaik saat menerima HTTP 429 adalah...',opts:['Langsung retry secepatnya','Hentikan semua request selamanya','Tunggu sesuai Retry-After header, lalu retry dengan exponential backoff','Ganti API provider'],c:2,fb:'Benar! Tunggu sesuai Retry-After (jika ada), lalu retry dengan exponential backoff - delay berlipat ganda setiap percobaan gagal (1s, 2s, 4s, 8s). Ini memberi server waktu pulih.'}],
+  [{q:'Apa tujuan utama dokumentasi API?',opts:['Membuat API berjalan lebih cepat','Membantu developer lain memahami cara menggunakan API tanpa melihat source code','Mengenkripsi data API','Membuat tampilan API lebih bagus'],c:1,fb:'Tepat! Dokumentasi API adalah panduan bagi developer lain (atau diri sendiri di masa depan) untuk memahami endpoint apa saja yang tersedia, parameter yang dibutuhkan, dan format response-nya.'},
+   {q:'Jenis dokumentasi API yang paling umum digunakan oleh perusahaan besar adalah...',opts:['README.txt biasa','Microsoft Word document','OpenAPI/Swagger specification','Email kepada developer'],c:2,fb:'Benar! OpenAPI/Swagger adalah standar industri untuk dokumentasi REST API. Stripe, GitHub, Slack, dan hampir semua API besar menggunakannya karena bisa auto-generate UI yang interaktif.'}],
+  [{q:'File OpenAPI specification biasanya ditulis dalam format...',opts:['HTML dan CSS','YAML atau JSON','Python atau JavaScript','SQL'],c:1,fb:'Tepat! OpenAPI spec ditulis dalam YAML (lebih mudah dibaca manusia) atau JSON. Swagger Editor bisa memvisualisasikan keduanya menjadi UI yang interaktif dan bisa dicoba langsung.'},
+   {q:'Field apa yang WAJIB ada dalam sebuah OpenAPI specification?',opts:['servers dan tags','openapi version, info, dan paths','x-custom-extension','operationId untuk semua endpoint'],c:1,fb:'Benar! Tiga field wajib: openapi (versi spec), info (nama dan versi API), dan paths (daftar endpoint). Tanpa ketiganya, spec tidak valid.'}],
+  [{q:'Postman Collection adalah...',opts:['Plugin untuk VS Code','Kumpulan request API yang terorganisir dan bisa dibagikan ke tim','Database untuk menyimpan respons API','Tool untuk deploy API ke cloud'],c:1,fb:'Tepat! Postman Collection adalah file JSON yang berisi sekumpulan request API yang terorganisir dalam folder. Bisa dibagikan ke tim, digunakan untuk testing otomatis, dan diterbitkan sebagai dokumentasi.'},
+   {q:'Apa keunggulan menggunakan Environment Variables di Postman?',opts:['Membuat request lebih cepat','Menyembunyikan API key dari response','Memisahkan nilai seperti base URL dan token antara dev/staging/production','Enkripsi semua request otomatis'],c:2,fb:'Benar! Environment variables memungkinkan kamu punya satu collection yang bisa dipakai di berbagai environment - dev pakai localhost, staging pakai staging URL, production pakai production URL. Tidak perlu edit manual setiap request.'}]
+];
+
+var step=0,qAnsw={},seqOn=-1,aiOpen=false,aiLoad=false,aiHist=[],pollTmr=null,rlTmr=null,rlRem=10,projTab=0,projDone=[false,false,false],yamlCopied=false,pmCopied=false;
+var RL_LIMIT=10;
+var PROJ_APIS=[
+  {name:'JSONPlaceholder',baseUrl:'https://jsonplaceholder.typicode.com',auth:'Tidak perlu (public)',desc:'API testing gratis dengan data dummy. Tersedia posts, users, todos, comments.',hint:'Coba endpoint /posts, /users, /todos'},
+  {name:'GitHub API',baseUrl:'https://api.github.com',auth:'Tidak perlu untuk public data (optional: token)',desc:'API GitHub untuk akses repo, user, issues, commits, dan banyak lagi.',hint:'Coba /users/{username}, /repos/{owner}/{repo}'},
+  {name:'OpenWeatherMap',baseUrl:'https://api.openweathermap.org/data/2.5',auth:'API Key (gratis di openweathermap.org)',desc:'API cuaca dengan data real-time dan forecast untuk ribuan kota di dunia.',hint:'Endpoint utama: /weather?q={city}&appid={key}'}
+];
+
+function esc(s){
+  return String(s).replace(/&/g,'&amp;').replace(/\x3c/g,'&lt;').replace(/\x3e/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function hlJson(json){
+  if(typeof json!=='string')json=JSON.stringify(json,null,2);
+  return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,function(m){
+    if(/^"/.test(m)){if(/:$/.test(m))return'<span class="ky">'+esc(m)+'</span>';return'<span class="ks">'+esc(m)+'</span>';}
+    if(/true|false|null/.test(m))return'<span class="kw">'+m+'</span>';
+    return'<span class="kn">'+m+'</span>';
+  });
+}
+
+function updateNav(){
+  var nav=document.getElementById('navRow');if(!nav)return;
+  nav.innerHTML=NAV.map(function(n,i){
+    var done=qAnsw[n.id]===true&&i!==step;
+    var cls='nb'+(i===step?' active':done?' done':'');
+    return '<button class="'+cls+'" onclick="goStep('+i+')"><span class="nid">'+n.num+'</span>'+n.label+'<span class="ntag">'+n.tag+'</span></button>';
+  }).join('');
+  var pct=Math.round((step+1)/NAV.length*100);
+  document.getElementById('pFill').style.width=pct+'%';
+  document.getElementById('pLbl').textContent=(step+1)+' / '+NAV.length;
+}
+
+function goStep(i){
+  if(pollTmr){clearInterval(pollTmr);pollTmr=null;}
+  if(rlTmr){clearInterval(rlTmr);rlTmr=null;}
+  step=i;seqOn=-1;render();
+}
+
+function render(){
+  updateNav();
+  var el=document.getElementById('main');if(!el)return;
+  var fns=[rS0,rS1,rS2,rS3,rS4,rS5,rS6,rS7];
+  try{el.innerHTML=fns[step]();}
+  catch(e){el.innerHTML='<div class="card"><p style="color:var(--rd)">Error: '+esc(e.message)+'</p></div>';}
+  window.scrollTo(0,0);
+}
+
+document.addEventListener('click',function(e){
+  var btn=e.target.closest('[data-sid][data-qi][data-oi]');
+  if(!btn||btn.disabled)return;
+  var sid=btn.dataset.sid,qi=parseInt(btn.dataset.qi),oi=parseInt(btn.dataset.oi);
+  qAnsw[sid+'_'+qi]=oi;qAnsw[sid]=true;render();
+});
+document.addEventListener('click',function(e){
+  var s=e.target.closest('.seqi[data-idx]');
+  if(!s)return;seqOn=seqOn===parseInt(s.dataset.idx)?-1:parseInt(s.dataset.idx);render();
+});
+document.addEventListener('click',function(e){
+  if(e.target.matches('[data-ptab]')){projTab=parseInt(e.target.dataset.ptab);render();}
+});
+
+function qHtml(sid,qi){
+  var q=QZ[parseInt(sid.substring(1))][qi];
+  var akey=sid+'_'+qi;var ans=qAnsw[akey];var done=ans!==undefined;
+  var h='<div class="qbox">';
+  h+='<div class="qlbl">&#9656; QUICK CHECK '+(qi+1)+'/2</div>';
+  h+='<div class="qq">'+esc(q.q)+'</div>';
+  h+='<div class="qopts">';
+  for(var i=0;i<q.opts.length;i++){
+    var cls='qopt';
+    if(done){cls+=i===q.c?' cor':i===ans?' wrg':'';}
+    var pre=done?(i===q.c?'&#10003; ':i===ans?'&#10007; ':' '):'';
+    h+='<button class="'+cls+'"'+(done?' disabled':'')+' data-sid="'+sid+'" data-qi="'+qi+'" data-oi="'+i+'">'+pre+esc(q.opts[i])+'</button>';
+  }
+  h+='</div>';
+  if(done)h+='<div class="qfb '+(ans===q.c?'ok':'err')+'">'+esc(q.fb)+'</div>';
+  return h+'</div>';
+}
+
+// -- S0: REST API vs Webhook -------------------------------------------------
+function rS0(){
+  var h='<div class="card">';
+  h+='<div class="stag">&#9656; WH-01 - PERBEDAAN</div>';
+  h+='<h1 class="stitle">REST API vs Webhook: <span>Dua Paradigma</span></h1>';
+  h+='<p>Keduanya digunakan untuk komunikasi antar sistem, tapi dengan cara yang sangat berbeda.</p>';
+  h+='<div class="cmp2">';
+  h+='<div class="cbox cbox-poll"><div class="chead"><span class="cion">&#128222;</span><span class="clbl" style="color:var(--yw)">REST API</span></div>';
+  h+='<div class="csub">Client request - Server response</div>';
+  h+='<div class="csteps">1. App kirim request ke server<br>2. Server proses<br>3. Server kirim response<br>4. App terima data</div>';
+  h+='<div class="ccode">GET /api/data &#8594; response</div></div>';
+  h+='<div class="cbox cbox-hook"><div class="chead"><span class="cion">&#128242;</span><span class="clbl" style="color:var(--cy)">WEBHOOK</span></div>';
+  h+='<div class="csub">Event terjadi - Server kirim notifikasi</div>';
+  h+='<div class="csteps">1. Event terjadi di server<br>2. Server langsung POST ke URL kamu<br>3. App terima &amp; proses<br>4. App balas 200 OK</div>';
+  h+='<div class="ccode">POST /webhook &#8592; dari server</div></div>';
+  h+='</div>';
+  h+='<table class="ctbl"><tr><th>Aspek</th><th class="tpoll">REST API</th><th class="thook">Webhook</th></tr>';
+  h+='<tr><td>Siapa mulai</td><td>Client (kamu)</td><td>Server (provider)</td></tr>';
+  h+='<tr><td>Kapan data dikirim</td><td>Saat kamu request</td><td>Saat event terjadi</td></tr>';
+  h+='<tr><td>Efisiensi</td><td>Request meski tidak ada perubahan</td><td>Hanya saat ada event</td></tr>';
+  h+='<tr><td>Latency</td><td>Tergantung polling interval</td><td>Hampir real-time</td></tr>';
+  h+='<tr><td>Kebutuhan</td><td>URL API dari provider</td><td>URL endpoint publik dari kamu</td></tr>';
+  h+='<tr><td>Contoh</td><td>Cek saldo, search produk</td><td>Notif pembayaran, webhook GitHub</td></tr>';
+  h+='</table>';
+  h+='<div style="background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.2);border-radius:8px;padding:14px;margin-top:14px">';
+  h+='<div style="font-size:10px;color:var(--cy);letter-spacing:.1em;margin-bottom:8px">&#128161; KAPAN PAKAI YANG MANA?</div>';
+  h+='<div style="font-size:12.5px;color:var(--mt);line-height:1.9">';
+  h+='<strong style="color:var(--yw)">REST API</strong>: kamu butuh data on-demand (search, get detail, submit form)<br>';
+  h+='<strong style="color:var(--cy)">Webhook</strong>: kamu butuh notifikasi saat event terjadi di sisi provider (payment, order, push, dsb)';
+  h+='</div></div></div>';
+  h+='<div class="card">'+qHtml('s0',0)+qHtml('s0',1)+'<div class="nvbtns"><button class="btnn" onclick="goStep(1)">Trigger-based vs Polling &#8594;</button></div></div>';
+  return h;
+}
+
+// -- S1: Trigger-based vs Polling --------------------------------------------
+function rS1(){
+  var seqs=[
+    {t:'Kamu daftarkan webhook URL ke provider',d:'Di dashboard provider (Stripe, GitHub, dsb): masukkan URL endpoint kamu dan pilih event yang ingin dimonitor. Misalnya: POST https://app.com/webhook - monitor event payment_intent.succeeded.'},
+    {t:'Event terjadi di sisi provider',d:'Customer berhasil bayar, ada push ke repo, email masuk, dsb. Provider mendeteksi event ini dan menyiapkan payload JSON dengan detail event.'},
+    {t:'Provider kirim HTTP POST ke URL kamu',d:'Provider langsung POST ke endpoint yang kamu daftarkan. Tidak menunggu kamu tanya. Payload berisi detail event dalam format JSON.'},
+    {t:'Server kamu proses payload',d:'Server kamu terima POST, verifikasi keasliannya, parse JSON payload, lalu jalankan bisnis logic: update database, kirim email, notifikasi user, dsb.'},
+    {t:'Balas 200 OK segera',d:'PENTING: balas 200 OK secepat mungkin (idealnya kurang dari 5 detik). Proses berat jalankan di background/queue. Jika tidak ada 200 OK, provider akan retry.'}
+  ];
+  var h='<div class="card">';
+  h+='<div class="stag">&#9656; WH-02 - ARSITEKTUR</div>';
+  h+='<h1 class="stitle">Trigger-based: <span>Cara Kerja Webhook</span></h1>';
+  h+='<p>Trigger-based berarti webhook dikirim HANYA saat event spesifik terjadi - bukan berdasarkan jadwal atau request kamu. Klik setiap langkah untuk detail:</p>';
+  h+='<div class="seq-list">';
+  seqs.forEach(function(s,i){
+    var on=seqOn===i?' on':'';
+    h+='<div class="seqi'+on+'" data-idx="'+i+'"><div class="snum">'+(i+1)+'</div><div class="sbody"><div class="sttl">'+s.t+'</div><div class="sdet">'+esc(s.d)+'</div></div></div>';
+  });
+  h+='</div>';
+  h+='<h3>Polling vs Trigger-based: Animasi</h3>';
+  h+='<div class="demo-box"><div class="demo-hdr"><button class="dbtn yw" onclick="startPoll()">&#9654; Polling</button><button class="dbtn cy" onclick="startHook()">&#9654; Trigger-based</button><button class="dbtn" onclick="resetDemo()">&#8635; Reset</button></div>';
+  h+='<div class="darea" id="demoArea"><div class="dmsg" style="color:var(--mt);font-style:italic">Klik animasi untuk lihat perbedaan cara kerja</div></div>';
+  h+='<div class="dstat" id="demoStat"></div></div>';
+  h+='<div style="background:rgba(255,166,87,.05);border:1px solid rgba(255,166,87,.2);border-left:3px solid var(--or);border-radius:6px;padding:14px 16px;margin-top:14px">';
+  h+='<div style="font-size:10px;color:var(--or);letter-spacing:.1em;margin-bottom:8px">&#9889; PREVIEW: WEBHOOK DI N8N</div>';
+  h+='<div style="font-size:12.5px;color:var(--mt);line-height:1.9">';
+  h+='Di n8n: tambah <span style="color:var(--cy)">Webhook node</span> sebagai trigger &#8594; n8n generate URL &#8594; daftarkan ke Stripe/GitHub &#8594; payload otomatis mengalir ke node berikutnya. Kamu tidak perlu setup server!';
+  h+='</div></div></div>';
+  h+='<div class="card">'+qHtml('s1',0)+qHtml('s1',1)+'<div class="nvbtns"><button class="btnp" onclick="goStep(0)">&#8592; REST API vs Webhook</button><button class="btnn" onclick="goStep(2)">Testing Webhook.site &#8594;</button></div></div>';
+  return h;
+}
+
+// -- S2: Testing Webhook.site -------------------------------------------------
+function rS2(){
+  var h='<div class="card">';
+  h+='<div class="stag">&#9656; WH-03 - TESTING</div>';
+  h+='<h1 class="stitle">Testing Webhook: <span>Webhook.site &amp; ngrok</span></h1>';
+  h+='<p>Dua tool utama untuk test webhook selama development. Keduanya gratis dan tidak butuh setup server.</p>';
+  h+='<h3>&#127760; Webhook.site - Inspect Payload</h3>';
+  h+='<div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:16px 20px;margin:12px 0">';
+  h+='<div style="font-size:12.5px;color:var(--mt);line-height:1.9">';
+  h+='1. Buka <span style="color:var(--cy)">webhook.site</span> di browser<br>';
+  h+='2. Kamu dapat URL unik seperti: <span style="color:var(--yw)">https://webhook.site/abc123-def-456</span><br>';
+  h+='3. Daftarkan URL ini di dashboard provider (Stripe, GitHub, dsb)<br>';
+  h+='4. Saat event terjadi, lihat seluruh request di webhook.site - headers, body, method<br>';
+  h+='5. Pelajari format payload sebelum implement di server nyata';
+  h+='</div></div>';
+  h+='<div class="cb"><div class="cbh"><span class="cbd cbr"></span><span class="cbd cby"></span><span class="cbd cbg"></span> Contoh payload yang masuk di webhook.site</div>';
+  h+='<pre style="margin:0;font-size:12px;line-height:1.8"><span class="kh">POST</span> <span class="kv">/abc123-def-456</span> <span class="kh">HTTP/1.1</span>\n<span class="kh">Content-Type:</span> <span class="kv">application/json</span>\n<span class="kh">X-Stripe-Signature:</span> <span class="kv">t=1705311000,v1=5257a...</span>\n\n{\n  <span class="ky">"type"</span>: <span class="ks">"payment_intent.succeeded"</span>,\n  <span class="ky">"data"</span>: {\n    <span class="ky">"object"</span>: {\n      <span class="ky">"amount"</span>: <span class="kn">150000</span>,\n      <span class="ky">"currency"</span>: <span class="ks">"idr"</span>,\n      <span class="ky">"status"</span>: <span class="ks">"succeeded"</span>\n    }\n  }\n}</pre></div>';
+  h+='<h3>&#128135; ngrok - Expose Localhost</h3>';
+  h+='<div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:16px 20px;margin:12px 0">';
+  h+='<div style="font-size:12.5px;color:var(--mt);line-height:1.9">';
+  h+='Ketika kamu SUDAH punya server lokal dan ingin test dengan payload nyata:';
+  h+='</div></div>';
+  h+='<div class="cb"><div class="cbh"><span class="cbd cbr"></span><span class="cbd cby"></span><span class="cbd cbg"></span> Setup ngrok</div>';
+  h+='<pre style="margin:0;font-size:12px;line-height:2"><span class="kc"># 1. Install ngrok (download dari ngrok.com)</span>\n<span class="kc"># 2. Jalankan server lokal kamu di port 3000</span>\n\n<span class="ky">ngrok http 3000</span>\n\n<span class="kc"># Output:</span>\n<span class="ks">Forwarding: https://abc123.ngrok.io -&gt; localhost:3000</span>\n\n<span class="kc"># 3. Daftarkan https://abc123.ngrok.io di dashboard provider</span>\n<span class="kc"># 4. Webhook dari Stripe/GitHub masuk ke server lokal kamu!</span></pre></div>';
+  h+='<h3>Kapan pakai yang mana?</h3>';
+  h+='<table class="ctbl"><tr><th>Situasi</th><th>Tool</th></tr>';
+  h+='<tr><td>Ingin lihat format payload dari provider baru</td><td style="color:var(--cy)">webhook.site</td></tr>';
+  h+='<tr><td>Sudah punya server lokal, ingin test end-to-end</td><td style="color:var(--pu)">ngrok</td></tr>';
+  h+='<tr><td>Build automation di n8n</td><td style="color:var(--or)">n8n Webhook node</td></tr>';
+  h+='</table></div>';
+  h+='<div class="card">'+qHtml('s2',0)+qHtml('s2',1)+'<div class="nvbtns"><button class="btnp" onclick="goStep(1)">&#8592; Trigger-based</button><button class="btnn" onclick="goStep(3)">Rate Limit &amp; Error Handling &#8594;</button></div></div>';
+  return h;
+}
+
+// -- S3: Rate Limiting & Error Handling --------------------------------------
+function rS3(){
+  var h='<div class="card">';
+  h+='<div class="stag">&#9656; WH-04 - ADVANCED</div>';
+  h+='<h1 class="stitle">Rate Limiting &amp; <span>Error Handling</span></h1>';
+  h+='<h3>HTTP Status Codes yang Wajib Diketahui</h3>';
+  h+='<table class="err-tbl"><tr><th>Code</th><th>Nama</th><th>Artinya</th><th>Yang Harus Kamu Lakukan</th></tr>';
+  h+='<tr><td class="ecode e2xx">200</td><td>OK</td><td>Request berhasil</td><td>Proses response</td></tr>';
+  h+='<tr><td class="ecode e2xx">201</td><td>Created</td><td>Resource berhasil dibuat</td><td>Simpan ID resource baru</td></tr>';
+  h+='<tr><td class="ecode e4xx">400</td><td>Bad Request</td><td>Request salah format</td><td>Cek body/parameter, perbaiki request</td></tr>';
+  h+='<tr><td class="ecode e4xx">401</td><td>Unauthorized</td><td>Token invalid/expired</td><td>Refresh token atau re-authenticate</td></tr>';
+  h+='<tr><td class="ecode e4xx">403</td><td>Forbidden</td><td>Tidak punya akses</td><td>Cek permissions/scope API key</td></tr>';
+  h+='<tr><td class="ecode e4xx">404</td><td>Not Found</td><td>Resource tidak ada</td><td>Cek URL/ID yang dipakai</td></tr>';
+  h+='<tr><td class="ecode e429">429</td><td>Too Many Requests</td><td>Rate limit tercapai</td><td>Tunggu, lalu retry dengan backoff</td></tr>';
+  h+='<tr><td class="ecode e5xx">500</td><td>Internal Server Error</td><td>Error di sisi server</td><td>Retry setelah beberapa saat</td></tr>';
+  h+='<tr><td class="ecode e5xx">503</td><td>Service Unavailable</td><td>Server down/overload</td><td>Retry, cek status page provider</td></tr>';
+  h+='</table>';
+  h+='<h3>Rate Limiting - Headers Penting</h3>';
+  h+='<div class="cb"><div class="cbh"><span class="cbd cbr"></span><span class="cbd cby"></span><span class="cbd cbg"></span> Response Headers dari API dengan Rate Limit</div>';
+  h+='<pre style="margin:0;font-size:12px;line-height:2"><span class="kh">X-RateLimit-Limit:</span>     <span class="kv">5000</span>         <span class="kc"># Max request per window</span>\n<span class="kh">X-RateLimit-Remaining:</span> <span class="kv">4998</span>         <span class="kc"># Sisa request</span>\n<span class="kh">X-RateLimit-Reset:</span>     <span class="kv">1705314600</span>   <span class="kc"># Kapan reset (Unix timestamp)</span>\n<span class="kh">Retry-After:</span>           <span class="kv">60</span>           <span class="kc"># Jika 429: tunggu N detik</span></pre></div>';
+  h+='<h3>Error Handling Pattern</h3>';
+  h+='<div class="cb"><div class="cbh"><span class="cbd cbr"></span><span class="cbd cby"></span><span class="cbd cbg"></span> JavaScript - Pattern yang Benar</div>';
+  h+='<pre style="margin:0;font-size:12px;line-height:1.8"><span class="kw">async function</span> <span class="ky">callAPI</span>(url, maxRetry = <span class="kn">3</span>) {\n  <span class="kw">for</span> (<span class="kw">let</span> attempt = <span class="kn">0</span>; attempt &lt; maxRetry; attempt++) {\n    <span class="kw">try</span> {\n      <span class="kw">const</span> res = <span class="kw">await</span> fetch(url);\n\n      <span class="kc">// Tangani setiap error code</span>\n      <span class="kw">if</span> (res.status === <span class="kn">429</span>) {\n        <span class="kw">const</span> wait = (res.headers.get(<span class="ks">"Retry-After"</span>) || <span class="kn">5</span>) * <span class="kn">1000</span>;\n        <span class="kw">await</span> <span class="kw">new</span> Promise(r =&gt; setTimeout(r, wait * (<span class="kn">2</span> ** attempt)));\n        <span class="kw">continue</span>; <span class="kc">// retry</span>\n      }\n      <span class="kw">if</span> (!res.ok) <span class="kw">throw new</span> Error(<span class="ks">"HTTP "</span> + res.status);\n\n      <span class="kw">return await</span> res.json();\n    } <span class="kw">catch</span> (err) {\n      <span class="kw">if</span> (attempt === maxRetry - <span class="kn">1</span>) <span class="kw">throw</span> err;\n      <span class="kw">await</span> <span class="kw">new</span> Promise(r =&gt; setTimeout(r, <span class="kn">1000</span> * (<span class="kn">2</span> ** attempt)));\n    }\n  }\n}</pre></div>';
+  h+='<h3>&#127918; Rate Limit Simulator</h3>';
+  h+='<div class="rl-box">';
+  h+='<div class="rl-meter"><div style="font-size:11px;color:var(--mt);white-space:nowrap">Quota:</div><div class="rl-bw"><div class="rl-bar" id="rlBar" style="width:100%"></div></div><div class="rl-cnt" id="rlCnt">'+rlRem+' / '+RL_LIMIT+'</div></div>';
+  h+='<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="send-btn" id="rlBtn" onclick="rlSend()">&#9654; Send Request</button><button class="dbtn" onclick="rlReset()">&#8635; Reset</button></div>';
+  h+='<div class="rl-log" id="rlLog"><div class="rle" style="color:var(--mt);font-style:italic">Klik "Send Request" untuk simulasi...</div></div>';
+  h+='</div></div>';
+  h+='<div class="card">'+qHtml('s3',0)+qHtml('s3',1)+'<div class="nvbtns"><button class="btnp" onclick="goStep(2)">&#8592; Testing Webhook</button><button class="btnn" onclick="goStep(4)">Dokumentasi API &#8594;</button></div></div>';
+  return h;
+}
+
+// -- S4: Dokumentasi API ------------------------------------------------------
+function rS4(){
+  var h='<div class="card">';
+  h+='<div class="stag">&#9656; WH-05 - DOCS</div>';
+  h+='<h1 class="stitle">Mengenal <span>Dokumentasi API</span></h1>';
+  h+='<p>Dokumentasi API adalah panduan bagi developer untuk memahami cara menggunakan sebuah API tanpa harus melihat source code-nya.</p>';
+  h+='<h3>Mengapa Dokumentasi API Penting?</h3>';
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0">';
+  [{icon:'&#128100;',t:'Bagi Developer Lain',d:'Tanpa dokumentasi, developer tidak tahu endpoint apa yang ada, parameter apa yang dibutuhkan, atau format response-nya.'},
+   {icon:'&#128197;',t:'Bagi Diri Sendiri',d:'6 bulan setelah membuat API, kamu sendiri akan lupa detail implementasinya. Dokumentasi adalah catatan teknis yang selalu bisa dirujuk.'},
+   {icon:'&#129309;',t:'Bagi Klien / Tim',d:'Klien atau tim bisa mengintegrasikan API kamu tanpa harus bertanya-tanya. Hemat waktu dan mengurangi miskomunikasi.'},
+   {icon:'&#127941;',t:'Standar Profesional',d:'Semua API besar (Stripe, GitHub, Slack) punya dokumentasi lengkap. Ini standar minimal untuk API yang siap digunakan.'}
+  ].forEach(function(it){
+    h+='<div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px 14px">';
+    h+='<div style="font-size:16px;margin-bottom:6px">'+it.icon+'</div>';
+    h+='<div style="font-size:13px;font-weight:600;color:var(--tx);margin-bottom:4px">'+it.t+'</div>';
+    h+='<div style="font-size:11.5px;color:var(--mt);line-height:1.6">'+it.d+'</div></div>';
+  });
+  h+='</div>';
+  h+='<h3>Jenis Dokumentasi API</h3>';
+  h+='<div class="doc-grid">';
+  [{n:'README / Wiki',i:'&#128196;',d:'Format paling sederhana. Cocok untuk API internal atau open-source kecil. Tulis di GitHub README atau Notion.',b:'Sederhana',bc:'badge-free'},
+   {n:'OpenAPI / Swagger',i:'&#128268;',d:'Standar industri. Format YAML/JSON yang bisa auto-generate UI interaktif. Semua API besar pakai ini.',b:'Standar Industri',bc:'badge-pop'},
+   {n:'Postman Docs',i:'&#128238;',d:'Dokumentasi sekaligus tool testing. Buat Collection, tambah deskripsi, publish sebagai halaman web.',b:'All-in-One',bc:'badge-pop'}
+  ].forEach(function(d){
+    h+='<div class="doc-card"><div class="dc-icon">'+d.i+'</div><div class="dc-name">'+d.n+'</div><div class="dc-desc">'+d.d+'</div><span class="dc-badge '+d.bc+'">'+d.b+'</span></div>';
+  });
+  h+='</div>';
+  h+='<h3>Anatomi Dokumentasi API yang Baik</h3>';
+  h+='<div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:16px 20px;font-size:12.5px;color:var(--mt);line-height:2">';
+  h+='&#9679; <strong style="color:var(--tx)">Overview</strong>: Apa API ini, untuk apa, siapa yang bisa pakai<br>';
+  h+='&#9679; <strong style="color:var(--tx)">Authentication</strong>: Cara dapat akses (API Key, OAuth, Bearer Token)<br>';
+  h+='&#9679; <strong style="color:var(--tx)">Base URL</strong>: URL dasar semua endpoint<br>';
+  h+='&#9679; <strong style="color:var(--tx)">Endpoints</strong>: Daftar lengkap dengan method, path, parameter, response<br>';
+  h+='&#9679; <strong style="color:var(--tx)">Error Codes</strong>: Daftar error yang mungkin terjadi dan artinya<br>';
+  h+='&#9679; <strong style="color:var(--tx)">Contoh / Samples</strong>: Request dan response nyata yang bisa dicopy';
+  h+='</div></div>';
+  h+='<div class="card">'+qHtml('s4',0)+qHtml('s4',1)+'<div class="nvbtns"><button class="btnp" onclick="goStep(3)">&#8592; Rate Limit &amp; Error</button><button class="btnn" onclick="goStep(5)">Swagger / OpenAPI &#8594;</button></div></div>';
+  return h;
+}
+
+// -- S5: Swagger / OpenAPI ----------------------------------------------------
+var YAML_TEMPLATE='openapi: "3.0.0"\ninfo:\n  title: "Nama API Kamu"\n  version: "1.0.0"\n  description: "Deskripsi singkat API ini"\nservers:\n  - url: "https://api.example.com"\n    description: "Production server"\npaths:\n  /endpoint-kamu:\n    get:\n      summary: "Apa yang dilakukan endpoint ini"\n      description: "Deskripsi lebih detail"\n      parameters:\n        - name: "param1"\n          in: "query"\n          required: false\n          description: "Fungsi parameter ini"\n          schema:\n            type: "string"\n      responses:\n        "200":\n          description: "Berhasil - deskripsi response"\n        "404":\n          description: "Resource tidak ditemukan"\n        "429":\n          description: "Rate limit tercapai"';
+
+function rS5(){
+  var h='<div class="card">';
+  h+='<div class="stag">&#9656; WH-06 - SWAGGER</div>';
+  h+='<h1 class="stitle">Swagger / <span>OpenAPI Specification</span></h1>';
+  h+='<p>OpenAPI (dulunya Swagger) adalah standar untuk mendokumentasikan REST API. Format YAML/JSON-nya bisa diubah menjadi UI interaktif yang bisa dicoba langsung.</p>';
+  h+='<h3>Kenapa OpenAPI Menjadi Standar?</h3>';
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:12px 0">';
+  [{i:'&#128268;',t:'Auto-generate UI',d:'Swagger UI tampilkan semua endpoint dengan form yang bisa dicoba'},
+   {i:'&#128196;',t:'Machine-readable',d:'Tools bisa auto-generate SDK, mock server, atau test dari spec'},
+   {i:'&#127931;',t:'Satu sumber kebenaran',d:'Tim backend, frontend, dan QA punya referensi yang sama'}
+  ].forEach(function(it){
+    h+='<div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px 14px;text-align:center">';
+    h+='<div style="font-size:20px;margin-bottom:6px">'+it.i+'</div>';
+    h+='<div style="font-size:12px;font-weight:600;color:var(--tx);margin-bottom:4px">'+it.t+'</div>';
+    h+='<div style="font-size:11px;color:var(--mt);line-height:1.5">'+it.d+'</div></div>';
+  });
+  h+='</div>';
+  h+='<h3>Struktur Dasar OpenAPI (YAML)</h3>';
+  h+='<div class="cb"><div class="cbh"><span class="cbd cbr"></span><span class="cbd cby"></span><span class="cbd cbg"></span> openapi-spec.yaml - Field Wajib</div>';
+  h+='<pre style="margin:0;font-size:12px;line-height:1.8"><span class="ky">openapi:</span> <span class="ks">"3.0.0"</span>            <span class="kc"># Versi OpenAPI spec (WAJIB)</span>\n<span class="ky">info:</span>                           <span class="kc"># Info API (WAJIB)</span>\n  <span class="ky">title:</span> <span class="ks">"My API"</span>\n  <span class="ky">version:</span> <span class="ks">"1.0.0"</span>\n  <span class="ky">description:</span> <span class="ks">"Apa yang dilakukan API ini"</span>\n<span class="ky">servers:</span>                        <span class="kc"># Base URL</span>\n  - <span class="ky">url:</span> <span class="ks">"https://api.example.com"</span>\n<span class="ky">paths:</span>                          <span class="kc"># Daftar endpoint (WAJIB)</span>\n  <span class="ky">/users:</span>\n    <span class="ky">get:</span>\n      <span class="ky">summary:</span> <span class="ks">"Get all users"</span>\n      <span class="ky">responses:</span>\n        <span class="ky">"200":</span>\n          <span class="ky">description:</span> <span class="ks">"List of users"</span></pre></div>';
+  h+='<h3>&#9997; Coba Buat Spec Sendiri</h3>';
+  h+='<p style="font-size:12.5px">Edit template di bawah, lalu copy ke <a href="https://editor.swagger.io" target="_blank" style="color:var(--cy)">editor.swagger.io</a> untuk melihat hasilnya!</p>';
+  var savedYaml=window._yamlVal||YAML_TEMPLATE;
+  h+='<textarea class="yamlbox" id="yamlEditor" oninput="window._yamlVal=this.value" rows="14">'+esc(savedYaml)+'</textarea>';
+  h+='<div style="display:flex;gap:8px;flex-wrap:wrap">';
+  h+='<button class="send-btn" onclick="copyYaml()">&#128203; Copy Spec</button>';
+  h+='<a href="https://editor.swagger.io" target="_blank"><button class="dbtn cy" style="padding:9px 16px">&#127760; Buka Swagger Editor</button></a>';
+  h+='</div>';
+  h+='<div id="yamlMsg" style="font-size:11px;color:var(--gn);margin-top:8px"></div>';
+  h+='</div>';
+  h+='<div class="card">'+qHtml('s5',0)+qHtml('s5',1)+'<div class="nvbtns"><button class="btnp" onclick="goStep(4)">&#8592; Dokumentasi API</button><button class="btnn" onclick="goStep(6)">Postman Collections &#8594;</button></div></div>';
+  return h;
+}
+
+// -- S6: Postman Collections --------------------------------------------------
+var PM_DEFAULTS={name:'My API Collection',desc:'Collection untuk mengakses My API',r1n:'Get All Posts',r1m:'GET',r1u:'https://jsonplaceholder.typicode.com/posts',r1d:'Mengambil semua posts',r2n:'Get User by ID',r2m:'GET',r2u:'https://jsonplaceholder.typicode.com/users/1',r2d:'Mengambil detail user berdasarkan ID',r3n:'Create Post',r3m:'POST',r3u:'https://jsonplaceholder.typicode.com/posts',r3d:'Membuat post baru'};
+
+function rS6(){
+  var d=window._pmData||PM_DEFAULTS;
+  var pm=buildPMJson(d);
+  var h='<div class="card">';
+  h+='<div class="stag">&#9656; WH-07 - POSTMAN</div>';
+  h+='<h1 class="stitle">Postman <span>Collections &amp; Docs</span></h1>';
+  h+='<p>Postman Collection adalah file JSON berisi kumpulan request API yang terorganisir. Bisa dibagikan ke tim, digunakan untuk testing, dan diterbitkan sebagai dokumentasi publik.</p>';
+  h+='<h3>Anatomi Postman Collection</h3>';
+  h+='<div class="cb"><div class="cbh"><span class="cbd cbr"></span><span class="cbd cby"></span><span class="cbd cbg"></span> collection.json - Struktur Dasar</div>';
+  h+='<pre style="margin:0;font-size:12px;line-height:1.8">{\n  <span class="ky">"info"</span>: {\n    <span class="ky">"name"</span>: <span class="ks">"My API Collection"</span>,\n    <span class="ky">"description"</span>: <span class="ks">"Kumpulan request API"</span>,\n    <span class="ky">"schema"</span>: <span class="ks">"https://schema.getpostman.com/collection/v2.1"</span>\n  },\n  <span class="ky">"item"</span>: [\n    {\n      <span class="ky">"name"</span>: <span class="ks">"Get Users"</span>,\n      <span class="ky">"request"</span>: {\n        <span class="ky">"method"</span>: <span class="ks">"GET"</span>,\n        <span class="ky">"url"</span>: <span class="ks">"{{baseUrl}}/users"</span>,\n        <span class="ky">"description"</span>: <span class="ks">"Ambil semua users"</span>\n      }\n    }\n  ]\n}</pre></div>';
+  h+='<h3>&#9997; Buat Collection Kamu</h3>';
+  h+='<div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:18px 22px;margin:12px 0">';
+  h+='<div class="jlbl">NAMA COLLECTION</div>';
+  h+='<input class="jinp" id="pmName" value="'+esc(d.name)+'" placeholder="Nama collection..." oninput="updatePM()">';
+  h+='<div class="jlbl">DESKRIPSI</div>';
+  h+='<input class="jinp" id="pmDesc" value="'+esc(d.desc)+'" placeholder="Deskripsi collection..." oninput="updatePM()">';
+  h+='<div style="margin-top:14px;font-size:10px;color:var(--cy);letter-spacing:.1em;margin-bottom:10px">REQUESTS (3)</div>';
+  [{k:'r1',n:d.r1n,m:d.r1m,u:d.r1u,desc:d.r1d},{k:'r2',n:d.r2n,m:d.r2m,u:d.r2u,desc:d.r2d},{k:'r3',n:d.r3n,m:d.r3m,u:d.r3u,desc:d.r3d}].forEach(function(r,i){
+    h+='<div class="ep-block"><div class="ep-num">REQUEST '+(i+1)+'</div>';
+    h+='<div class="ep-row"><select class="method-sel" id="pm'+r.k+'m" onchange="updatePM()">';
+    ['GET','POST','PUT','PATCH','DELETE'].forEach(function(m){h+='<option'+(r.m===m?' selected':'')+'>'+m+'</option>';});
+    h+='</select><input class="jinp" style="margin:0;flex:1" id="pm'+r.k+'n" value="'+esc(r.n)+'" placeholder="Nama request..." oninput="updatePM()"></div>';
+    h+='<input class="jinp" id="pm'+r.k+'u" value="'+esc(r.u)+'" placeholder="URL endpoint..." oninput="updatePM()">';
+    h+='<input class="jinp" id="pm'+r.k+'d" value="'+esc(r.desc)+'" placeholder="Deskripsi request..." oninput="updatePM()">';
+    h+='</div>';
+  });
+  h+='<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">';
+  h+='<button class="send-btn" onclick="copyPM()">&#128203; Copy Collection JSON</button>';
+  h+='<a href="https://www.postman.com" target="_blank"><button class="dbtn cy" style="padding:9px 16px">&#127760; Buka Postman</button></a>';
+  h+='</div>';
+  h+='<div id="pmMsg" style="font-size:11px;color:var(--gn);margin-top:8px"></div>';
+  h+='</div>';
+  h+='<div class="jlbl" style="margin:10px 0 6px">PREVIEW JSON:</div>';
+  h+='<div class="json-preview" id="pmPreview">'+hlJson(pm)+'</div>';
+  h+='</div>';
+  h+='<div class="card">'+qHtml('s6',0)+qHtml('s6',1)+'<div class="nvbtns"><button class="btnp" onclick="goStep(5)">&#8592; Swagger</button><button class="btnn" onclick="goStep(7)">Project: Dok 3 API &#8594;</button></div></div>';
+  return h;
+}
+
+function buildPMJson(d){
+  return {
+    info:{name:d.name||'My Collection',description:d.desc||'',schema:'https://schema.getpostman.com/json/collection/v2.1.0/collection.json'},
+    item:[
+      {name:d.r1n||'Request 1',request:{method:d.r1m||'GET',url:{raw:d.r1u||''},description:d.r1d||''}},
+      {name:d.r2n||'Request 2',request:{method:d.r2m||'GET',url:{raw:d.r2u||''},description:d.r2d||''}},
+      {name:d.r3n||'Request 3',request:{method:d.r3m||'POST',url:{raw:d.r3u||''},description:d.r3d||''}}
+    ]
+  };
+}
+
+function updatePM(){
+  var d={};
+  ['r1','r2','r3'].forEach(function(r){
+    var nm=document.getElementById('pm'+r+'n');var mm=document.getElementById('pm'+r+'m');
+    var um=document.getElementById('pm'+r+'u');var dm=document.getElementById('pm'+r+'d');
+    if(nm)d[r+'n']=nm.value;if(mm)d[r+'m']=mm.value;
+    if(um)d[r+'u']=um.value;if(dm)d[r+'d']=dm.value;
+  });
+  var nn=document.getElementById('pmName');var nd=document.getElementById('pmDesc');
+  if(nn)d.name=nn.value;if(nd)d.desc=nd.value;
+  window._pmData=d;
+  var prev=document.getElementById('pmPreview');
+  if(prev)prev.innerHTML=hlJson(buildPMJson(d));
+}
+
+function copyPM(){
+  var d=window._pmData||PM_DEFAULTS;
+  var json=JSON.stringify(buildPMJson(d),null,2);
+  if(navigator.clipboard){navigator.clipboard.writeText(json);}
+  var msg=document.getElementById('pmMsg');
+  if(msg){msg.textContent='Collection JSON tersalin! Buka Postman > Import > Raw text > Paste';setTimeout(function(){msg.textContent='';},4000);}
+}
+
+function copyYaml(){
+  var el=document.getElementById('yamlEditor');
+  var txt=el?el.value:(window._yamlVal||YAML_TEMPLATE);
+  if(navigator.clipboard){navigator.clipboard.writeText(txt);}
+  var msg=document.getElementById('yamlMsg');
+  if(msg){msg.textContent='YAML tersalin! Buka editor.swagger.io > paste di panel kiri';setTimeout(function(){msg.textContent='';},4000);}
+}
+
+// -- S7: Project - Dokumentasi 3 API -----------------------------------------
+function rS7(){
+  var api=PROJ_APIS[projTab];
+  var k='p'+projTab;
+  var saved=window._proj||(window._proj={});
+  var sd=saved[k]||{};
+  var allDone=projDone[0]&&projDone[1]&&projDone[2];
+  var h='<div class="card">';
+  h+='<div class="stag">&#9656; WH-08 - PROJECT</div>';
+  h+='<h1 class="stitle">Project: <span>Dokumentasi 3 API</span></h1>';
+  h+='<p>Kamu akan membuat dokumentasi untuk 3 layanan API yang berbeda. Ini adalah project praktis yang langsung bisa masuk portfolio kamu.</p>';
+  h+='<div class="proj-tabs">';
+  PROJ_APIS.forEach(function(a,i){
+    var cls='ptab'+(i===projTab?' on':'')+(projDone[i]?' dn':'');
+    h+='<button class="'+cls+'" data-ptab="'+i+'">'+(projDone[i]?'&#10003; API '+(i+1)+': ':'API '+(i+1)+': ')+a.name+'</button>';
+  });
+  h+='</div>';
+  h+='<div class="proj-panel">';
+  h+='<div class="proj-hint">&#128161; Panduan: '+esc(api.hint)+'</div>';
+  h+='<h3 style="margin-top:0">'+esc(api.name)+' - Informasi Dasar</h3>';
+  h+='<div class="jlbl">DESKRIPSI API (apa fungsi API ini?)</div>';
+  h+='<input class="jinp" id="pDesc" value="'+esc(sd.desc||api.desc||'')+'" placeholder="'+esc(api.desc)+'" oninput="saveProjField()">';
+  h+='<div class="jlbl">BASE URL</div>';
+  h+='<input class="jinp" id="pBase" value="'+esc(sd.base||api.baseUrl||'')+'" placeholder="'+esc(api.baseUrl)+'" oninput="saveProjField()">';
+  h+='<div class="jlbl">METODE AUTENTIKASI</div>';
+  h+='<input class="jinp" id="pAuth" value="'+esc(sd.auth||api.auth||'')+'" placeholder="'+esc(api.auth)+'" oninput="saveProjField()">';
+  h+='<h3>Dokumentasi Endpoint (minimal 2)</h3>';
+  [1,2].forEach(function(ep){
+    var epKey='ep'+ep;var epd=sd[epKey]||{};
+    h+='<div class="ep-block"><div class="ep-num">ENDPOINT '+ep+'</div>';
+    h+='<div class="ep-row"><select class="method-sel" id="pM'+ep+'" onchange="saveProjField()">';
+    ['GET','POST','PUT','DELETE'].forEach(function(m){h+='<option'+(epd.method===m?' selected':'')+'>'+m+'</option>';});
+    h+='</select><input class="jinp" style="margin:0;flex:1" id="pPath'+ep+'" value="'+esc(epd.path||'')+'" placeholder="/endpoint/path" oninput="saveProjField()"></div>';
+    h+='<input class="jinp" id="pEpDesc'+ep+'" value="'+esc(epd.desc||'')+'" placeholder="Apa yang dilakukan endpoint ini?" oninput="saveProjField()">';
+    h+='<div class="jlbl">PARAMETER / BODY (jika ada)</div>';
+    h+='<input class="jinp" id="pParam'+ep+'" value="'+esc(epd.param||'')+'" placeholder="Contoh: ?userId=1, atau body: {title, body, userId}" oninput="saveProjField()">';
+    h+='<div class="jlbl">CONTOH RESPONSE (singkat)</div>';
+    h+='<input class="jinp" id="pResp'+ep+'" value="'+esc(epd.resp||'')+'" placeholder="Contoh: {id:1, title:..., body:...}" oninput="saveProjField()">';
+    h+='</div>';
+  });
+  h+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">';
+  h+='<button class="send-btn" onclick="checkProj()">&#10003; Selesaikan Dokumentasi API '+(projTab+1)+'</button>';
+  if(projTab<2)h+='<button class="dbtn cy" onclick="nextProj()" style="padding:9px 16px">API Berikutnya &#8594;</button>';
+  h+='</div>';
+  h+='<div id="projMsg" style="font-size:12px;margin-top:10px"></div>';
+  if(projDone[projTab])h+='<div style="background:rgba(63,185,80,.08);border:1px solid var(--gn);border-radius:6px;padding:10px 14px;font-size:12px;color:var(--gn);margin-top:10px">&#10003; Dokumentasi API '+(projTab+1)+' sudah selesai!</div>';
+  h+='</div>';
+  if(allDone){
+    h+='<div class="done-banner"><h2>&#127881; Sesi 3 Selesai - 100% Roadmap!</h2>';
+    h+='<p>Kamu telah menyelesaikan semua 5 topik F-01 Sesi 3: REST API vs Webhook, Trigger-based, Testing, Rate Limiting, dan Dokumentasi API.</p>';
+    h+='<p style="margin-top:8px;color:var(--cy)">Selanjutnya: F-02 JavaScript untuk Automation! &#128640;</p></div>';
+  }
+  h+='</div>';
+  h+='<div class="nvbtns" style="max-width:880px;margin:0 auto;padding:0 24px"><button class="btnp" onclick="goStep(6)">&#8592; Postman Collections</button></div>';
+  return h;
+}
+
+function saveProjField(){
+  if(!window._proj)window._proj={};
+  var k='p'+projTab;var d={};
+  var pDesc=document.getElementById('pDesc');var pBase=document.getElementById('pBase');var pAuth=document.getElementById('pAuth');
+  if(pDesc)d.desc=pDesc.value;if(pBase)d.base=pBase.value;if(pAuth)d.auth=pAuth.value;
+  [1,2].forEach(function(ep){
+    var m=document.getElementById('pM'+ep);var pa=document.getElementById('pPath'+ep);
+    var ed=document.getElementById('pEpDesc'+ep);var pm=document.getElementById('pParam'+ep);var pr=document.getElementById('pResp'+ep);
+    d['ep'+ep]={method:m?m.value:'GET',path:pa?pa.value:'',desc:ed?ed.value:'',param:pm?pm.value:'',resp:pr?pr.value:''};
+  });
+  window._proj[k]=d;
+}
+
+function checkProj(){
+  saveProjField();
+  var k='p'+projTab;var d=(window._proj||{})[k]||{};
+  var msg=document.getElementById('projMsg');
+  var errors=[];
+  if(!d.desc||d.desc.trim().length<10)errors.push('Deskripsi API kurang lengkap (min 10 karakter)');
+  if(!d.base||!d.base.startsWith('http'))errors.push('Base URL harus dimulai dengan http://  atau  https://');
+  if(!d.auth||d.auth.trim().length<3)errors.push('Metode autentikasi harus diisi');
+  var ep1=d.ep1||{};var ep2=d.ep2||{};
+  if(!ep1.path||ep1.path.trim().length<2)errors.push('Path Endpoint 1 belum diisi');
+  if(!ep1.desc||ep1.desc.trim().length<5)errors.push('Deskripsi Endpoint 1 kurang lengkap');
+  if(!ep2.path||ep2.path.trim().length<2)errors.push('Path Endpoint 2 belum diisi');
+  if(!ep2.desc||ep2.desc.trim().length<5)errors.push('Deskripsi Endpoint 2 kurang lengkap');
+  if(errors.length>0){
+    if(msg)msg.innerHTML='<div style="color:var(--rd)">Lengkapi dulu:<br>- '+errors.join('<br>- ')+'</div>';
+    return;
+  }
+  projDone[projTab]=true;
+  if(msg)msg.innerHTML='<div style="color:var(--gn)">&#10003; Dokumentasi API '+(projTab+1)+' disimpan!</div>';
+  setTimeout(render,800);
+}
+
+function nextProj(){checkProj();if(projDone[projTab]){projTab=Math.min(2,projTab+1);render();}}
+
+// -- Demo Animations ---------------------------------------------------------
+function resetDemo(){
+  if(pollTmr){clearInterval(pollTmr);pollTmr=null;}
+  var a=document.getElementById('demoArea');var s=document.getElementById('demoStat');
+  if(a)a.innerHTML='<div class="dmsg" style="color:var(--mt);font-style:italic">Klik animasi untuk melihat perbedaan</div>';
+  if(s)s.textContent='';
+}
+function startPoll(){
+  resetDemo();
+  var area=document.getElementById('demoArea'),stat=document.getElementById('demoStat');if(!area)return;
+  var msgs=[{c:'dout',t:'-> App: "Ada update?" (request #1)'},{c:'din',t:'<- Server: "Belum ada." (200 OK)'},{c:'dout',t:'-> App: "Ada update?" (request #2)'},{c:'din',t:'<- Server: "Belum ada." (200 OK)'},{c:'dout',t:'-> App: "Ada update?" (request #3)'},{c:'din',t:'<- Server: "Belum ada." (200 OK)'},{c:'dout',t:'-> App: "Ada update?" (request #4)'},{c:'dok',t:'<- Server: "Ada! Payment berhasil" OK'}];
+  var i=0;area.innerHTML='';
+  pollTmr=setInterval(function(){
+    if(i<msgs.length){var d=document.createElement('div');d.className='dmsg '+msgs[i].c;d.textContent=msgs[i].t;area.appendChild(d);area.scrollTop=area.scrollHeight;i++;if(stat&&i>=msgs.length)stat.textContent='4 request terkirim - 3 request sia-sia!';}
+    else{clearInterval(pollTmr);pollTmr=null;}
+  },700);
+}
+function startHook(){
+  resetDemo();
+  var area=document.getElementById('demoArea'),stat=document.getElementById('demoStat');if(!area)return;
+  var msgs=[{c:'devt',t:'[ Event terjadi: payment berhasil ]'},{c:'dhk',t:'<- Provider: POST /webhook {"event":"payment.success"}'},{c:'dok',t:'-> App: 200 OK - Payload diterima!'},{c:'dok',t:'  App proses: update DB, kirim email'},{c:'dok',t:'  Total: 1 request. Efisien!'}];
+  var i=0;area.innerHTML='';
+  var tmr=setInterval(function(){
+    if(i<msgs.length){var d=document.createElement('div');d.className='dmsg '+msgs[i].c;d.textContent=msgs[i].t;area.appendChild(d);area.scrollTop=area.scrollHeight;i++;if(stat&&i>=msgs.length)stat.textContent='1 request - data langsung saat event terjadi!';}
+    else clearInterval(tmr);
+  },700);
+}
+
+// -- Rate Limit Simulator -----------------------------------------------------
+function rlSend(){
+  var log=document.getElementById('rlLog'),bar=document.getElementById('rlBar'),cnt=document.getElementById('rlCnt'),btn=document.getElementById('rlBtn');
+  if(!log)return;
+  if(rlRem<=0){addRlLog(log,'rle-er','HTTP 429 Too Many Requests - Rate limited!');startRlCD();return;}
+  rlRem--;
+  var pct=rlRem/RL_LIMIT*100;
+  if(bar){bar.style.width=pct+'%';bar.style.background=pct<=30?'var(--rd)':pct<=60?'var(--yw)':'var(--gn)';}
+  if(cnt){cnt.textContent=rlRem+' / '+RL_LIMIT;cnt.style.color=pct<=30?'var(--rd)':pct<=60?'var(--yw)':'';}
+  addRlLog(log,pct<=30?'rle-wn':'rle-ok','200 OK - Remaining: '+rlRem+'/'+RL_LIMIT+(rlRem<=3?' - Quota menipis!':''));
+}
+function addRlLog(log,cls,msg){var e=document.createElement('div');e.className='rle '+cls;e.textContent=msg;log.appendChild(e);log.scrollTop=log.scrollHeight;}
+function startRlCD(){
+  var btn=document.getElementById('rlBtn');if(!btn)return;
+  btn.disabled=true;var secs=10;
+  if(rlTmr)clearInterval(rlTmr);
+  rlTmr=setInterval(function(){
+    secs--;
+    if(secs<=0){
+      clearInterval(rlTmr);rlTmr=null;rlRem=RL_LIMIT;
+      var b=document.getElementById('rlBar'),c=document.getElementById('rlCnt'),bb=document.getElementById('rlBtn'),lg=document.getElementById('rlLog');
+      if(b){b.style.width='100%';b.style.background='var(--gn)';}
+      if(c){c.textContent=RL_LIMIT+' / '+RL_LIMIT;c.style.color='';}
+      if(bb){bb.disabled=false;bb.textContent='&#9654; Send Request';}
+      if(lg)addRlLog(lg,'rle-ok','Window reset! Quota kembali penuh.');
+    }else{if(btn)btn.textContent='Rate Limited - Reset in '+secs+'s';}
+  },1000);
+}
+function rlReset(){
+  if(rlTmr){clearInterval(rlTmr);rlTmr=null;}
+  rlRem=RL_LIMIT;
+  var b=document.getElementById('rlBar'),c=document.getElementById('rlCnt'),btn=document.getElementById('rlBtn'),log=document.getElementById('rlLog');
+  if(b){b.style.width='100%';b.style.background='var(--gn)';}
+  if(c){c.textContent=RL_LIMIT+' / '+RL_LIMIT;c.style.color='';}
+  if(btn){btn.disabled=false;btn.textContent='&#9654; Send Request';}
+  if(log)log.innerHTML='<div class="rle" style="color:var(--mt);font-style:italic">Quota direset. Mulai lagi!</div>';
+}
+
+// -- AI Tutor -----------------------------------------------------------------
+document.getElementById('aiFab').onclick=function(){aiOpen=!aiOpen;document.getElementById('aiPanel').className='ai-pan'+(aiOpen?' open':'');};
+document.getElementById('aiClose').onclick=function(){aiOpen=false;document.getElementById('aiPanel').className='ai-pan';};
+document.getElementById('aiInp').addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendAI();}});
+document.getElementById('aiSnd').onclick=sendAI;
+
+function renderAiHist(){
+  var h=document.getElementById('aiHist');if(!h)return;
+  h.innerHTML=aiHist.map(function(m){return'<div class="ai-msg '+m.r+'">'+esc(m.c)+'</div>';}).join('');
+  if(aiLoad)h.innerHTML+='<div class="ai-msg bot loading">Thinking...</div>';
+  h.scrollTop=h.scrollHeight;
+}
+
+async function sendAI(){
+  var inp=document.getElementById('aiInp');if(!inp)return;
+  var msg=inp.value.trim();if(!msg||aiLoad)return;
+  inp.value='';aiHist.push({r:'user',c:msg});aiLoad=true;
+  document.getElementById('aiSnd').disabled=true;renderAiHist();
+  var messages=aiHist.slice(-8).map(function(m){return{role:m.r==='user'?'user':'assistant',content:m.c};});
+  try{
+    var res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:'Kamu adalah AI Tutor untuk F-01 Sesi 3: Webhook & Advanced API. Topik yang dicover: perbedaan REST API vs Webhook, trigger-based vs polling, testing dengan webhook.site dan ngrok, rate limiting dan error handling, dan dokumentasi API (Swagger/OpenAPI dan Postman Collections). Semua ini untuk persiapan belajar n8n. Jawab dalam Bahasa Indonesia, ringkas, praktis, dan dengan contoh konkret. Maksimal 3 paragraf pendek.',messages:messages})});
+    var data=await res.json();
+    var reply=data.content&&data.content[0]?data.content[0].text:'Maaf, tidak dapat merespons.';
+    aiHist.push({r:'bot',c:reply});
+  }catch(e){aiHist.push({r:'bot',c:'Error: '+e.message});}
+  aiLoad=false;document.getElementById('aiSnd').disabled=false;renderAiHist();
+}
+
+render();
+</script>
+</body>
+</html>

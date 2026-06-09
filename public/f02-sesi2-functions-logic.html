@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>F-02 · Sesi 2 · Functions &amp; Logic</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#080c10;color:#c9d1d9;font-family:'JetBrains Mono','Courier New',monospace;font-size:13px;min-height:100vh}
+.hdr{background:linear-gradient(180deg,#0d1f2d,#080c10);border-bottom:1px solid #1e3a4a;padding:14px 20px 10px;position:sticky;top:0;z-index:100}
+.hdr-top{display:flex;align-items:center;gap:8px;margin-bottom:3px}
+.pulse{width:7px;height:7px;border-radius:50%;background:#ffeb3b;box-shadow:0 0 8px #ffeb3b;animation:pulse 2s infinite;flex-shrink:0}
+.hdr-label{font-size:9px;color:#ffeb3b;letter-spacing:3px;text-transform:uppercase}
+.hdr-title{font-size:15px;font-weight:700;color:#e6edf3;letter-spacing:1px}
+.hdr-sub{font-size:10px;color:#6e7681;margin:2px 0 9px}
+.dots-row{display:flex;align-items:center;gap:8px}
+.step-dots{display:flex;gap:4px;flex-wrap:wrap}
+.dot{width:20px;height:4px;border-radius:2px;background:#1e3a4a;cursor:pointer;transition:all .2s}
+.dot.active{background:#ffeb3b;box-shadow:0 0 6px #ffeb3b}
+.dot.done{background:#ffeb3b40}
+.step-ctr{font-size:9px;color:#6e7681;letter-spacing:1px;white-space:nowrap}
+.prog{height:2px;background:#1e3a4a;border-radius:1px;margin-top:7px;overflow:hidden}
+.prog-fill{height:100%;background:#ffeb3b;transition:width .4s}
+.content{padding:20px 20px 80px;max-width:720px}
+.sec-lbl{font-size:9px;color:#6e7681;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
+.step-title{font-size:19px;font-weight:700;color:#e6edf3;margin-bottom:6px;line-height:1.3}
+.step-sub{font-size:11px;color:#8b949e;line-height:1.7;margin-bottom:18px}
+.code-blk{background:#050809;border:1px solid #1e3a4a;border-radius:6px;overflow:hidden;margin:12px 0}
+.code-hdr{display:flex;align-items:center;justify-content:space-between;padding:7px 12px;background:#0a0f14;border-bottom:1px solid #1e3a4a}
+.code-lang{font-size:9px;color:#ffeb3b;letter-spacing:2px}
+.copy-btn{font-size:9px;background:none;border:none;color:#6e7681;font-family:inherit;cursor:pointer;transition:color .2s;padding:0}
+.copy-btn:hover{color:#ffeb3b}
+pre{padding:13px;overflow-x:auto;font-size:12px;line-height:1.75;color:#c9d1d9}
+.kw{color:#ff79c6}.fn{color:#50fa7b}.str{color:#f1fa8c}.num{color:#bd93f9}
+.cm{color:#6272a4;font-style:italic}.var{color:#8be9fd}.prop{color:#ffb86c}
+.box{background:#0d1f2d;border:1px solid #1e3a4a;border-left:3px solid #ffeb3b;border-radius:6px;padding:12px 14px;margin:12px 0}
+.box.ok{border-left-color:#3fb950;background:#0d2a1a;border-color:#2ea04326}
+.box.warn{border-left-color:#f0883e;background:#181000;border-color:#f0883e33}
+.box.tip{border-left-color:#00e5ff;background:#0a1820;border-color:#1e3a4a}
+.box-lbl{font-size:9px;letter-spacing:2px;margin-bottom:6px;text-transform:uppercase;color:#ffeb3b}
+.box-lbl.g{color:#3fb950}.box-lbl.o{color:#f0883e}.box-lbl.b{color:#00e5ff}
+.box-body{font-size:11px;line-height:1.65;color:#c9d1d9}
+.runner{background:#050809;border:1px solid #1e3a4a;border-radius:6px;overflow:hidden;margin:12px 0}
+.runner-hdr{display:flex;align-items:center;justify-content:space-between;padding:7px 12px;background:#0a0f14;border-bottom:1px solid #1e3a4a}
+.runner-lbl{font-size:9px;color:#ffeb3b;letter-spacing:2px}
+.run-btn{padding:3px 13px;background:#ffeb3b22;border:1px solid #ffeb3b;color:#ffeb3b;border-radius:3px;cursor:pointer;font-size:10px;font-family:inherit;transition:all .2s;letter-spacing:1px}
+.run-btn:hover{background:#ffeb3b;color:#000;font-weight:700}
+.code-ta{width:100%;padding:13px;background:transparent;border:none;color:#c9d1d9;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.75;resize:vertical;outline:none;min-height:100px}
+.out-lbl{font-size:9px;color:#6e7681;letter-spacing:2px;padding:5px 13px;background:#030508;border-top:1px solid #1e3a4a}
+.out-area{padding:10px 13px;background:#030508;font-size:11px;line-height:1.6;min-height:42px;color:#3fb950;white-space:pre-wrap;font-family:'JetBrains Mono',monospace}
+.out-area.err{color:#f85149}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.card{background:#0d1f2d;border:1px solid #1e3a4a;border-radius:6px;padding:12px}
+.card-ttl{font-size:10px;color:#ffeb3b;letter-spacing:1px;margin-bottom:8px}
+.card pre{padding:0;font-size:11px}
+.card p{font-size:11px;line-height:1.55;color:#c9d1d9}
+.quiz-wrap{background:#0d1f2d;border:1px solid #1e3a4a;border-radius:8px;padding:15px;margin:14px 0}
+.quiz-q{font-size:12px;color:#e6edf3;line-height:1.55;margin-bottom:11px}
+.quiz-opts{display:flex;flex-direction:column;gap:5px}
+.opt-btn{display:flex;gap:10px;align-items:flex-start;padding:7px 11px;border:1px solid #1e3a4a;border-radius:4px;cursor:pointer;background:#0a0f14;transition:all .2s;font-size:11px;color:#c9d1d9;font-family:inherit;text-align:left;line-height:1.5;width:100%}
+.opt-btn:hover:not(:disabled){border-color:#ffeb3b55;background:#ffeb3b0d}
+.opt-btn.correct{border-color:#3fb950;background:#0d2a1a;color:#3fb950}
+.opt-btn.wrong{border-color:#f85149;background:#1a0d0d;color:#f85149}
+.quiz-fb{font-size:11px;padding:8px 11px;border-radius:4px;margin-top:7px;display:none;line-height:1.55}
+.quiz-fb.show{display:block}
+.quiz-fb.correct{background:#0d2a1a;color:#3fb950;border:1px solid #3fb95040}
+.quiz-fb.wrong{background:#1a0d0d;color:#f85149;border:1px solid #f8514940}
+.mission{background:#0d1f2d;border:1px solid #1e3a4a;border-radius:8px;padding:15px;margin-bottom:12px}
+.mission-num{font-size:9px;color:#ffeb3b;letter-spacing:2px;margin-bottom:4px}
+.mission-ttl{font-size:13px;color:#e6edf3;font-weight:600;margin-bottom:7px}
+.mission-desc{font-size:11px;color:#8b949e;line-height:1.65;margin-bottom:8px}
+.val-btn{padding:5px 13px;background:#ffeb3b22;border:1px solid #ffeb3b;color:#ffeb3b;border-radius:4px;cursor:pointer;font-size:10px;font-family:inherit;letter-spacing:1px;transition:all .2s;margin-top:7px}
+.val-btn:hover{background:#ffeb3b;color:#000;font-weight:700}
+.m-result{margin-top:7px;padding:7px 11px;border-radius:4px;font-size:11px;display:none;line-height:1.55}
+.m-result.show{display:block}
+.m-result.pass{background:#0d2a1a;color:#3fb950;border:1px solid #3fb95040}
+.m-result.fail{background:#1a0d0d;color:#f85149;border:1px solid #f8514940}
+.nav-bar{position:fixed;bottom:0;left:0;right:0;display:flex;gap:10px;padding:11px 20px;background:linear-gradient(0deg,#080c10 72%,transparent)}
+.nav-btn{flex:1;padding:9px;border-radius:6px;cursor:pointer;font-size:11px;font-family:inherit;letter-spacing:1px;transition:all .2s;border:1px solid #1e3a4a;background:#0a0f14;color:#c9d1d9}
+.nav-btn:disabled{opacity:.28;cursor:default}
+.nav-btn.next{border-color:#ffeb3b55;background:#ffeb3b22;color:#ffeb3b}
+.nav-btn.next:hover:not(:disabled){background:#ffeb3b;color:#000;font-weight:700}
+hr.div{border:none;border-top:1px solid #1e3a4a;margin:20px 0}
+.row-item{display:flex;gap:12px;margin-bottom:6px;padding:9px 12px;background:#0d1f2d;border:1px solid #1e3a4a;border-left:2px solid #ffeb3b;border-radius:4px;align-items:flex-start}
+.check-item{display:flex;gap:10px;margin-bottom:5px;padding:7px 11px;background:#0d1f2d;border:1px solid #1e3a4a;border-left:2px solid #ffeb3b;border-radius:4px}
+.check-item span:first-child{color:#ffeb3b;flex-shrink:0;margin-top:1px}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn .22s ease}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:#080c10}
+::-webkit-scrollbar-thumb{background:#1e3a4a;border-radius:2px}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div class="hdr-top">
+    <div class="pulse"></div>
+    <span class="hdr-label">F-02 · JAVASCRIPT UNTUK AUTOMATION</span>
+  </div>
+  <div class="hdr-title">SESI 2: FUNCTIONS &amp; LOGIC</div>
+  <div class="hdr-sub">Minggu 4–5 · Arrow Function · map · filter/find · Destructuring · Optional Chaining</div>
+  <div class="dots-row">
+    <div class="step-dots" id="stepDots"></div>
+    <span class="step-ctr" id="stepCtr"></span>
+  </div>
+  <div class="prog"><div class="prog-fill" id="progFill"></div></div>
+</div>
+<div class="content" id="content"></div>
+<div class="nav-bar">
+  <button class="nav-btn" id="btnPrev" onclick="nav(-1)">← SEBELUMNYA</button>
+  <button class="nav-btn next" id="btnNext" onclick="nav(1)">BERIKUTNYA →</button>
+</div>
+<script>
+var cur=0,done=new Set();
+var QUIZ={
+  arrow:{q:"Mana penulisan arrow function yang benar untuk 1 parameter <code>price</code> yang mengembalikan <code>price * 1.11</code>?",opts:[
+    {t:"const addTax = (price) => { price * 1.11 }",c:false,e:"Tidak ada kata kunci return — hasilnya selalu undefined"},
+    {t:"const addTax = price => price * 1.11",c:true,e:"Betul! 1 parameter (tanpa kurung) + 1 ekspresi (tanpa curly braces dan return)"},
+    {t:"const addTax = function(price) { return price * 1.11 }",c:false,e:"Valid tapi ini function expression biasa — bukan arrow function"},
+    {t:"const addTax => price { return price * 1.11 }",c:false,e:"Syntax salah — tanda = harus ada setelah nama variable"}
+  ]},
+  map:{q:"Dari array <code>[100, 200, 300]</code>, perlu array setelah diskon 20%: <code>[80, 160, 240]</code>. Code yang tepat?",opts:[
+    {t:"prices.filter(p => p * 0.8)",c:false,e:"filter() untuk seleksi true/false — bukan transformasi nilai"},
+    {t:"prices.map(p => p * 0.8)",c:true,e:"Betul! map() mentransformasi setiap item dan mengembalikan array baru dengan panjang sama"},
+    {t:"prices.forEach(p => p * 0.8)",c:false,e:"forEach() tidak mengembalikan array baru — hasilnya undefined"},
+    {t:"prices.find(p => p * 0.8)",c:false,e:"find() hanya mengembalikan 1 item yang pertama cocok"}
+  ]},
+  filterfind:{q:"Array <code>users</code> berisi 100 user. Perlu mencari 1 user dengan <code>id === 42</code>. Method paling tepat?",opts:[
+    {t:"users.map(u => u.id === 42)",c:false,e:"map() menghasilkan array boolean — bukan yang dicari"},
+    {t:"users.filter(u => u.id === 42)",c:false,e:"Bisa, tapi mengembalikan array. Karena ID unik, find() lebih tepat"},
+    {t:"users.find(u => u.id === 42)",c:true,e:"Betul! find() langsung mengembalikan item pertama yang cocok — sempurna untuk ID unik"},
+    {t:"users.forEach(u => u.id === 42)",c:false,e:"forEach() tidak mengembalikan nilai apapun — selalu undefined"}
+  ]},
+  destruct:{q:"Dari <code>const obj = { name: 'Budi', score: 90, level: 'advanced' }</code>, ambil hanya <code>name</code> dan <code>level</code> dalam 1 baris:",opts:[
+    {t:"const name = obj.name; const level = obj.level;",c:false,e:"Valid tapi ini 2 baris — bukan destructuring"},
+    {t:"const { name, level } = obj;",c:true,e:"Betul! Object destructuring — ambil beberapa field dari object sekaligus dalam 1 baris"},
+    {t:"const [name, level] = obj;",c:false,e:"Bracket [] adalah array destructuring — untuk object gunakan curly braces {}"},
+    {t:"const name, level = obj;",c:false,e:"Syntax JavaScript tidak valid sama sekali"}
+  ]},
+  optional:{q:"<code>const data = { user: null }</code>. Apa hasil dari <code>data?.user?.email ?? 'no email'</code>?",opts:[
+    {t:"TypeError: Cannot read properties of null",c:false,e:"Optional chaining ?. mencegah error ini — jika null, langsung return undefined"},
+    {t:"'no email'",c:true,e:"Betul! data.user null → ?.email return undefined → ?? memberikan fallback 'no email'"},
+    {t:"null",c:false,e:"null adalah nilai data.user, tapi setelah ?. hasilnya undefined dan ?? memberikan fallback string"},
+    {t:"undefined",c:false,e:"Nilai antara sebelum ??. Karena ada nullish coalescing, hasil akhirnya adalah 'no email'"}
+  ]}
+};
+
+var CODE={
+'r-arrow':"// Arrow functions\nconst greet = name => \"Halo, \" + name + \"!\";\nconsole.log(greet(\"Budi\"));\n\n// Multi-param: butuh kurung\nconst formatPrice = (price, currency) => currency + \" \" + price.toLocaleString(\"id-ID\");\nconsole.log(formatPrice(1500000, \"Rp\"));\n\n// Return object: bungkus dengan ( )\nconst makeProduct = (name, price) => ({ name: name, price: price });\nconsole.log(JSON.stringify(makeProduct(\"Laptop\", 12000000)));",
+
+'r-map':"const orders = [\n  { order_id: \"ORD-001\", customer: \"Budi\", total_idr: 500000, items: 3 },\n  { order_id: \"ORD-002\", customer: \"Sari\", total_idr: 1200000, items: 7 },\n  { order_id: \"ORD-003\", customer: \"Joko\", total_idr: 250000, items: 1 },\n];\n\n// Transform: rename field, konversi IDR ke USD, tambah summary\nconst report = orders.map(order => ({\n  id: order.order_id,\n  customer: order.customer,\n  totalUSD: (order.total_idr / 15800).toFixed(2),\n  summary: order.items + \" item(s)\",\n}));\n\nconsole.log(JSON.stringify(report, null, 2));",
+
+'r-filter':"const products = [\n  { id: \"P01\", name: \"Laptop\", category: \"electronics\", price: 12000000, inStock: true },\n  { id: \"P02\", name: \"Mouse\", category: \"electronics\", price: 150000, inStock: false },\n  { id: \"P03\", name: \"Meja Kerja\", category: \"furniture\", price: 2500000, inStock: true },\n  { id: \"P04\", name: \"Kursi\", category: \"furniture\", price: 1800000, inStock: true },\n  { id: \"P05\", name: \"Monitor\", category: \"electronics\", price: 3500000, inStock: true },\n];\n\n// filter: electronics yang tersedia\nconst availElec = products.filter(p => p.category === \"electronics\" && p.inStock);\nconsole.log(\"Electronics in stock:\", availElec.map(p => p.name).join(\", \"));\n\n// filter: harga di bawah 2 juta\nconst affordable = products.filter(p => p.price < 2000000);\nconsole.log(\"Under 2M:\", affordable.map(p => p.name).join(\", \"));\n\n// find: 1 produk spesifik\nconst target = products.find(p => p.id === \"P03\");\nconsole.log(\"Found:\", target ? target.name : \"not found\");",
+
+'r-foreach':"const invoices = [\n  { id: \"INV-001\", client: \"PT Maju\", amount: 5000000, status: \"unpaid\" },\n  { id: \"INV-002\", client: \"CV Berkah\", amount: 3200000, status: \"paid\" },\n  { id: \"INV-003\", client: \"UD Jaya\", amount: 1500000, status: \"unpaid\" },\n];\n\nconst unpaid = invoices.filter(inv => inv.status === \"unpaid\");\nconsole.log(\"=== TAGIHAN BELUM DIBAYAR ===\");\nunpaid.forEach(inv => {\n  const fmt = \"Rp \" + inv.amount.toLocaleString(\"id-ID\");\n  console.log(inv.id + \" | \" + inv.client + \" | \" + fmt);\n});\nconsole.log(\"Total: \" + unpaid.length + \" invoice\");",
+
+'r-destruct':"const formData = {\n  full_name: \"Budi Santoso\",\n  email_address: \"budi@company.com\",\n  phone: \"081234567890\",\n  company: \"PT Maju Bersama\",\n  timestamp: \"2025-01-15T10:30:00Z\",\n};\n\n// Destructuring: ambil field + rename\nconst { full_name: name, email_address: email, company } = formData;\nconsole.log(\"Name:\", name, \"| Email:\", email);\n\n// Spread: buat object baru dengan tambah field\nconst crmPayload = {\n  ...formData,\n  fullName: name,\n  source: \"website\",\n  status: \"new_lead\",\n};\nconsole.log(JSON.stringify(crmPayload, null, 2));",
+
+'r-optional':"const customers = [\n  { id: 1, profile: { fullName: \"Budi Santoso\" }, address: { city: \"Jakarta\" }, subscription: { plan: \"pro\" } },\n  { id: 2, profile: { fullName: \"Sari Dewi\" }, address: null, subscription: { plan: \"free\" } },\n  { id: 3, subscription: null },\n];\n\nconst formatted = customers.map(c => ({\n  id: c.id,\n  name: c?.profile?.fullName ?? \"Unknown\",\n  city: c?.address?.city ?? \"No address\",\n  plan: c?.subscription?.plan ?? \"free\",\n}));\n\nconsole.log(JSON.stringify(formatted, null, 2));",
+
+'r-chain':"const salesData = [\n  { rep: \"Budi\", region: \"North\", deals: 12, revenue: 180000000 },\n  { rep: \"Sari\", region: \"South\", deals: 8,  revenue: 120000000 },\n  { rep: \"Joko\", region: \"North\", deals: 15, revenue: 225000000 },\n  { rep: \"Rina\", region: \"East\",  deals: 6,  revenue:  90000000 },\n  { rep: \"Dodi\", region: \"North\", deals: 20, revenue: 300000000 },\n  { rep: \"Maya\", region: \"South\", deals: 11, revenue: 165000000 },\n];\n\n// Pipeline: North → sort desc → top 2 → format\nconst topNorth = salesData\n  .filter(s => s.region === \"North\")\n  .sort((a, b) => b.revenue - a.revenue)\n  .slice(0, 2)\n  .map((s, i) => ({\n    rank: i + 1,\n    rep: s.rep,\n    revenue: \"Rp \" + (s.revenue / 1000000).toFixed(0) + \"M\",\n  }));\n\nconsole.log(\"Top 2 North:\", JSON.stringify(topNorth, null, 2));\nconst total = salesData.reduce((sum, s) => sum + s.revenue, 0);\nconsole.log(\"Grand total: Rp \" + (total / 1000000).toFixed(0) + \"M\");",
+
+'m01':"const rawLeads = [\n  { first_name: \"Budi\", last_name: \"Santoso\", email: \"budi@co.com\", lead_score: 85, source: \"web\" },\n  { first_name: \"Sari\", last_name: \"Dewi\",    email: \"sari@co.com\", lead_score: 62, source: \"referral\" },\n  { first_name: \"Joko\", last_name: \"Purnomo\", email: \"joko@co.com\", lead_score: 45, source: \"ads\" },\n];\n\n// Output: { fullName, email, category, source }\n// category: hot(>=80) warm(>=50) cold(<50)\nconst formatted = rawLeads.map(lead => ({\n  fullName: lead.first_name + \" \" + lead.last_name,\n  email: lead.email,\n  category: lead.lead_score >= 80 ? \"hot\" : lead.lead_score >= 50 ? \"warm\" : \"cold\",\n  source: lead.source,\n}));\n\nconsole.log(JSON.stringify(formatted, null, 2));",
+
+'m02':"const orders = [\n  { order_id: \"O1\", customer: \"Budi\", status: \"paid\",      total: 2500000 },\n  { order_id: \"O2\", customer: \"Sari\", status: \"pending\",   total: 1800000 },\n  { order_id: \"O3\", customer: \"Joko\", status: \"paid\",      total:  750000 },\n  { order_id: \"O4\", customer: \"Rina\", status: \"paid\",      total: 3200000 },\n  { order_id: \"O5\", customer: \"Dodi\", status: \"cancelled\", total:  950000 },\n  { order_id: \"O6\", customer: \"Maya\", status: \"paid\",      total:  420000 },\n];\n\n// filter paid + total > 1jt, then clean field names\nconst result = orders\n  .filter(o => o.status === \"paid\" && o.total > 1000000)\n  .map(o => ({ orderId: o.order_id, customer: o.customer, total: o.total }));\n\nconsole.log(JSON.stringify(result, null, 2));\nconsole.log(\"Count:\", result.length, \"orders\");",
+
+'m03':"const webhooks = [\n  { event: \"lead_created\", data: { contact: { name: \"Budi\", email: \"b@c.com\" }, address: { city: \"Jakarta\" } } },\n  { event: \"lead_created\", data: { contact: { name: \"Sari\" } } },\n  { event: \"lead_created\", data: null },\n];\n\n// Safe parse dengan ?. dan ??\nconst parsed = webhooks.map(w => ({\n  event: w.event,\n  name:  w?.data?.contact?.name  ?? \"Unknown\",\n  email: w?.data?.contact?.email ?? \"no-reply@placeholder.com\",\n  city:  w?.data?.address?.city  ?? \"Unknown City\",\n}));\n\nconsole.log(JSON.stringify(parsed, null, 2));",
+
+'m04':"const closedDeals = [\n  { deal_id: \"D01\", rep: \"Budi\", client: \"PT Alpha\", value: 12000000, product: \"Pro Plan\" },\n  { deal_id: \"D02\", rep: \"Sari\", client: \"CV Beta\",  value:  3500000, product: \"Starter\" },\n  { deal_id: \"D03\", rep: \"Joko\", client: \"UD Gamma\", value:  8500000, product: \"Enterprise\" },\n  { deal_id: \"D04\", rep: \"Rina\", client: \"PT Delta\", value:  2000000, product: \"Starter\" },\n];\n\n// filter >5M, gunakan destructuring di map()\nconst messages = closedDeals\n  .filter(({ value }) => value > 5000000)\n  .map(({ deal_id, rep, client, value, product }) => ({\n    id: deal_id,\n    slack: \"[DEAL CLOSED] \" + rep + \" won \" + client +\n           \" (\" + product + \") — Rp \" + (value / 1000000).toFixed(1) + \"M\",\n  }));\n\nmessages.forEach(m => console.log(m.id + \": \" + m.slack));",
+
+'m05':"const rawCustomers = [\n  { id: 1, name: \"Budi S\", active: true,  joinDate: \"2024-03-15\", address: { city: \"Jakarta\" },  tier: \"gold\" },\n  { id: 2, name: \"Sari D\", active: false, joinDate: \"2024-01-10\", address: null,               tier: \"silver\" },\n  { id: 3, name: \"Joko P\", active: true,  joinDate: \"2023-11-20\", address: { city: \"Bandung\" }, tier: \"platinum\" },\n  { id: 4, name: \"Rina M\", active: true,  joinDate: \"2024-05-01\", address: { city: \"Surabaya\" },tier: \"gold\" },\n  { id: 5, name: \"Dodi K\", active: true,  joinDate: \"2024-02-28\", address: null,               tier: \"silver\" },\n];\n\n// filter active → safe parse → enrich → sort oldest first\nconst enriched = rawCustomers\n  .filter(c => c.active)\n  .map(c => ({\n    id: c.id,\n    name: c.name,\n    city: c?.address?.city ?? \"Unknown\",\n    tier: c.tier,\n    joinDate: c.joinDate,\n    segment: c.tier === \"platinum\" ? \"VIP\" : c.tier === \"gold\" ? \"Premium\" : \"Standard\",\n  }))\n  .sort((a, b) => new Date(a.joinDate) - new Date(b.joinDate));\n\nconsole.log(\"Active:\", enriched.length);\nconsole.log(JSON.stringify(enriched, null, 2));"
+};
+
+function renderQuiz(id){
+  var q=QUIZ[id];
+  var letters=["A","B","C","D"];
+  var opts=q.opts.map(function(opt,i){
+    return '<button class="opt-btn" id="qopt-'+id+'-'+i+'" onclick="checkQ(\''+id+'\','+i+')">'+
+      '<span style="color:#ffeb3b;font-size:10px;flex-shrink:0;margin-top:1px">'+letters[i]+'.</span>'+
+      '<code style="font-size:11px;line-height:1.5">'+opt.t+'</code></button>';
+  }).join("");
+  return '<div class="quiz-wrap">'+
+    '<div class="sec-lbl">◈ MINI QUIZ</div>'+
+    '<div class="quiz-q">'+q.q+'</div>'+
+    '<div class="quiz-opts" id="qopts-'+id+'">'+opts+'</div>'+
+    '<div class="quiz-fb" id="qfb-'+id+'"></div></div>';
+}
+
+function checkQ(id,idx){
+  var q=QUIZ[id];
+  var fb=document.getElementById("qfb-"+id);
+  if(fb.classList.contains("show"))return;
+  var opts=document.getElementById("qopts-"+id).querySelectorAll(".opt-btn");
+  opts.forEach(function(b){b.disabled=true;});
+  var isCorrect=q.opts[idx].c;
+  document.getElementById("qopt-"+id+"-"+idx).classList.add(isCorrect?"correct":"wrong");
+  if(!isCorrect){q.opts.forEach(function(o,i){if(o.c)document.getElementById("qopt-"+id+"-"+i).classList.add("correct");});}
+  fb.className="quiz-fb show "+(isCorrect?"correct":"wrong");
+  fb.textContent=(isCorrect?"✓ BENAR!  ":"✗ SALAH.  ")+q.opts[idx].e;
+}
+
+var STEPS=[
+
+{title:"Welcome",codes:{},html:function(){
+  var topics=[
+    ["TOPIK 1","Arrow Functions","Syntax ringkas untuk menulis function modern"],
+    ["TOPIK 2","map()","Transform setiap item dalam array"],
+    ["TOPIK 3","filter() &amp; find()","Seleksi data berdasarkan kondisi"],
+    ["TOPIK 4","forEach()","Iterasi array untuk side effects"],
+    ["TOPIK 5","Destructuring &amp; Spread","Ambil dan gabungkan data secara elegan"],
+    ["TOPIK 6","Optional Chaining (?.)","Akses nested data tanpa crash"],
+    ["TOPIK 7","Method Chaining","Gabungkan semua menjadi data pipeline"]
+  ];
+  return '<div class="sec-lbl">◈ F-02 · MINGGU 4–5</div>'+
+    '<div class="step-title">Functions &amp; Logic</div>'+
+    '<div class="step-sub">Setelah JSON dan REST API di F-01, sekarang masuk ke senjata utama JavaScript untuk mentransformasi data di automation workflows.</div>'+
+    '<div class="box ok"><div class="box-lbl g">◈ KONTEKS N8N</div><div class="box-body">Di n8n Code Node, setiap kali data masuk dari API atau trigger, kamu perlu <strong style="color:#ffeb3b">mentransformasinya</strong> — filter yang relevan, ubah format, gabungkan field. Skill di sesi ini adalah cara profesional melakukannya.</div></div>'+
+    '<div class="sec-lbl" style="margin-top:20px">◈ TOPIK SESI INI</div>'+
+    topics.map(function(t){return '<div class="row-item"><span style="font-size:9px;letter-spacing:1px;min-width:64px;padding-top:2px">'+t[0]+'</span><div><div style="font-size:12px;color:#e6edf3;font-weight:600">'+t[1]+'</div><div style="font-size:10px;color:#6e7681;margin-top:2px">'+t[2]+'</div></div></div>';}).join("")+
+    '<div class="box warn" style="margin-top:16px"><div class="box-lbl o">◈ MINDSET</div><div class="box-body">Kamu <strong style="color:#f0883e">bukan belajar JS untuk jadi developer</strong> — kamu belajar untuk bisa menulis logic di n8n Code Node. Fokus pada <em>data transformation</em>.</div></div>'+
+    '<div class="box"><div class="box-lbl">◈ PROJECT AKHIR SESI</div><div class="box-body"><strong style="color:#ffeb3b">Transform 5 API response</strong> menjadi format yang dibutuhkan — menggunakan semua skill di sesi ini.</div></div>';
+}},
+
+{title:"Arrow Functions",codes:{"r-arrow":CODE["r-arrow"]},html:function(){
+  return '<div class="sec-lbl">◈ TOPIK 1</div>'+
+    '<div class="step-title">Arrow Functions</div>'+
+    '<div class="step-sub">Cara menulis function yang lebih ringkas. Syntax yang paling sering kamu lihat di semua kode automation modern.</div>'+
+    '<div class="grid2">'+
+      '<div class="card" style="border-left:2px solid #6272a4"><div class="card-ttl" style="color:#6272a4">CARA LAMA</div><pre><span class="kw">function</span> <span class="fn">greet</span>(<span class="var">name</span>) {\n  <span class="kw">return</span> <span class="str">"Halo, "</span> + <span class="var">name</span>;\n}</pre></div>'+
+      '<div class="card" style="border-left:2px solid #ffeb3b"><div class="card-ttl">ARROW FUNCTION</div><pre><span class="kw">const</span> <span class="fn">greet</span> = (<span class="var">name</span>) => {\n  <span class="kw">return</span> <span class="str">"Halo, "</span> + <span class="var">name</span>;\n}</pre></div>'+
+    '</div>'+
+    '<div class="box tip"><div class="box-lbl b">◈ SHORTHAND RULES</div><div class="box-body"><strong style="color:#00e5ff">1 parameter</strong> → boleh hilangkan tanda kurung<br><strong style="color:#00e5ff">1 ekspresi</strong> → hilangkan <code>{ }</code> dan kata <code>return</code></div></div>'+
+    '<div class="code-blk"><div class="code-hdr"><span class="code-lang">JS · ARROW SHORTHAND</span><button class="copy-btn" onclick="copyBlock(this)">copy</button></div><pre>'+
+      '<span class="cm">// Full arrow</span>\n<span class="kw">const</span> <span class="fn">double</span> = (<span class="var">n</span>) => { <span class="kw">return</span> <span class="var">n</span> * <span class="num">2</span>; };\n\n'+
+      '<span class="cm">// Shorthand: 1 param, 1 ekspresi</span>\n<span class="kw">const</span> <span class="fn">double</span> = <span class="var">n</span> => <span class="var">n</span> * <span class="num">2</span>;\n\n'+
+      '<span class="cm">// Multi-param: butuh kurung</span>\n<span class="kw">const</span> <span class="fn">add</span> = (<span class="var">a</span>, <span class="var">b</span>) => <span class="var">a</span> + <span class="var">b</span>;\n\n'+
+      '<span class="cm">// Return object: bungkus dengan ( )</span>\n<span class="kw">const</span> <span class="fn">makeUser</span> = (<span class="var">n</span>, <span class="var">r</span>) => ({ <span class="prop">name</span>: <span class="var">n</span>, <span class="prop">role</span>: <span class="var">r</span> });\n\n'+
+      '<span class="cm">// Konteks automation:</span>\n<span class="kw">const</span> <span class="fn">addPPN</span> = <span class="var">price</span> => <span class="var">price</span> * <span class="num">1.11</span>;\n<span class="kw">const</span> <span class="fn">isActive</span> = <span class="var">u</span> => <span class="var">u</span>.<span class="prop">status</span> === <span class="str">"active"</span>;'+
+    '</pre></div>'+
+    '<div class="sec-lbl" style="margin-top:16px">◈ COBA SENDIRI</div>'+
+    '<div class="runner"><div class="runner-hdr"><span class="runner-lbl">▶ INTERACTIVE RUNNER</span><button class="run-btn" onclick="runCode(\'r-arrow\')">▶ RUN</button></div>'+
+    '<textarea class="code-ta" id="r-arrow" rows="10"></textarea>'+
+    '<div class="out-lbl">// OUTPUT</div><div class="out-area" id="out-r-arrow">Klik ▶ RUN untuk menjalankan kode</div></div>'+
+    renderQuiz("arrow");
+}},
+
+{title:"map()",codes:{"r-map":CODE["r-map"]},html:function(){
+  return '<div class="sec-lbl">◈ TOPIK 2</div>'+
+    '<div class="step-title">map() — Transformasi Array</div>'+
+    '<div class="step-sub"><code>map()</code> mengambil setiap item, melakukan transformasi, dan mengembalikan array BARU dengan panjang yang sama. Method paling sering dipakai untuk memformat ulang data API.</div>'+
+    '<div class="box"><div class="box-lbl">◈ KAPAN PAKAI map()</div><div class="box-body">API kirim array 50 customer dengan 15 field — kamu hanya butuh 3 field dengan format berbeda. Konversi mata uang, rename key, tambah computed field.</div></div>'+
+    '<div class="code-blk"><div class="code-hdr"><span class="code-lang">JS · map() ANATOMY</span><button class="copy-btn" onclick="copyBlock(this)">copy</button></div><pre>'+
+      '<span class="cm">// Anatomy dasar</span>\n<span class="kw">const</span> <span class="var">result</span> = <span class="var">array</span>.<span class="fn">map</span>(<span class="var">item</span> => <span class="cm">/* transformasi */</span>);\n\n'+
+      '<span class="cm">// Contoh 1: angka</span>\n<span class="kw">const</span> <span class="var">prices</span> = [<span class="num">100</span>, <span class="num">200</span>, <span class="num">300</span>];\n<span class="kw">const</span> <span class="var">withTax</span> = <span class="var">prices</span>.<span class="fn">map</span>(<span class="var">p</span> => <span class="var">p</span> * <span class="num">1.11</span>);\n<span class="cm">// → [111, 222, 333]</span>\n\n'+
+      '<span class="cm">// Contoh 2: transform API response</span>\n<span class="kw">const</span> <span class="var">apiUsers</span> = [\n  { <span class="prop">id</span>: <span class="num">1</span>, <span class="prop">first_name</span>: <span class="str">"Budi"</span>, <span class="prop">last_name</span>: <span class="str">"Santoso"</span>, <span class="prop">email</span>: <span class="str">"budi@mail.com"</span> },\n];\n\n<span class="kw">const</span> <span class="var">customers</span> = <span class="var">apiUsers</span>.<span class="fn">map</span>(<span class="var">u</span> => ({\n  <span class="prop">id</span>: <span class="var">u</span>.<span class="prop">id</span>,\n  <span class="prop">fullName</span>: <span class="var">u</span>.<span class="prop">first_name</span> + <span class="str">" "</span> + <span class="var">u</span>.<span class="prop">last_name</span>,\n  <span class="prop">email</span>: <span class="var">u</span>.<span class="prop">email</span>,\n}));\n<span class="cm">// → [{ id:1, fullName:"Budi Santoso", email:"budi@mail.com" }]</span>'+
+    '</pre></div>'+
+    '<div class="box warn"><div class="box-lbl o">◈ PENTING</div><div class="box-body">map() <strong>tidak mengubah</strong> array asli — selalu membuat array baru. Panjang array hasil selalu sama dengan array input.</div></div>'+
+    '<div class="sec-lbl" style="margin-top:14px">◈ COBA SENDIRI</div>'+
+    '<div class="runner"><div class="runner-hdr"><span class="runner-lbl">▶ map() PRACTICE</span><button class="run-btn" onclick="runCode(\'r-map\')">▶ RUN</button></div>'+
+    '<textarea class="code-ta" id="r-map" rows="13"></textarea>'+
+    '<div class="out-lbl">// OUTPUT</div><div class="out-area" id="out-r-map">Klik ▶ RUN untuk menjalankan kode</div></div>'+
+    renderQuiz("map");
+}},
+
+{title:"filter() & find()",codes:{"r-filter":CODE["r-filter"]},html:function(){
+  return '<div class="sec-lbl">◈ TOPIK 3</div>'+
+    '<div class="step-title">filter() &amp; find() — Seleksi Data</div>'+
+    '<div class="step-sub">Setelah dapat data dari API, sering perlu menyaring yang relevan. <code>filter()</code> untuk banyak hasil, <code>find()</code> untuk satu hasil spesifik.</div>'+
+    '<div class="grid2">'+
+      '<div class="card" style="border-left:2px solid #ffeb3b"><div class="card-ttl">filter()</div><p>Mengembalikan <strong style="color:#ffeb3b">array baru</strong> berisi semua item yang memenuhi kondisi.<br><br><em style="color:#6e7681">Hasil: 0, 1, atau banyak item</em></p></div>'+
+      '<div class="card" style="border-left:2px solid #00e5ff"><div class="card-ttl" style="color:#00e5ff">find()</div><p>Mengembalikan <strong style="color:#00e5ff">item pertama</strong> yang memenuhi kondisi.<br><br><em style="color:#6e7681">Hasil: 1 item ATAU undefined</em></p></div>'+
+    '</div>'+
+    '<div class="code-blk"><div class="code-hdr"><span class="code-lang">JS · filter() &amp; find()</span><button class="copy-btn" onclick="copyBlock(this)">copy</button></div><pre>'+
+      '<span class="kw">const</span> <span class="var">leads</span> = [\n  { <span class="prop">id</span>: <span class="num">1</span>, <span class="prop">name</span>: <span class="str">"Budi"</span>, <span class="prop">status</span>: <span class="str">"hot"</span>,  <span class="prop">value</span>: <span class="num">5000000</span> },\n  { <span class="prop">id</span>: <span class="num">2</span>, <span class="prop">name</span>: <span class="str">"Sari"</span>, <span class="prop">status</span>: <span class="str">"cold"</span>, <span class="prop">value</span>: <span class="num">1000000</span> },\n  { <span class="prop">id</span>: <span class="num">3</span>, <span class="prop">name</span>: <span class="str">"Joko"</span>, <span class="prop">status</span>: <span class="str">"hot"</span>,  <span class="prop">value</span>: <span class="num">8000000</span> },\n];\n\n'+
+      '<span class="cm">// filter(): semua hot leads</span>\n<span class="kw">const</span> <span class="var">hotLeads</span> = <span class="var">leads</span>.<span class="fn">filter</span>(<span class="var">l</span> => <span class="var">l</span>.<span class="prop">status</span> === <span class="str">"hot"</span>);\n<span class="cm">// → [Budi, Joko]</span>\n\n'+
+      '<span class="cm">// filter() multi kondisi</span>\n<span class="kw">const</span> <span class="var">bigHot</span> = <span class="var">leads</span>.<span class="fn">filter</span>(<span class="var">l</span> => <span class="var">l</span>.<span class="prop">status</span> === <span class="str">"hot"</span> && <span class="var">l</span>.<span class="prop">value</span> > <span class="num">4000000</span>);\n\n'+
+      '<span class="cm">// find(): cari 1 lead by ID</span>\n<span class="kw">const</span> <span class="var">target</span> = <span class="var">leads</span>.<span class="fn">find</span>(<span class="var">l</span> => <span class="var">l</span>.<span class="prop">id</span> === <span class="num">3</span>);\n<span class="cm">// → { id:3, name:"Joko", ... }</span>\n\n'+
+      '<span class="cm">// ⚠️ find() return undefined jika tidak ketemu!</span>\n<span class="kw">const</span> <span class="var">miss</span> = <span class="var">leads</span>.<span class="fn">find</span>(<span class="var">l</span> => <span class="var">l</span>.<span class="prop">id</span> === <span class="num">99</span>);\n<span class="cm">// → undefined — selalu check sebelum akses property!</span>'+
+    '</pre></div>'+
+    '<div class="sec-lbl" style="margin-top:14px">◈ COBA SENDIRI</div>'+
+    '<div class="runner"><div class="runner-hdr"><span class="runner-lbl">▶ filter() &amp; find() PRACTICE</span><button class="run-btn" onclick="runCode(\'r-filter\')">▶ RUN</button></div>'+
+    '<textarea class="code-ta" id="r-filter" rows="16"></textarea>'+
+    '<div class="out-lbl">// OUTPUT</div><div class="out-area" id="out-r-filter">Klik ▶ RUN untuk menjalankan kode</div></div>'+
+    renderQuiz("filterfind");
+}},
+
+{title:"forEach()",codes:{"r-foreach":CODE["r-foreach"]},html:function(){
+  var rows=[["map()","Array baru (sama panjang)","Transform setiap item"],["filter()","Array baru (subset)","Seleksi berdasarkan kondisi"],["find()","1 item / undefined","Cari 1 item spesifik"],["forEach()","undefined","Side effects saja"]];
+  return '<div class="sec-lbl">◈ TOPIK 4</div>'+
+    '<div class="step-title">forEach() — Iterasi dengan Side Effects</div>'+
+    '<div class="step-sub"><code>forEach()</code> menjalankan function untuk setiap item tapi <strong style="color:#ffeb3b">tidak mengembalikan nilai</strong>. Dipakai untuk "melakukan sesuatu dengan setiap item" — bukan membuat array baru.</div>'+
+    '<div class="box warn"><div class="box-lbl o">◈ PERBEDAAN 4 METHOD</div><div class="box-body"><table style="width:100%;font-size:11px;border-collapse:collapse"><tr style="font-size:9px;color:#6e7681;letter-spacing:1px"><td style="padding:4px 8px 4px 0">METHOD</td><td style="padding:4px 8px 4px 0">RETURN</td><td>PAKAI UNTUK</td></tr>'+
+    rows.map(function(r){return '<tr style="border-top:1px solid #1e3a4a"><td style="padding:6px 8px 6px 0;color:#ffeb3b">'+r[0]+'</td><td style="padding:6px 8px 6px 0;color:#c9d1d9">'+r[1]+'</td><td style="color:#8b949e">'+r[2]+'</td></tr>';}).join("")+
+    '</table></div></div>'+
+    '<div class="code-blk"><div class="code-hdr"><span class="code-lang">JS · forEach()</span><button class="copy-btn" onclick="copyBlock(this)">copy</button></div><pre>'+
+      '<span class="kw">const</span> <span class="var">notifs</span> = [\n  { <span class="prop">user</span>: <span class="str">"Budi"</span>, <span class="prop">email</span>: <span class="str">"budi@mail.com"</span>, <span class="prop">type</span>: <span class="str">"invoice"</span> },\n];\n\n'+
+      '<span class="cm">// forEach: jalankan sesuatu untuk setiap item</span>\n<span class="var">notifs</span>.<span class="fn">forEach</span>(<span class="var">n</span> => {\n  <span class="var">console</span>.<span class="fn">log</span>(<span class="str">"Kirim: "</span> + <span class="var">n</span>.<span class="prop">email</span> + <span class="str">" ["</span> + <span class="var">n</span>.<span class="prop">type</span> + <span class="str">"]"</span>);\n});\n\n'+
+      '<span class="cm">// ❌ forEach tidak bisa di-chain!</span>\n<span class="cm">// notifs.forEach(...).map(...) ← ERROR</span>\n\n'+
+      '<span class="cm">// ✅ Chain filter + forEach — pattern umum di n8n</span>\n<span class="var">notifs</span>\n  .<span class="fn">filter</span>(<span class="var">n</span> => <span class="var">n</span>.<span class="prop">type</span> === <span class="str">"invoice"</span>)\n  .<span class="fn">forEach</span>(<span class="var">n</span> => <span class="var">console</span>.<span class="fn">log</span>(<span class="str">"Invoice: "</span> + <span class="var">n</span>.<span class="prop">user</span>));'+
+    '</pre></div>'+
+    '<div class="sec-lbl" style="margin-top:14px">◈ COBA SENDIRI</div>'+
+    '<div class="runner"><div class="runner-hdr"><span class="runner-lbl">▶ forEach() PRACTICE</span><button class="run-btn" onclick="runCode(\'r-foreach\')">▶ RUN</button></div>'+
+    '<textarea class="code-ta" id="r-foreach" rows="13"></textarea>'+
+    '<div class="out-lbl">// OUTPUT</div><div class="out-area" id="out-r-foreach">Klik ▶ RUN untuk menjalankan kode</div></div>'+
+    '<div class="box ok"><div class="box-lbl g">◈ TIP N8N</div><div class="box-body">Di n8n Code Node, kamu lebih sering pakai <code>map()</code> dan <code>filter()</code> karena keduanya mengembalikan array baru yang bisa langsung di-return ke node berikutnya.</div></div>';
+}},
+
+{title:"Destructuring & Spread",codes:{"r-destruct":CODE["r-destruct"]},html:function(){
+  return '<div class="sec-lbl">◈ TOPIK 5</div>'+
+    '<div class="step-title">Destructuring &amp; Spread</div>'+
+    '<div class="step-sub">Dua syntax paling elegan di JS modern. Destructuring untuk <strong style="color:#ffeb3b">mengambil nilai dari object</strong>, spread <code>...</code> untuk <strong style="color:#ffeb3b">menggabungkan atau menyalin</strong> data.</div>'+
+    '<div class="sec-lbl">◈ OBJECT DESTRUCTURING</div>'+
+    '<div class="code-blk"><div class="code-hdr"><span class="code-lang">JS · DESTRUCTURING</span><button class="copy-btn" onclick="copyBlock(this)">copy</button></div><pre>'+
+      '<span class="kw">const</span> <span class="var">user</span> = { <span class="prop">id</span>: <span class="num">1</span>, <span class="prop">name</span>: <span class="str">"Budi"</span>, <span class="prop">email</span>: <span class="str">"budi@mail.com"</span>, <span class="prop">role</span>: <span class="str">"admin"</span> };\n\n'+
+      '<span class="cm">// Cara lama: 1 baris per field</span>\n<span class="kw">const</span> <span class="var">name</span> = <span class="var">user</span>.<span class="prop">name</span>;\n\n'+
+      '<span class="cm">// Destructuring: ambil beberapa sekaligus</span>\n<span class="kw">const</span> { <span class="var">name</span>, <span class="var">email</span>, <span class="var">role</span> } = <span class="var">user</span>;\n\n'+
+      '<span class="cm">// Rename saat destructuring</span>\n<span class="kw">const</span> { <span class="var">name</span>: <span class="var">fullName</span>, <span class="var">role</span>: <span class="var">userRole</span> } = <span class="var">user</span>;\n\n'+
+      '<span class="cm">// Default value jika field tidak ada</span>\n<span class="kw">const</span> { <span class="var">name</span>, <span class="var">avatar</span> = <span class="str">"default.png"</span> } = <span class="var">user</span>;\n\n'+
+      '<span class="cm">// Di function parameter — sangat umum di n8n!</span>\n<span class="kw">const</span> <span class="fn">fmt</span> = ({ <span class="var">name</span>, <span class="var">email</span> }) => <span class="var">name</span> + <span class="str">" → "</span> + <span class="var">email</span>;\n<span class="fn">fmt</span>(<span class="var">user</span>); <span class="cm">// langsung pass object</span>'+
+    '</pre></div>'+
+    '<div class="sec-lbl">◈ SPREAD OPERATOR (...)</div>'+
+    '<div class="code-blk"><div class="code-hdr"><span class="code-lang">JS · SPREAD (...)</span><button class="copy-btn" onclick="copyBlock(this)">copy</button></div><pre>'+
+      '<span class="cm">// Gabung dua array</span>\n<span class="kw">const</span> <span class="var">all</span> = [...<span class="var">list1</span>, ...<span class="var">list2</span>];\n\n'+
+      '<span class="cm">// Merge dua object (kanan override kiri)</span>\n<span class="kw">const</span> <span class="var">base</span>   = { <span class="prop">timeout</span>: <span class="num">5000</span>, <span class="prop">retries</span>: <span class="num">3</span> };\n<span class="kw">const</span> <span class="var">custom</span> = { <span class="prop">timeout</span>: <span class="num">10000</span>, <span class="prop">apiKey</span>: <span class="str">"abc"</span> };\n<span class="kw">const</span> <span class="var">config</span> = { ...<span class="var">base</span>, ...<span class="var">custom</span> };\n<span class="cm">// → { timeout: 10000, retries: 3, apiKey: "abc" }</span>\n\n'+
+      '<span class="cm">// Pattern umum: salin object + tambah field baru</span>\n<span class="kw">const</span> <span class="var">enriched</span> = {\n  ...<span class="var">rawUser</span>,\n  <span class="prop">createdAt</span>: <span class="kw">new</span> <span class="fn">Date</span>().<span class="fn">toISOString</span>(),\n  <span class="prop">verified</span>: <span class="kw">false</span>,\n};'+
+    '</pre></div>'+
+    '<div class="sec-lbl" style="margin-top:14px">◈ COBA SENDIRI</div>'+
+    '<div class="runner"><div class="runner-hdr"><span class="runner-lbl">▶ DESTRUCTURING &amp; SPREAD PRACTICE</span><button class="run-btn" onclick="runCode(\'r-destruct\')">▶ RUN</button></div>'+
+    '<textarea class="code-ta" id="r-destruct" rows="18"></textarea>'+
+    '<div class="out-lbl">// OUTPUT</div><div class="out-area" id="out-r-destruct">Klik ▶ RUN untuk menjalankan kode</div></div>'+
+    renderQuiz("destruct");
+}},
+
+{title:"Optional Chaining (?.)",codes:{"r-optional":CODE["r-optional"]},html:function(){
+  return '<div class="sec-lbl">◈ TOPIK 6</div>'+
+    '<div class="step-title">Optional Chaining <code style="color:#ffeb3b">?.</code></div>'+
+    '<div class="step-sub">Ini adalah <strong style="color:#ffeb3b">penyelamat utama</strong> saat bekerja dengan data API yang tidak konsisten. Tanpa optional chaining, mengakses property yang tidak ada akan langsung crash seluruh workflow.</div>'+
+    '<div class="box warn"><div class="box-lbl o">◈ MASALAH NYATA DI AUTOMATION</div><div class="box-body">API response sering tidak konsisten — kadang ada field <code>address</code>, kadang tidak. Kadang <code>user</code> adalah null. Satu crash di Code Node = seluruh workflow berhenti!</div></div>'+
+    '<div class="code-blk"><div class="code-hdr"><span class="code-lang">JS · PROBLEM VS SOLUTION</span><button class="copy-btn" onclick="copyBlock(this)">copy</button></div><pre>'+
+      '<span class="cm">// Data tidak konsisten dari API:</span>\n<span class="kw">const</span> <span class="var">r1</span> = { <span class="prop">user</span>: { <span class="prop">name</span>: <span class="str">"Budi"</span>, <span class="prop">addr</span>: { <span class="prop">city</span>: <span class="str">"Jakarta"</span> } } };\n<span class="kw">const</span> <span class="var">r2</span> = { <span class="prop">user</span>: { <span class="prop">name</span>: <span class="str">"Sari"</span> } }; <span class="cm">// tidak ada addr!</span>\n<span class="kw">const</span> <span class="var">r3</span> = {};                      <span class="cm">// tidak ada user!</span>\n\n'+
+      '<span class="cm">// ❌ Tanpa ?. — CRASH pada r2 dan r3!</span>\n<span class="var">console</span>.<span class="fn">log</span>(<span class="var">r2</span>.<span class="prop">user</span>.<span class="prop">addr</span>.<span class="prop">city</span>); <span class="cm">// 💥 TypeError</span>\n\n'+
+      '<span class="cm">// ✅ Dengan ?. — selalu aman!</span>\n<span class="var">console</span>.<span class="fn">log</span>(<span class="var">r1</span>?.<span class="prop">user</span>?.<span class="prop">addr</span>?.<span class="prop">city</span>); <span class="cm">// "Jakarta"</span>\n<span class="var">console</span>.<span class="fn">log</span>(<span class="var">r2</span>?.<span class="prop">user</span>?.<span class="prop">addr</span>?.<span class="prop">city</span>); <span class="cm">// undefined</span>\n<span class="var">console</span>.<span class="fn">log</span>(<span class="var">r3</span>?.<span class="prop">user</span>?.<span class="prop">addr</span>?.<span class="prop">city</span>); <span class="cm">// undefined</span>'+
+    '</pre></div>'+
+    '<div class="code-blk"><div class="code-hdr"><span class="code-lang">JS · ?. DENGAN ?? (FALLBACK VALUE)</span><button class="copy-btn" onclick="copyBlock(this)">copy</button></div><pre>'+
+      '<span class="cm">// ?? memberikan default jika hasilnya null/undefined</span>\n<span class="kw">const</span> <span class="var">city</span> = <span class="var">data</span>?.<span class="prop">user</span>?.<span class="prop">address</span>?.<span class="prop">city</span> ?? <span class="str">"Unknown City"</span>;\n\n'+
+      '<span class="cm">// Pattern nyata di n8n Code Node:</span>\n<span class="kw">const</span> <span class="fn">formatCustomer</span> = (<span class="var">data</span>) => ({\n  <span class="prop">name</span>:  <span class="var">data</span>?.<span class="prop">profile</span>?.<span class="prop">fullName</span>  ?? <span class="str">"Unknown"</span>,\n  <span class="prop">city</span>:  <span class="var">data</span>?.<span class="prop">address</span>?.<span class="prop">city</span>      ?? <span class="str">"Unknown"</span>,\n  <span class="prop">plan</span>:  <span class="var">data</span>?.<span class="prop">subscription</span>?.<span class="prop">plan</span> ?? <span class="str">"free"</span>,\n});\n\n'+
+      '<span class="cm">// Optional chaining memanggil method</span>\n<span class="kw">const</span> <span class="var">tags</span> = <span class="var">data</span>?.<span class="prop">tags</span>?.<span class="fn">join</span>(<span class="str">", "</span>) ?? <span class="str">"no tags"</span>;'+
+    '</pre></div>'+
+    '<div class="sec-lbl" style="margin-top:14px">◈ COBA SENDIRI</div>'+
+    '<div class="runner"><div class="runner-hdr"><span class="runner-lbl">▶ OPTIONAL CHAINING PRACTICE</span><button class="run-btn" onclick="runCode(\'r-optional\')">▶ RUN</button></div>'+
+    '<textarea class="code-ta" id="r-optional" rows="16"></textarea>'+
+    '<div class="out-lbl">// OUTPUT</div><div class="out-area" id="out-r-optional">Klik ▶ RUN untuk menjalankan kode</div></div>'+
+    renderQuiz("optional");
+}},
+
+{title:"Method Chaining",codes:{"r-chain":CODE["r-chain"]},html:function(){
+  return '<div class="sec-lbl">◈ TOPIK 7 — ADVANCED PATTERN</div>'+
+    '<div class="step-title">Method Chaining — Data Pipeline</div>'+
+    '<div class="step-sub">Kekuatan sebenarnya ada di kemampuan <strong style="color:#ffeb3b">menggabungkan semua method dalam satu pipeline</strong>. Inilah cara developer menulis data transformation yang bersih dan readable.</div>'+
+    '<div class="box ok"><div class="box-lbl g">◈ KONEKSI LANGSUNG KE N8N</div><div class="box-body">n8n workflow adalah pipeline visual: Node A → Node B → Node C. Method chaining adalah hal yang sama dalam kode: <code>.filter() → .map() → .sort() → .slice()</code>. Setiap method menerima output method sebelumnya.</div></div>'+
+    '<div class="code-blk"><div class="code-hdr"><span class="code-lang">JS · METHOD CHAINING PIPELINE</span><button class="copy-btn" onclick="copyBlock(this)">copy</button></div><pre>'+
+      '<span class="kw">const</span> <span class="var">rawData</span> = [\n  { <span class="prop">id</span>: <span class="num">1</span>, <span class="prop">name</span>: <span class="str">"Budi"</span>, <span class="prop">active</span>: <span class="kw">true</span>,  <span class="prop">region</span>: <span class="str">"Java"</span>, <span class="prop">revenue</span>: <span class="num">15000000</span> },\n  { <span class="prop">id</span>: <span class="num">2</span>, <span class="prop">name</span>: <span class="str">"Sari"</span>, <span class="prop">active</span>: <span class="kw">false</span>, <span class="prop">region</span>: <span class="str">"Bali"</span>, <span class="prop">revenue</span>:  <span class="num">8000000</span> },\n  { <span class="prop">id</span>: <span class="num">3</span>, <span class="prop">name</span>: <span class="str">"Joko"</span>, <span class="prop">active</span>: <span class="kw">true</span>,  <span class="prop">region</span>: <span class="str">"Java"</span>, <span class="prop">revenue</span>: <span class="num">22000000</span> },\n];\n\n'+
+      '<span class="cm">// Pipeline: active Java → sort desc → top 2 → format</span>\n<span class="kw">const</span> <span class="var">topJava</span> = <span class="var">rawData</span>\n  .<span class="fn">filter</span>(<span class="var">c</span> => <span class="var">c</span>.<span class="prop">active</span> && <span class="var">c</span>.<span class="prop">region</span> === <span class="str">"Java"</span>)   <span class="cm">// seleksi</span>\n  .<span class="fn">sort</span>((<span class="var">a</span>, <span class="var">b</span>) => <span class="var">b</span>.<span class="prop">revenue</span> - <span class="var">a</span>.<span class="prop">revenue</span>)        <span class="cm">// urutkan</span>\n  .<span class="fn">slice</span>(<span class="num">0</span>, <span class="num">2</span>)                                    <span class="cm">// ambil top 2</span>\n  .<span class="fn">map</span>((<span class="var">c</span>, <span class="var">i</span>) => ({                               <span class="cm">// format output</span>\n    <span class="prop">rank</span>: <span class="var">i</span> + <span class="num">1</span>,\n    <span class="prop">name</span>: <span class="var">c</span>.<span class="prop">name</span>,\n    <span class="prop">revenue</span>: <span class="str">"Rp "</span> + (<span class="var">c</span>.<span class="prop">revenue</span> / <span class="num">1000000</span>).<span class="fn">toFixed</span>(<span class="num">1</span>) + <span class="str">"M"</span>,\n  }));'+
+    '</pre></div>'+
+    '<div class="box tip"><div class="box-lbl b">◈ READABILITY TIP</div><div class="box-body">Tulis setiap method di baris baru dengan indentasi. Ini membuat pipeline mudah dibaca dan di-debug — setiap baris = satu transformasi yang jelas tujuannya.</div></div>'+
+    '<div class="sec-lbl" style="margin-top:14px">◈ COBA SENDIRI — FULL PIPELINE</div>'+
+    '<div class="runner"><div class="runner-hdr"><span class="runner-lbl">▶ METHOD CHAINING PRACTICE</span><button class="run-btn" onclick="runCode(\'r-chain\')">▶ RUN</button></div>'+
+    '<textarea class="code-ta" id="r-chain" rows="22"></textarea>'+
+    '<div class="out-lbl">// OUTPUT</div><div class="out-area" id="out-r-chain">Klik ▶ RUN untuk menjalankan kode</div></div>';
+}},
+
+{title:"Practice Missions",codes:{"m01":CODE["m01"],"m02":CODE["m02"],"m03":CODE["m03"],"m04":CODE["m04"],"m05":CODE["m05"]},html:function(){
+  var missions=[
+    ["01","CRM Lead Formatter","API mengirim array leads mentah. Transform: gabungkan first/last name → <code>fullName</code>, kategorikan berdasarkan <code>lead_score</code> (hot≥80, warm≥50, cold&lt;50), ambil 4 field saja.","r-arrow"],
+    ["02","E-commerce Order Filter","Dari 6 orders, filter hanya yang <code>status === 'paid'</code> AND <code>total &gt; 1000000</code>, lalu map ke format baru dengan field <code>orderId</code>, <code>customer</code>, <code>total</code>.","r-map"],
+    ["03","Webhook Safe Parser","3 webhook payloads dengan struktur berbeda — beberapa field null atau tidak ada. Gunakan <code>?.</code> dan <code>??</code> untuk parse semua dengan aman tanpa TypeError.","r-optional"],
+    ["04","Slack Deal Notifier","Filter deals <code>value &gt; 5000000</code>, gunakan <strong>destructuring</strong> di parameter map callback, format sebagai string notifikasi Slack dengan ID deal.","r-destruct"],
+    ["05 — FINAL BOSS","Full CRM Pipeline","Full pipeline: raw customers → filter active → safe parse address → enrich dengan field <code>segment</code> → sort by joinDate ascending (oldest first).","r-chain"]
+  ];
+  return '<div class="sec-lbl">◈ PROJECT PRAKTIK — MINGGU 4–5</div>'+
+    '<div class="step-title">Transform 5 API Responses</div>'+
+    '<div class="step-sub">Project akhir sesi. Gunakan semua skill yang sudah dipelajari. Setiap mission sudah ada solusi sebagai starting point — kamu bisa run, modifikasi, dan validate.</div>'+
+    missions.map(function(m,i){
+      var id="m0"+(i+1);
+      return '<div class="mission"><div class="mission-num">◈ MISSION '+m[0]+' / 05</div>'+
+        '<div class="mission-ttl">'+m[1]+'</div>'+
+        '<div class="mission-desc">'+m[2]+'</div>'+
+        '<div class="runner"><div class="runner-hdr"><span class="runner-lbl">▶ MISSION '+m[0]+'</span>'+
+        '<button class="run-btn" onclick="runCode(\''+id+'\')">▶ RUN</button></div>'+
+        '<textarea class="code-ta" id="'+id+'" rows="13"></textarea>'+
+        '<div class="out-lbl">// OUTPUT</div><div class="out-area" id="out-'+id+'">Klik ▶ RUN untuk menjalankan kode</div></div>'+
+        '<button class="val-btn" onclick="validateM(\''+(i<9?'0'+(i+1):i+1)+'\')">◈ VALIDATE MISSION</button>'+
+        '<div class="m-result" id="mres-'+(i<9?'0'+(i+1):i+1)+'"></div></div>';
+    }).join("");
+}},
+
+{title:"Sesi Complete!",codes:{},html:function(){
+  var items=[
+    ["Arrow Functions","Syntax ringkas — backbone dari semua array method"],
+    ["map()","Transform setiap item → array baru, panjang sama"],
+    ["filter()","Seleksi item berdasarkan kondisi → array subset"],
+    ["find()","Cari 1 item spesifik → item atau undefined"],
+    ["forEach()","Iterasi untuk side effects — tidak return array baru"],
+    ["Destructuring","Ambil beberapa field sekaligus, bisa rename dan default"],
+    ["Spread (...)","Gabungkan/salin array dan object, tambah field baru"],
+    ["Optional Chaining (?.)","Akses nested data aman — tidak crash walau field null"],
+    ["Nullish Coalescing (??)","Fallback value untuk null/undefined"],
+    ["Method Chaining","Pipeline: filter → sort → slice → map dalam satu ekspresi"]
+  ];
+  return '<div class="sec-lbl">◈ SESI SELESAI</div>'+
+    '<div class="step-title" style="color:#ffeb3b">Functions &amp; Logic ✓</div>'+
+    '<div class="step-sub">Kamu telah menyelesaikan Sesi 2 Minggu 4–5. Review semua yang sudah dikuasai.</div>'+
+    '<div class="sec-lbl">◈ YANG SUDAH DIKUASAI</div>'+
+    items.map(function(it){return '<div class="check-item"><span>✓</span><div><strong style="font-size:12px;color:#e6edf3">'+it[0]+'</strong><span style="font-size:10px;color:#6e7681;margin-left:8px">'+it[1]+'</span></div></div>';}).join("")+
+    '<hr class="div">'+
+    '<div class="box ok"><div class="box-lbl g">◈ KONEKSI KE N8N CODE NODE</div><div class="box-body">'+
+      '<code style="color:#ffeb3b">$input.all()</code> → array dari node sebelumnya<br>'+
+      '<code style="color:#ffeb3b">.filter(item => item.json.status === "active")</code> → seleksi<br>'+
+      '<code style="color:#ffeb3b">.map(item => ({ ...item.json, newField: "x" }))</code> → transform<br>'+
+      '<code style="color:#ffeb3b">item?.json?.address?.city ?? "Unknown"</code> → safe access<br>'+
+      '<code style="color:#ffeb3b">return items</code> → kirim ke node berikutnya'+
+    '</div></div>'+
+    '<div class="box"><div class="box-lbl">◈ LANGKAH BERIKUTNYA</div><div class="box-body">'+
+      '<strong style="color:#ffeb3b">Sesi 3 — Minggu 6–8: JS untuk Automation Context</strong><br>'+
+      'Async/Await · fetch() untuk HTTP request · Error handling try/catch · Date &amp; time manipulation · Regex dasar untuk parsing data'+
+    '</div></div>'+
+    '<div style="background:#0d1f2d;border:1px solid #1e3a4a;border-radius:8px;padding:20px;margin-top:16px;text-align:center">'+
+      '<div style="font-size:28px;margin-bottom:8px">🎯</div>'+
+      '<div style="font-size:15px;color:#e6edf3;font-weight:700;margin-bottom:4px">Sesi 2 Complete!</div>'+
+      '<div style="font-size:10px;color:#6e7681;margin-bottom:12px">F-02 · Minggu 4–5 · Functions &amp; Logic</div>'+
+      '<div style="font-size:11px;color:#ffeb3b;font-style:italic">"Data transformation adalah bahasa universal automation."</div>'+
+    '</div>';
+}}
+
+];
+
+function runCode(id){
+  var ta=document.getElementById(id),out=document.getElementById("out-"+id);
+  if(!ta||!out)return;
+  var logs=[],origLog=console.log;
+  console.log=function(){
+    logs.push(Array.from(arguments).map(function(a){return typeof a==="object"?JSON.stringify(a,null,2):String(a);}).join(" "));
+    origLog.apply(console,arguments);
+  };
+  try{
+    new Function(ta.value)();
+    out.className="out-area";
+    out.textContent=logs.length?logs.join("\n"):"(no output)";
+  }catch(e){
+    out.className="out-area err";
+    out.textContent="Error: "+e.message;
+  }finally{console.log=origLog;}
+}
+
+function copyBlock(btn){
+  var pre=btn.closest(".code-blk").querySelector("pre");
+  if(!pre)return;
+  navigator.clipboard.writeText(pre.textContent).then(function(){
+    btn.textContent="copied!";
+    setTimeout(function(){btn.textContent="copy";},1600);
+  });
+}
+
+function validateM(num){
+  var id="m"+num;
+  var ta=document.getElementById(id);
+  var res=document.getElementById("mres-"+num);
+  if(!ta||!res)return;
+  var code=ta.value;
+  function pass(msg){res.className="m-result show pass";res.textContent="✓ MISSION PASSED — "+msg;}
+  function fail(msg){res.className="m-result show fail";res.textContent="✗ NOT YET — "+msg;}
+  try{
+    if(num==="01"){
+      var out=new Function(code+"\nreturn typeof formatted!=='undefined'?formatted:null;")();
+      if(!Array.isArray(out)||out.length!==3)return fail("formatted harus array 3 item. Cek map() pada rawLeads.");
+      if(out[0].fullName!=="Budi Santoso")return fail("fullName harus first_name + ' ' + last_name");
+      if(out[0].category!=="hot"||out[1].category!=="warm"||out[2].category!=="cold")return fail("category: hot(>=80), warm(>=50), cold(<50)");
+      if(!out[0].email||!out[0].source)return fail("Field email dan source harus ada");
+      pass("fullName, email, category, source semua benar! Arrow + map + ternary ✓");
+    }else if(num==="02"){
+      var out=new Function(code+"\nreturn typeof result!=='undefined'?result:null;")();
+      if(!Array.isArray(out)||out.length!==2)return fail("Harusnya 2 orders (paid + >1M). Got: "+(out?out.length:"null"));
+      if(!out.every(function(o){return o.orderId&&o.customer&&o.total>1000000;}))return fail("Field harus bernama orderId (bukan order_id), customer, total");
+      pass("2 orders lolos filter (paid + >1M), field clean. filter() + map() ✓");
+    }else if(num==="03"){
+      var out=new Function(code+"\nreturn typeof parsed!=='undefined'?parsed:null;")();
+      if(!Array.isArray(out)||out.length!==3)return fail("parsed harus array 3 item");
+      if(!out[0].name||out[0].name!=="Budi")return fail("Webhook pertama harusnya name: Budi");
+      if(out[1].city===undefined||out[1].city===null)return fail("Webhook kedua city harusnya pakai fallback dari ??");
+      if(out[2].name===undefined||out[2].name===null)return fail("Webhook ketiga (data null) harusnya semua field pakai ?? fallback");
+      pass("Semua 3 webhook ter-parse tanpa crash. Optional chaining + ?? ✓");
+    }else if(num==="04"){
+      var out=new Function(code+"\nreturn typeof messages!=='undefined'?messages:null;")();
+      if(!Array.isArray(out)||out.length!==2)return fail("Harusnya 2 deals >5M (D01 dan D03). Got: "+(out?out.length:"null"));
+      if(!out.every(function(m){return m.id&&m.slack&&m.slack.length>10;}))return fail("Setiap item harus punya id dan slack string");
+      pass("2 big deals ter-filter, destructuring di map() bekerja, Slack messages terbentuk ✓");
+    }else if(num==="05"){
+      var out=new Function(code+"\nreturn typeof enriched!=='undefined'?enriched:null;")();
+      if(!Array.isArray(out)||out.length!==4)return fail("Harusnya 4 active customers (Sari skip). Got: "+(out?out.length:"null"));
+      if(out[0].id!==3)return fail("Sort salah — joinDate ascending, Joko (2023-11-20) harus index [0]");
+      if(!out.every(function(c){return c.segment;}))return fail("Setiap customer harus punya field segment");
+      var hasPlatVip=out.some(function(c){return c.tier==="platinum"&&c.segment==="VIP";});
+      if(!hasPlatVip)return fail("tier platinum → segment harus VIP");
+      pass("4 active, sorted oldest first (Joko dulu), enriched dengan segment. Full pipeline ✓");
+    }
+  }catch(e){fail("Error: "+e.message);}
+}
+
+function nav(dir){
+  var next=cur+dir;
+  if(next<0||next>=STEPS.length)return;
+  done.add(cur);cur=next;render();
+}
+function jumpTo(idx){
+  if(idx===cur)return;
+  done.add(cur);cur=idx;render();
+}
+function render(){
+  var step=STEPS[cur];
+  document.getElementById("content").innerHTML='<div class="fade-in">'+step.html()+'</div>';
+  if(step.codes){
+    Object.keys(step.codes).forEach(function(id){
+      var ta=document.getElementById(id);
+      if(ta)ta.value=step.codes[id];
+    });
+  }
+  var dotsEl=document.getElementById("stepDots");
+  dotsEl.innerHTML=STEPS.map(function(_,i){
+    var cls="dot"+(i===cur?" active":done.has(i)?" done":"");
+    return '<div class="'+cls+'" onclick="jumpTo('+i+')" title="'+STEPS[i].title+'"></div>';
+  }).join("");
+  document.getElementById("stepCtr").textContent=(cur+1)+" / "+STEPS.length;
+  document.getElementById("progFill").style.width=((cur+1)/STEPS.length*100)+"%";
+  document.getElementById("btnPrev").disabled=cur===0;
+  var btnNext=document.getElementById("btnNext");
+  btnNext.disabled=cur===STEPS.length-1;
+  btnNext.textContent=cur===STEPS.length-2?"SELESAI →":"BERIKUTNYA →";
+  window.scrollTo(0,0);
+}
+render();
+</script>
+</body>
+</html>
