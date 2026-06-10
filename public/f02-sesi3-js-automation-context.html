@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>F-02 Sesi 3 — JS untuk Automation Context</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#080c10;color:#c9d1d9;font-family:'JetBrains Mono','Courier New',monospace;font-size:13px;line-height:1.6;min-height:100vh}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:#080c10}::-webkit-scrollbar-thumb{background:#1e3a4a;border-radius:3px}
+
+/* HEADER */
+.hdr{position:sticky;top:0;z-index:90;background:linear-gradient(180deg,#0d1820 0%,#080c10 100%);border-bottom:1px solid #1e3a4a;padding:10px 16px 8px}
+.hdr-top{display:flex;align-items:center;gap:8px;margin-bottom:2px}
+.pdot{width:7px;height:7px;border-radius:50%;background:#ffeb3b;box-shadow:0 0 8px rgba(255,235,59,.65);animation:blink 2s infinite;flex-shrink:0}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.hdr-badge{font-size:9px;color:#ffeb3b;letter-spacing:2px}
+.hdr-title{font-size:14px;font-weight:700;color:#e6edf3}
+.hdr-sub{font-size:9px;color:#6e7681;margin-top:2px}
+.pbar{height:2px;background:#1e3a4a;border-radius:1px;margin-top:8px;overflow:hidden}
+.pfill{height:100%;background:linear-gradient(90deg,#ffeb3b,#ff8c42);border-radius:1px;transition:width .35s ease}
+.dots{display:flex;gap:5px;justify-content:center;margin-top:7px}
+.dot{width:5px;height:5px;border-radius:50%;background:#1e3a4a;cursor:pointer;transition:all .2s}
+.dot.active{background:#ffeb3b;box-shadow:0 0 5px rgba(255,235,59,.5)}
+.dot.done{background:#3fb950}
+
+/* LAYOUT */
+.main{padding:16px 16px 110px;max-width:640px;margin:0 auto}
+.step{display:none}.step.show{display:block}
+
+/* TYPOGRAPHY */
+.badge{font-size:9px;letter-spacing:2px;color:#ffeb3b;margin-bottom:6px;display:block}
+.ttl{font-size:20px;font-weight:700;color:#e6edf3;margin-bottom:8px;line-height:1.3}
+.sub{font-size:11px;color:#8b949e;line-height:1.65}
+.slabel{font-size:9px;color:#6e7681;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;display:block}
+.divider{height:1px;background:#1e3a4a;margin:16px 0}
+
+/* CARDS */
+.card{background:#0d1f2d;border:1px solid #1e3a4a;border-radius:8px;padding:14px;margin-bottom:12px}
+.card-y{border-left:3px solid #ffeb3b}
+.card-g{border-left:3px solid #3fb950;background:#071410}
+.card-o{border-left:3px solid #ff8c42;background:#120d07}
+.card-b{border-left:3px solid #79c0ff;background:#070d1a}
+.clabel{font-size:9px;letter-spacing:2px;margin-bottom:8px;display:block}
+.cy{color:#ffeb3b}.cg{color:#3fb950}.co{color:#ff8c42}.cb{color:#79c0ff}.cr{color:#f85149}
+
+/* LIST */
+.li{display:flex;gap:8px;margin-bottom:7px;font-size:11px;line-height:1.55;align-items:flex-start}
+.li:last-child{margin-bottom:0}
+.arr{flex-shrink:0;padding-top:1px}
+
+/* CODE DISPLAY */
+.codeblock{background:#060a0f;border:1px solid #1e3a4a;border-radius:6px;padding:14px;margin:10px 0;font-size:11px;line-height:1.8;overflow-x:auto;white-space:pre;color:#c9d1d9;font-family:'JetBrains Mono','Courier New',monospace}
+.kw{color:#ff7b72}.fn{color:#d2a8ff}.str{color:#a5d6ff}.cm{color:#6e7681;font-style:italic}.nm{color:#79c0ff}.vr{color:#ffa657}
+
+/* EDITOR */
+.editor-wrap{margin:12px 0}
+.edlabel{font-size:9px;color:#6e7681;letter-spacing:1px;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.edlabel::before{content:'';width:5px;height:5px;border-radius:50%;background:#ffeb3b}
+textarea.ce{width:100%;background:#060a0f;border:1px solid #1e3a4a;border-radius:6px 6px 0 0;padding:14px;color:#c9d1d9;font-family:'JetBrains Mono','Courier New',monospace;font-size:11px;line-height:1.8;resize:vertical;outline:none;tab-size:2;min-height:160px;display:block}
+textarea.ce:focus{border-color:rgba(255,235,59,.4)}
+.ea{display:flex;border:1px solid #1e3a4a;border-top:none;border-radius:0;overflow:hidden}
+.rbtn{flex:1;padding:8px;background:rgba(255,235,59,.1);border:none;border-right:1px solid #1e3a4a;color:#ffeb3b;font-family:'JetBrains Mono',monospace;font-size:10px;cursor:pointer;letter-spacing:1px;transition:all .2s}
+.rbtn:hover{background:rgba(255,235,59,.2)}
+.resetbtn{padding:8px 14px;background:#060a0f;border:none;color:#6e7681;font-family:'JetBrains Mono',monospace;font-size:10px;cursor:pointer;transition:all .2s}
+.resetbtn:hover{color:#c9d1d9}
+.outbox{background:#060a0f;border:1px solid #1e3a4a;border-top:1px solid rgba(255,235,59,.15);border-radius:0 0 6px 6px;padding:12px 14px;min-height:50px;font-size:11px;line-height:1.8;color:#6e7681;white-space:pre-wrap;font-family:'JetBrains Mono',monospace;word-break:break-word}
+
+/* N8N CARD */
+.n8n{background:rgba(7,20,16,.9);border:1px solid rgba(63,185,80,.2);border-left:3px solid #3fb950;border-radius:6px;padding:12px 14px;margin:12px 0}
+.n8nlabel{font-size:9px;color:#3fb950;letter-spacing:2px;margin-bottom:6px;display:block}
+.n8ntext{font-size:11px;color:#c9d1d9;line-height:1.65}
+
+/* WARN / TIP */
+.warn{background:rgba(18,13,7,.8);border:1px solid rgba(255,140,66,.25);border-left:3px solid #ff8c42;border-radius:6px;padding:10px 12px;margin:10px 0;font-size:11px;color:#c9d1d9;line-height:1.6}
+.tip{background:rgba(7,7,18,.8);border:1px solid rgba(121,192,255,.2);border-left:3px solid #79c0ff;border-radius:6px;padding:10px 12px;margin:10px 0;font-size:11px;color:#c9d1d9;line-height:1.6}
+
+/* SYNTAX TABLE */
+.stbl{width:100%;border-collapse:collapse;font-size:11px;margin:10px 0}
+.stbl th{padding:7px 10px;text-align:left;font-size:9px;letter-spacing:1px;color:#6e7681;border-bottom:1px solid #1e3a4a;font-weight:400}
+.stbl td{padding:7px 10px;border-bottom:1px solid rgba(30,58,74,.5);vertical-align:top;line-height:1.5}
+.stbl td:first-child{color:#79c0ff}
+.stbl td:nth-child(2){color:#c9d1d9;font-size:10px}
+.stbl td:last-child{color:#8b949e;font-size:10px}
+
+/* QUIZ */
+.qblock{margin-bottom:22px;padding-bottom:22px;border-bottom:1px solid #1e3a4a}
+.qnum{font-size:9px;color:#ffeb3b;letter-spacing:1px;margin-bottom:6px;display:block}
+.qtext{font-size:12px;color:#e6edf3;font-weight:600;margin-bottom:10px;line-height:1.5}
+.qopts{display:flex;flex-direction:column;gap:6px}
+.qopt{padding:10px 12px;background:#0a1628;border:1px solid #1e3a4a;border-radius:6px;cursor:pointer;font-size:11px;color:#c9d1d9;font-family:'JetBrains Mono',monospace;text-align:left;line-height:1.45;transition:all .2s;width:100%}
+.qopt:hover{border-color:rgba(255,235,59,.4);background:rgba(255,235,59,.04)}
+.qopt.correct{border-color:#3fb950;background:rgba(63,185,80,.1);color:#3fb950;pointer-events:none}
+.qopt.wrong{border-color:#f85149;background:rgba(248,81,73,.1);color:#f85149;pointer-events:none}
+.qopt.dim{pointer-events:none;opacity:.45}
+.qfb{margin-top:8px;padding:10px;border-radius:6px;font-size:11px;line-height:1.6;display:none}
+.qfb.show{display:block}
+.qfb.ok{background:rgba(63,185,80,.08);border:1px solid rgba(63,185,80,.3);color:#3fb950}
+.qfb.no{background:rgba(248,81,73,.08);border:1px solid rgba(248,81,73,.3);color:#f85149}
+.score-box{text-align:center;padding:20px 16px;margin-top:20px;background:rgba(255,235,59,.05);border:1px solid rgba(255,235,59,.2);border-radius:8px;display:none}
+.score-num{font-size:40px;font-weight:700;color:#ffeb3b}
+.score-label{font-size:11px;color:#8b949e;margin-top:4px}
+
+/* MISSIONS */
+.mission{background:#0d1f2d;border:1px solid #1e3a4a;border-radius:8px;padding:16px;margin-bottom:14px}
+.mbadge{display:inline-block;padding:2px 8px;border-radius:3px;font-size:9px;letter-spacing:1px;margin-bottom:8px}
+.measy{background:rgba(63,185,80,.12);color:#3fb950;border:1px solid rgba(63,185,80,.3)}
+.mmed{background:rgba(255,235,59,.12);color:#ffeb3b;border:1px solid rgba(255,235,59,.3)}
+.mhard{background:rgba(248,81,73,.12);color:#f85149;border:1px solid rgba(248,81,73,.3)}
+.mtitle{font-size:13px;font-weight:700;color:#e6edf3;margin-bottom:6px}
+.mdesc{font-size:11px;color:#8b949e;line-height:1.65;margin-bottom:10px}
+
+/* MILESTONE */
+.milestone{background:rgba(255,235,59,.05);border:1px solid rgba(255,235,59,.2);border-left:3px solid #ffeb3b;border-radius:6px;padding:14px;margin-top:20px}
+
+/* NAV FOOTER */
+.nav-foot{position:fixed;bottom:0;left:0;right:0;z-index:80;background:rgba(8,12,16,.97);border-top:1px solid #1e3a4a;padding:10px 16px 14px;display:flex;align-items:center;gap:10px;max-width:640px;margin-left:auto;margin-right:auto}
+.nbtn{flex:1;padding:10px;border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:10px;cursor:pointer;transition:all .2s;letter-spacing:1px;border:1px solid}
+.nbtn-p{background:#0d1f2d;border-color:#1e3a4a;color:#8b949e}
+.nbtn-p:hover:not(:disabled){border-color:#2d4a5a;color:#c9d1d9}
+.nbtn-p:disabled{opacity:.3;cursor:default}
+.nbtn-n{background:rgba(255,235,59,.1);border-color:rgba(255,235,59,.4);color:#ffeb3b}
+.nbtn-n:hover{background:rgba(255,235,59,.2)}
+.sindic{font-size:10px;color:#6e7681;text-align:center;white-space:nowrap;min-width:40px}
+
+/* AI TUTOR */
+.ttbtn{position:fixed;bottom:68px;right:16px;z-index:100;width:42px;height:42px;border-radius:50%;background:rgba(255,235,59,.12);border:1px solid rgba(255,235,59,.35);color:#ffeb3b;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;box-shadow:0 4px 14px rgba(0,0,0,.4)}
+.ttbtn:hover{background:rgba(255,235,59,.22);box-shadow:0 0 14px rgba(255,235,59,.3)}
+.tpanel{position:fixed;bottom:118px;right:16px;z-index:99;width:min(320px,calc(100vw - 32px));background:#0d1f2d;border:1px solid rgba(255,235,59,.3);border-radius:10px;display:none;flex-direction:column;max-height:380px;box-shadow:0 8px 30px rgba(0,0,0,.5)}
+.tpanel.open{display:flex}
+.thdr{padding:11px 14px;border-bottom:1px solid #1e3a4a;display:flex;align-items:center;justify-content:space-between}
+.ttitle{font-size:11px;color:#ffeb3b;font-weight:600;letter-spacing:1px}
+.tclose{background:none;border:none;color:#6e7681;cursor:pointer;font-size:16px;font-family:monospace;line-height:1}
+.tmsgs{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:7px}
+.tmsg{padding:8px 10px;border-radius:6px;font-size:11px;line-height:1.55}
+.tmsg.sys{background:rgba(255,235,59,.04);border:1px solid rgba(255,235,59,.1);color:#6e7681}
+.tmsg.usr{background:#0a1628;border:1px solid #1e3a4a;color:#c9d1d9}
+.tmsg.ai{background:rgba(63,185,80,.05);border:1px solid rgba(63,185,80,.15);color:#c9d1d9}
+.tinput-area{padding:10px;border-top:1px solid #1e3a4a;display:flex;gap:6px}
+.tinput{flex:1;background:#060a0f;border:1px solid #1e3a4a;border-radius:4px;padding:8px;color:#c9d1d9;font-family:'JetBrains Mono',monospace;font-size:11px;outline:none;resize:none;height:56px}
+.tinput:focus{border-color:rgba(255,235,59,.3)}
+.tsend{padding:8px 10px;background:rgba(255,235,59,.1);border:1px solid rgba(255,235,59,.3);border-radius:4px;color:#ffeb3b;font-family:'JetBrains Mono',monospace;font-size:10px;cursor:pointer;align-self:flex-end}
+.tsend:hover{background:rgba(255,235,59,.2)}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-top"><div class="pdot"></div><span class="hdr-badge">F-02 &middot; SESI 3 &middot; MINGGU 6&ndash;8</span></div>
+  <div class="hdr-title">JS untuk Automation Context</div>
+  <div class="hdr-sub">Async/Await &middot; fetch() &middot; try/catch &middot; Date &middot; Regex</div>
+  <div class="pbar"><div class="pfill" id="pfill" style="width:12.5%"></div></div>
+  <div class="dots">
+    <div class="dot active" id="dot-0" onclick="go(0)" title="Intro"></div>
+    <div class="dot" id="dot-1" onclick="go(1)" title="Async/Await"></div>
+    <div class="dot" id="dot-2" onclick="go(2)" title="fetch()"></div>
+    <div class="dot" id="dot-3" onclick="go(3)" title="try/catch"></div>
+    <div class="dot" id="dot-4" onclick="go(4)" title="Date &amp; Time"></div>
+    <div class="dot" id="dot-5" onclick="go(5)" title="Regex"></div>
+    <div class="dot" id="dot-6" onclick="go(6)" title="Integrasi"></div>
+    <div class="dot" id="dot-7" onclick="go(7)" title="Misi + Quiz"></div>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- ====================================================== STEP 0: WELCOME -->
+<div class="step show" id="step-0">
+  <span class="badge">F-02 &middot; SESI 3 &middot; MINGGU 6&ndash;8</span>
+  <div class="ttl">JS untuk Automation Context</div>
+  <div class="sub">Sesi final F-02. Kamu akan belajar JavaScript yang langsung dipakai di n8n Code Node: ambil data API, proses, dan format output. Bukan teori umum &mdash; ini toolkit automation sesungguhnya.</div>
+
+  <div class="divider"></div>
+  <span class="slabel">&#9670; MATERI SESI INI</span>
+  <div class="card card-y">
+    <div class="li"><span class="arr cy">01.</span><div><strong style="color:#e6edf3">Async/Await Dasar</strong><div style="font-size:10px;color:#6e7681;margin-top:2px">Jalankan operasi async tanpa blokir program</div></div></div>
+    <div class="li"><span class="arr cy">02.</span><div><strong style="color:#e6edf3">fetch() untuk HTTP Request</strong><div style="font-size:10px;color:#6e7681;margin-top:2px">Ambil data dari API langsung via JavaScript</div></div></div>
+    <div class="li"><span class="arr cy">03.</span><div><strong style="color:#e6edf3">Error Handling: try/catch</strong><div style="font-size:10px;color:#6e7681;margin-top:2px">Tangkap error agar workflow tidak crash</div></div></div>
+    <div class="li"><span class="arr cy">04.</span><div><strong style="color:#e6edf3">Date &amp; Time Manipulation</strong><div style="font-size:10px;color:#6e7681;margin-top:2px">Format dan manipulasi tanggal/waktu</div></div></div>
+    <div class="li"><span class="arr cy">05.</span><div><strong style="color:#e6edf3">Regex Dasar untuk Parsing Data</strong><div style="font-size:10px;color:#6e7681;margin-top:2px">Extract dan validasi data dengan pattern matching</div></div></div>
+  </div>
+
+  <span class="slabel">&#9670; PROJECT SESI</span>
+  <div class="card card-o">
+    <span class="clabel co">PROJECT AKHIR SESI</span>
+    <div style="font-size:13px;font-weight:700;color:#e6edf3;margin-bottom:6px">Fetch API &rarr; Proses &rarr; Format Output</div>
+    <div style="font-size:11px;color:#8b949e;line-height:1.65">Script lengkap yang mengambil data dari real API, memprosesnya dengan regex dan date, dan memformat hasilnya &mdash; persis pola n8n Code Node.</div>
+  </div>
+
+  <div class="n8n">
+    <span class="n8nlabel">&#9670; KONEKSI KE N8N</span>
+    <div class="n8ntext">Setelah sesi ini kamu bisa menulis Code Node yang: <strong style="color:#ffeb3b">fetch API &rarr; transform data &rarr; return ke workflow berikutnya</strong>. Pattern ini adalah fondasi automation kompleks.</div>
+  </div>
+
+  <div style="text-align:center;margin-top:20px">
+    <button onclick="go(1)" style="padding:10px 24px;background:rgba(255,235,59,.1);border:1px solid rgba(255,235,59,.4);border-radius:6px;color:#ffeb3b;font-family:'JetBrains Mono',monospace;font-size:11px;cursor:pointer;letter-spacing:1px">MULAI BELAJAR &rarr;</button>
+  </div>
+</div>
+
+<!-- ====================================================== STEP 1: ASYNC/AWAIT -->
+<div class="step" id="step-1">
+  <span class="badge">STEP 2 OF 8 &middot; MATERI 01</span>
+  <div class="ttl">Async/Await Dasar</div>
+  <div class="sub">JavaScript berjalan satu jalur (single-threaded). Async/await memungkinkan kita "menunggu" operasi lambat seperti network request tanpa membekukan seluruh program.</div>
+
+  <div class="divider"></div>
+  <span class="slabel">&#9670; KONSEP INTI</span>
+  <div class="card card-y">
+    <span class="clabel cy">TIGA KATA KUNCI</span>
+    <div class="li"><span class="arr cy">&#8250;</span><div><strong>Promise</strong> &mdash; representasi nilai yang akan ada di masa depan (resolve atau reject)</div></div>
+    <div class="li"><span class="arr cy">&#8250;</span><div><strong>async</strong> &mdash; tandai function sebagai "bisa melakukan operasi async"</div></div>
+    <div class="li"><span class="arr cy">&#8250;</span><div><strong>await</strong> &mdash; "pause di sini sampai Promise selesai, baru lanjut ke baris berikutnya"</div></div>
+  </div>
+
+  <div class="warn"><strong style="color:#ff8c42">&#9888; Aturan wajib:</strong> <code>await</code> hanya bisa digunakan di dalam function yang ditandai <code>async</code>. Tanpa itu, JavaScript throw SyntaxError.</div>
+
+  <span class="slabel">&#9670; SYNTAX</span>
+  <div class="codeblock"><span class="cm">// Cara lama: Promise chain</span>
+fetch(url)
+  .then(<span class="vr">res</span>  => res.<span class="fn">json</span>())
+  .then(<span class="vr">data</span> => console.<span class="fn">log</span>(data))
+  .<span class="fn">catch</span>(<span class="vr">err</span>  => console.<span class="fn">log</span>(err));
+
+<span class="cm">// Cara baru: async/await — lebih bersih</span>
+<span class="kw">async function</span> <span class="fn">ambilData</span>() {
+  <span class="kw">const</span> <span class="vr">res</span>  = <span class="kw">await</span> <span class="fn">fetch</span>(url);
+  <span class="kw">const</span> <span class="vr">data</span> = <span class="kw">await</span> res.<span class="fn">json</span>();
+  console.<span class="fn">log</span>(data);
+}</div>
+
+  <div class="n8n">
+    <span class="n8nlabel">&#9670; DI N8N CODE NODE</span>
+    <div class="n8ntext">n8n Code Node berjalan secara async. Kamu bisa langsung pakai <code style="color:#ffeb3b">await</code> di top-level tanpa wrapper function extra.</div>
+    <div class="codeblock" style="margin-top:8px;font-size:10px"><span class="cm">// Langsung di Code Node:</span>
+<span class="kw">const</span> <span class="vr">res</span>  = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">'https://api.example.com/data'</span>);
+<span class="kw">const</span> <span class="vr">data</span> = <span class="kw">await</span> res.<span class="fn">json</span>();
+<span class="kw">return</span> [{ json: data }];</div>
+  </div>
+
+  <span class="slabel">&#9670; COBA SENDIRI</span>
+  <div class="editor-wrap">
+    <div class="edlabel">EDITOR &mdash; Async/Await dengan Delay</div>
+    <textarea class="ce" id="ed-1"></textarea>
+    <div class="ea">
+      <button class="rbtn" onclick="run('ed-1')">&#9654; JALANKAN</button>
+      <button class="resetbtn" onclick="rst('ed-1')">&#8635; RESET</button>
+    </div>
+    <div class="outbox" id="out-1">// output akan muncul di sini...</div>
+  </div>
+</div>
+
+<!-- ====================================================== STEP 2: FETCH() -->
+<div class="step" id="step-2">
+  <span class="badge">STEP 3 OF 8 &middot; MATERI 02</span>
+  <div class="ttl">fetch() untuk HTTP Request</div>
+  <div class="sub">fetch() adalah fungsi bawaan JavaScript untuk membuat HTTP request. Mengembalikan Promise &mdash; selalu gunakan dengan async/await.</div>
+
+  <div class="divider"></div>
+  <span class="slabel">&#9670; ANATOMY FETCH</span>
+  <div class="codeblock"><span class="kw">async function</span> <span class="fn">ambilData</span>() {
+  <span class="cm">// Step 1: kirim request, tunggu response</span>
+  <span class="kw">const</span> <span class="vr">response</span> = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">'https://api.example.com/data'</span>);
+
+  <span class="cm">// Step 2: parse body sebagai JSON (juga async!)</span>
+  <span class="kw">const</span> <span class="vr">data</span> = <span class="kw">await</span> response.<span class="fn">json</span>();
+
+  console.<span class="fn">log</span>(data);
+}</div>
+
+  <div class="warn"><strong style="color:#ff8c42">&#9888; Dua kali await:</strong> satu untuk fetch() (dapat header), satu untuk response.json() (baca body). Lupa await kedua = dapat Promise, bukan data!</div>
+
+  <span class="slabel">&#9670; CEK RESPONSE STATUS</span>
+  <div class="codeblock"><span class="kw">const</span> <span class="vr">response</span> = <span class="kw">await</span> <span class="fn">fetch</span>(url);
+
+<span class="cm">// response.ok = true jika status 200-299</span>
+<span class="kw">if</span> (!response.<span class="vr">ok</span>) {
+  <span class="kw">throw new</span> <span class="fn">Error</span>(<span class="str">"HTTP Error: "</span> + response.<span class="vr">status</span>);
+}
+<span class="kw">const</span> <span class="vr">data</span> = <span class="kw">await</span> response.<span class="fn">json</span>();</div>
+
+  <span class="slabel">&#9670; REFERENSI CEPAT</span>
+  <table class="stbl">
+    <tr><th>PROPERTY</th><th>CONTOH</th><th>KEGUNAAN</th></tr>
+    <tr><td>response.ok</td><td>true / false</td><td>cek request berhasil</td></tr>
+    <tr><td>response.status</td><td>200, 404, 500</td><td>kode status HTTP</td></tr>
+    <tr><td>await response.json()</td><td>Object / Array</td><td>parse body sebagai JSON</td></tr>
+    <tr><td>await response.text()</td><td>String</td><td>baca body sebagai teks</td></tr>
+  </table>
+
+  <div class="n8n">
+    <span class="n8nlabel">&#9670; DI N8N CODE NODE</span>
+    <div class="n8ntext">fetch() bekerja sama di n8n. Untuk request sederhana gunakan <strong>HTTP Request Node</strong> saja. Code Node + fetch() digunakan saat butuh <em>logic khusus</em> sebelum atau sesudah request.</div>
+  </div>
+
+  <span class="slabel">&#9670; COBA SENDIRI</span>
+  <div class="editor-wrap">
+    <div class="edlabel">EDITOR &mdash; Fetch dari JSONPlaceholder API</div>
+    <textarea class="ce" id="ed-2"></textarea>
+    <div class="ea">
+      <button class="rbtn" onclick="run('ed-2')">&#9654; JALANKAN</button>
+      <button class="resetbtn" onclick="rst('ed-2')">&#8635; RESET</button>
+    </div>
+    <div class="outbox" id="out-2">// output akan muncul di sini...</div>
+  </div>
+  <div class="tip"><strong style="color:#79c0ff">&#128161; Tip:</strong> Ganti angka di URL dari <code>/todos/5</code> ke 1&ndash;200 untuk lihat data berbeda. JSONPlaceholder adalah free API testing tanpa auth.</div>
+</div>
+
+<!-- ====================================================== STEP 3: TRY/CATCH -->
+<div class="step" id="step-3">
+  <span class="badge">STEP 4 OF 8 &middot; MATERI 03</span>
+  <div class="ttl">Error Handling: try/catch</div>
+  <div class="sub">API bisa down. Jaringan bisa putus. Data bisa tidak sesuai format. try/catch memastikan workflow tetap berjalan dengan baik meski ada yang salah.</div>
+
+  <div class="divider"></div>
+  <span class="slabel">&#9670; STRUKTUR</span>
+  <div class="codeblock"><span class="kw">try</span> {
+  <span class="cm">// kode yang MUNGKIN gagal</span>
+  <span class="kw">const</span> <span class="vr">data</span> = <span class="kw">await</span> <span class="fn">ambilDariAPI</span>();
+  console.<span class="fn">log</span>(data);
+
+} <span class="kw">catch</span> (<span class="vr">error</span>) {
+  <span class="cm">// dijalankan JIKA ada error di try</span>
+  console.<span class="fn">log</span>(<span class="str">"Error:"</span>, error.<span class="vr">message</span>);
+
+} <span class="kw">finally</span> {
+  <span class="cm">// SELALU dijalankan, ada error atau tidak</span>
+  console.<span class="fn">log</span>(<span class="str">"Selesai"</span>);
+}</div>
+
+  <div class="card card-y">
+    <span class="clabel cy">FUNGSI SETIAP BLOK</span>
+    <div class="li"><span class="arr cy">try</span><div>Kode berjalan normal. Jika error &rarr; langsung lompat ke catch. Baris setelah error tidak dieksekusi.</div></div>
+    <div class="li"><span class="arr cy">catch</span><div>Menerima object <code>error</code> berisi <code>error.message</code>. Bisa log, kirim notifikasi, atau set default value.</div></div>
+    <div class="li"><span class="arr cy">finally</span><div>Selalu jalan &mdash; untuk cleanup: set loading = false, tutup koneksi, log timestamp selesai.</div></div>
+  </div>
+
+  <div class="n8n">
+    <span class="n8nlabel">&#9670; DI N8N CODE NODE</span>
+    <div class="n8ntext">Error yang tidak di-handle akan <strong>stop workflow</strong>. Dengan try/catch kamu bisa: log error ke Slack/Sheet, kirim ke error workflow, atau return data fallback &mdash; inilah yang membuat workflow production-ready.</div>
+  </div>
+
+  <span class="slabel">&#9670; COBA SENDIRI</span>
+  <div class="editor-wrap">
+    <div class="edlabel">EDITOR &mdash; try/catch dengan URL valid dan invalid</div>
+    <textarea class="ce" id="ed-3"></textarea>
+    <div class="ea">
+      <button class="rbtn" onclick="run('ed-3')">&#9654; JALANKAN</button>
+      <button class="resetbtn" onclick="rst('ed-3')">&#8635; RESET</button>
+    </div>
+    <div class="outbox" id="out-3">// output akan muncul di sini...</div>
+  </div>
+</div>
+
+<!-- ====================================================== STEP 4: DATE & TIME -->
+<div class="step" id="step-4">
+  <span class="badge">STEP 5 OF 8 &middot; MATERI 04</span>
+  <div class="ttl">Date &amp; Time Manipulation</div>
+  <div class="sub">Timestamp, format tanggal, menghitung waktu &mdash; semua butuh Date object. Di automation, date dipakai untuk logging, scheduling, dan memberi konteks pada data.</div>
+
+  <div class="divider"></div>
+  <span class="slabel">&#9670; MEMBUAT DATE OBJECT</span>
+  <div class="codeblock"><span class="kw">const</span> <span class="vr">sekarang</span>  = <span class="kw">new</span> <span class="fn">Date</span>();           <span class="cm">// waktu saat ini</span>
+<span class="kw">const</span> <span class="vr">spesifik</span>  = <span class="kw">new</span> <span class="fn">Date</span>(<span class="str">'2024-06-15'</span>);  <span class="cm">// dari string ISO</span>
+<span class="kw">const</span> <span class="vr">timestamp</span> = <span class="nm">Date</span>.<span class="fn">now</span>();                <span class="cm">// ms sejak epoch, tanpa new</span></div>
+
+  <span class="slabel">&#9670; METHOD PENTING</span>
+  <table class="stbl">
+    <tr><th>METHOD</th><th>CONTOH HASIL</th><th>CATATAN</th></tr>
+    <tr><td>getDate()</td><td>1 &ndash; 31</td><td>hari dalam bulan</td></tr>
+    <tr><td>getMonth()</td><td>0 &ndash; 11</td><td><strong style="color:#ff8c42">0 = Januari!</strong> Harus +1</td></tr>
+    <tr><td>getFullYear()</td><td>2024</td><td>tahun 4 digit</td></tr>
+    <tr><td>getHours()</td><td>0 &ndash; 23</td><td>format 24 jam</td></tr>
+    <tr><td>getMinutes()</td><td>0 &ndash; 59</td><td>menit</td></tr>
+    <tr><td>toISOString()</td><td>2024-06-15T08:30:00.000Z</td><td>format standar API</td></tr>
+    <tr><td>Date.now()</td><td>1718438400000</td><td>milliseconds sejak epoch</td></tr>
+  </table>
+
+  <div class="warn"><strong style="color:#ff8c42">&#9888; Gotcha klasik:</strong> <code>getMonth()</code> mengembalikan 0 untuk Januari, 11 untuk Desember. Selalu tambah <code>+1</code> saat menampilkan ke user atau menyimpan ke database!</div>
+
+  <span class="slabel">&#9670; FORMAT CUSTOM DD/MM/YYYY</span>
+  <div class="codeblock"><span class="kw">const</span> <span class="vr">now</span>  = <span class="kw">new</span> <span class="fn">Date</span>();
+<span class="kw">const</span> <span class="vr">dd</span>   = <span class="fn">String</span>(now.<span class="fn">getDate</span>()).<span class="fn">padStart</span>(<span class="nm">2</span>, <span class="str">'0'</span>);
+<span class="kw">const</span> <span class="vr">mm</span>   = <span class="fn">String</span>(now.<span class="fn">getMonth</span>() + <span class="nm">1</span>).<span class="fn">padStart</span>(<span class="nm">2</span>, <span class="str">'0'</span>);
+<span class="kw">const</span> <span class="vr">yyyy</span> = now.<span class="fn">getFullYear</span>();
+<span class="kw">const</span> <span class="vr">fmt</span>  = dd + <span class="str">"/"</span> + mm + <span class="str">"/"</span> + yyyy; <span class="cm">// "15/06/2024"</span></div>
+
+  <div class="n8n">
+    <span class="n8nlabel">&#9670; DI N8N CODE NODE</span>
+    <div class="n8ntext">Timestamp sering dipakai untuk: (1) <strong>audit trail</strong> &mdash; catat kapan data diproses, (2) <strong>file naming</strong> &mdash; laporan-2024-06-15.pdf, (3) <strong>scheduling</strong> &mdash; apakah sudah lewat deadline?</div>
+  </div>
+
+  <span class="slabel">&#9670; COBA SENDIRI</span>
+  <div class="editor-wrap">
+    <div class="edlabel">EDITOR &mdash; Date &amp; Time Manipulation</div>
+    <textarea class="ce" id="ed-4"></textarea>
+    <div class="ea">
+      <button class="rbtn" onclick="run('ed-4')">&#9654; JALANKAN</button>
+      <button class="resetbtn" onclick="rst('ed-4')">&#8635; RESET</button>
+    </div>
+    <div class="outbox" id="out-4">// output akan muncul di sini...</div>
+  </div>
+</div>
+
+<!-- ====================================================== STEP 5: REGEX -->
+<div class="step" id="step-5">
+  <span class="badge">STEP 6 OF 8 &middot; MATERI 05</span>
+  <div class="ttl">Regex Dasar untuk Parsing Data</div>
+  <div class="sub">Regex adalah pola untuk mencari, memvalidasi, dan mengekstrak teks. Di automation: parsing log, validasi input, membersihkan data sebelum diproses.</div>
+
+  <div class="divider"></div>
+  <span class="slabel">&#9670; SYNTAX DASAR</span>
+  <div class="codeblock"><span class="cm">// Format: /pola/flags</span>
+<span class="kw">const</span> <span class="vr">p1</span> = <span class="fn">/hello/i</span>;   <span class="cm">// i = case-insensitive</span>
+<span class="kw">const</span> <span class="vr">p2</span> = <span class="fn">/\d+/g</span>;    <span class="cm">// g = global (cari semua match)</span></div>
+
+  <span class="slabel">&#9670; TIGA METHOD UTAMA</span>
+  <div class="codeblock"><span class="kw">const</span> <span class="vr">teks</span> = <span class="str">"Error 404 di 2024-06-15"</span>;
+
+<span class="cm">// test()  — apakah pola ada? &rarr; true/false</span>
+<span class="fn">/error/i</span>.<span class="fn">test</span>(<span class="vr">teks</span>);              <span class="cm">// true</span>
+
+<span class="cm">// match() — ambil yang cocok &rarr; array atau null</span>
+<span class="vr">teks</span>.<span class="fn">match</span>(<span class="fn">/\d+/g</span>);              <span class="cm">// ["404","2024","06","15"]</span>
+<span class="vr">teks</span>.<span class="fn">match</span>(<span class="fn">/\d{4}-\d{2}-\d{2}/</span>); <span class="cm">// ["2024-06-15"]</span>
+
+<span class="cm">// replace() — ganti yang cocok &rarr; string baru</span>
+<span class="vr">teks</span>.<span class="fn">replace</span>(<span class="fn">/\d+/g</span>, <span class="str">"X"</span>);       <span class="cm">// "Error X di X-X-X"</span></div>
+
+  <span class="slabel">&#9670; POLA YANG SERING DIPAKAI</span>
+  <table class="stbl">
+    <tr><th>POLA</th><th>ARTI</th><th>CONTOH MATCH</th></tr>
+    <tr><td>\d</td><td>satu digit 0-9</td><td>3, 7</td></tr>
+    <tr><td>\d+</td><td>satu atau lebih digit</td><td>42, 1000</td></tr>
+    <tr><td>\d{4}</td><td>tepat 4 digit</td><td>2024</td></tr>
+    <tr><td>\w+</td><td>kata (huruf/angka/_)</td><td>hello, user_1</td></tr>
+    <tr><td>\S+</td><td>bukan whitespace</td><td>email@test.com</td></tr>
+    <tr><td>flag i</td><td>case-insensitive</td><td>ERROR = error</td></tr>
+    <tr><td>flag g</td><td>cari semua match</td><td>tanpa g = hanya pertama</td></tr>
+  </table>
+
+  <div class="tip"><strong style="color:#79c0ff">&#128161; Tip aman:</strong> Gunakan <code>teks.match(/pola/)?.[0]</code> &mdash; jika tidak ada match (null), optional chaining <code>?.[0]</code> tidak throw error, hanya return undefined.</div>
+
+  <div class="n8n">
+    <span class="n8nlabel">&#9670; DI N8N CODE NODE</span>
+    <div class="n8ntext">Kasus nyata: (1) extract invoice number dari email subject, (2) validasi format data sebelum simpan ke DB, (3) parse log untuk ambil status dan timestamp, (4) bersihkan HTML tags dari teks.</div>
+  </div>
+
+  <span class="slabel">&#9670; COBA SENDIRI</span>
+  <div class="editor-wrap">
+    <div class="edlabel">EDITOR &mdash; Regex untuk Parsing Log Data</div>
+    <textarea class="ce" id="ed-5"></textarea>
+    <div class="ea">
+      <button class="rbtn" onclick="run('ed-5')">&#9654; JALANKAN</button>
+      <button class="resetbtn" onclick="rst('ed-5')">&#8635; RESET</button>
+    </div>
+    <div class="outbox" id="out-5">// output akan muncul di sini...</div>
+  </div>
+</div>
+
+<!-- ====================================================== STEP 6: INTEGRASI -->
+<div class="step" id="step-6">
+  <span class="badge">STEP 7 OF 8 &middot; INTEGRASI</span>
+  <div class="ttl">Semua Bersatu</div>
+  <div class="sub">Inilah pattern yang ditulis di n8n Code Node: async/await + fetch + try/catch + date + regex &mdash; semua bersama membangun automation yang solid.</div>
+
+  <div class="divider"></div>
+  <span class="slabel">&#9670; PATTERN LENGKAP</span>
+
+  <div class="codeblock" style="font-size:10px"><span class="cm">// N8N CODE NODE: Fetch API -> Process -> Format Output</span>
+<span class="kw">async function</span> <span class="fn">processData</span>() {
+  <span class="kw">const</span> <span class="vr">timestamp</span> = <span class="kw">new</span> <span class="fn">Date</span>().<span class="fn">toISOString</span>();   <span class="cm">// DATE</span>
+
+  <span class="kw">try</span> {                                              <span class="cm">// TRY/CATCH</span>
+    <span class="cm">// 1. FETCH</span>
+    <span class="kw">const</span> <span class="vr">res</span>  = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">'https://api.example.com'</span>); <span class="cm">// ASYNC/AWAIT</span>
+    <span class="kw">if</span> (!res.<span class="vr">ok</span>) <span class="kw">throw new</span> <span class="fn">Error</span>(<span class="str">"API Error: "</span> + res.<span class="vr">status</span>);
+    <span class="kw">const</span> <span class="vr">data</span> = <span class="kw">await</span> res.<span class="fn">json</span>();                  <span class="cm">// FETCH</span>
+
+    <span class="cm">// 2. PROCESS + REGEX</span>
+    <span class="kw">const</span> <span class="vr">hasil</span> = data.<span class="fn">map</span>(<span class="kw">function</span>(<span class="vr">item</span>) {
+      <span class="kw">const</span> <span class="vr">words</span> = (item.title.<span class="fn">match</span>(<span class="fn">/\w{4,}/g</span>) || []); <span class="cm">// REGEX</span>
+      <span class="kw">return</span> { id: item.<span class="vr">id</span>, keywords: <span class="vr">words</span>, processedAt: <span class="vr">timestamp</span> };
+    });
+
+    <span class="cm">// 3. RETURN KE WORKFLOW N8N</span>
+    <span class="kw">return</span> hasil.<span class="fn">map</span>(<span class="vr">item</span> => ({ json: <span class="vr">item</span> }));
+
+  } <span class="kw">catch</span> (<span class="vr">err</span>) {
+    console.<span class="fn">log</span>(<span class="str">"Error:"</span>, err.<span class="vr">message</span>);
+    <span class="kw">return</span> [{ json: { error: err.<span class="vr">message</span>, timestamp: <span class="vr">timestamp</span> } }];
+  }
+}</div>
+
+  <div class="card card-g">
+    <span class="clabel cg">ALUR DATA</span>
+    <div class="li"><span class="arr cg">1</span><div><strong>INPUT</strong> &mdash; Data dari node sebelumnya atau fetch dari API</div></div>
+    <div class="li"><span class="arr cg">2</span><div><strong>PROCESS</strong> &mdash; Filter, transform, extract dengan JS (map, filter, regex, date)</div></div>
+    <div class="li"><span class="arr cg">3</span><div><strong>OUTPUT</strong> &mdash; Return array <code>[{ json: ... }]</code> untuk node berikutnya</div></div>
+  </div>
+
+  <span class="slabel">&#9670; COBA SENDIRI &mdash; FULL PROJECT</span>
+  <div class="editor-wrap">
+    <div class="edlabel">EDITOR &mdash; Fetch API &rarr; Process &rarr; Format Output</div>
+    <textarea class="ce" id="ed-6" style="min-height:240px"></textarea>
+    <div class="ea">
+      <button class="rbtn" onclick="run('ed-6')">&#9654; JALANKAN</button>
+      <button class="resetbtn" onclick="rst('ed-6')">&#8635; RESET</button>
+    </div>
+    <div class="outbox" id="out-6" style="min-height:80px">// output akan muncul di sini...</div>
+  </div>
+</div>
+
+<!-- ====================================================== STEP 7: MISI + QUIZ -->
+<div class="step" id="step-7">
+  <span class="badge">STEP 8 OF 8 &middot; MISI + QUIZ</span>
+  <div class="ttl">Practice Mission &amp; Quiz</div>
+  <div class="sub">Tiga misi dari mudah ke kompleks, lalu 5 quiz untuk konfirmasi pemahaman.</div>
+
+  <div class="divider"></div>
+  <span class="slabel">&#9670; PRACTICE MISSIONS</span>
+
+  <!-- M1 -->
+  <div class="mission">
+    <span class="mbadge measy">MISI 1 &mdash; MUDAH</span>
+    <div class="mtitle">Format Timestamp Async</div>
+    <div class="mdesc">Buat async function yang menampilkan timestamp sekarang dalam format <strong>DD/MM/YYYY HH:mm</strong>, tunggu 500ms, lalu tampilkan "Selesai!"</div>
+    <div class="editor-wrap">
+      <div class="edlabel">EDITOR &mdash; Misi 1</div>
+      <textarea class="ce" id="em-1" style="min-height:200px"></textarea>
+      <div class="ea">
+        <button class="rbtn" onclick="run('em-1')">&#9654; JALANKAN</button>
+        <button class="resetbtn" onclick="rst('em-1')">&#8635; RESET</button>
+      </div>
+      <div class="outbox" id="om-1">// output akan muncul di sini...</div>
+    </div>
+  </div>
+
+  <!-- M2 -->
+  <div class="mission">
+    <span class="mbadge mmed">MISI 2 &mdash; MEDIUM</span>
+    <div class="mtitle">Fetch User Data + Error Handling</div>
+    <div class="mdesc">Fetch user dari <code style="font-size:10px">https://jsonplaceholder.typicode.com/users/1</code>, tampilkan nama dan email. Handle error jika request gagal.</div>
+    <div class="editor-wrap">
+      <div class="edlabel">EDITOR &mdash; Misi 2</div>
+      <textarea class="ce" id="em-2" style="min-height:200px"></textarea>
+      <div class="ea">
+        <button class="rbtn" onclick="run('em-2')">&#9654; JALANKAN</button>
+        <button class="resetbtn" onclick="rst('em-2')">&#8635; RESET</button>
+      </div>
+      <div class="outbox" id="om-2">// output akan muncul di sini...</div>
+    </div>
+  </div>
+
+  <!-- M3 -->
+  <div class="mission">
+    <span class="mbadge mhard">MISI 3 &mdash; PROJECT</span>
+    <div class="mtitle">Full Pipeline: Fetch &rarr; Regex &rarr; Format</div>
+    <div class="mdesc">Fetch 10 posts, filter hanya <code>userId === 1</code>, extract kata 4+ huruf dari title pakai regex, format output dengan timestamp. Handle semua error.</div>
+    <div class="editor-wrap">
+      <div class="edlabel">EDITOR &mdash; Misi 3 (Project Utama)</div>
+      <textarea class="ce" id="em-3" style="min-height:240px"></textarea>
+      <div class="ea">
+        <button class="rbtn" onclick="run('em-3')">&#9654; JALANKAN</button>
+        <button class="resetbtn" onclick="rst('em-3')">&#8635; RESET</button>
+      </div>
+      <div class="outbox" id="om-3" style="min-height:80px">// output akan muncul di sini...</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  <span class="slabel">&#9670; KNOWLEDGE CHECK</span>
+
+  <!-- Q1 -->
+  <div class="qblock">
+    <span class="qnum">SOAL 01 / 05 &mdash; ASYNC/AWAIT</span>
+    <div class="qtext">Apa yang WAJIB ada agar kita bisa menggunakan kata kunci 'await' di dalam sebuah function?</div>
+    <div class="qopts" id="q0">
+      <button class="qopt" onclick="ans(0,0)">Function harus bernama 'main'</button>
+      <button class="qopt" onclick="ans(0,1)">Function harus menggunakan keyword 'async'</button>
+      <button class="qopt" onclick="ans(0,2)">Function harus menggunakan 'const'</button>
+      <button class="qopt" onclick="ans(0,3)">Function harus punya return value</button>
+    </div>
+    <div class="qfb" id="qfb0"></div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="qblock">
+    <span class="qnum">SOAL 02 / 05 &mdash; FETCH()</span>
+    <div class="qtext">Setelah 'const res = await fetch(url)', langkah BERIKUTNYA untuk mendapatkan data JSON?</div>
+    <div class="qopts" id="q1">
+      <button class="qopt" onclick="ans(1,0)">JSON.parse(res)</button>
+      <button class="qopt" onclick="ans(1,1)">res.data</button>
+      <button class="qopt" onclick="ans(1,2)">await res.json()</button>
+      <button class="qopt" onclick="ans(1,3)">res.body</button>
+    </div>
+    <div class="qfb" id="qfb1"></div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="qblock">
+    <span class="qnum">SOAL 03 / 05 &mdash; TRY/CATCH</span>
+    <div class="qtext">Kapan blok 'finally' dalam try/catch/finally dijalankan?</div>
+    <div class="qopts" id="q2">
+      <button class="qopt" onclick="ans(2,0)">Hanya saat ada error di catch</button>
+      <button class="qopt" onclick="ans(2,1)">Hanya saat try berhasil tanpa error</button>
+      <button class="qopt" onclick="ans(2,2)">Selalu dijalankan, ada error atau tidak</button>
+      <button class="qopt" onclick="ans(2,3)">Tergantung kondisi yang kita tulis</button>
+    </div>
+    <div class="qfb" id="qfb2"></div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="qblock">
+    <span class="qnum">SOAL 04 / 05 &mdash; DATE & TIME</span>
+    <div class="qtext">new Date().getMonth() mengembalikan 0 untuk Januari. Untuk tampilkan bulan 1-12 yang benar?</div>
+    <div class="qopts" id="q3">
+      <button class="qopt" onclick="ans(3,0)">Gunakan getMonthDisplay() sebagai gantinya</button>
+      <button class="qopt" onclick="ans(3,1)">Tambah +1: getMonth() + 1</button>
+      <button class="qopt" onclick="ans(3,2)">Kalikan 1: getMonth() * 1</button>
+      <button class="qopt" onclick="ans(3,3)">Gunakan getDate() untuk mendapat bulan</button>
+    </div>
+    <div class="qfb" id="qfb3"></div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="qblock">
+    <span class="qnum">SOAL 05 / 05 &mdash; REGEX</span>
+    <div class="qtext">Method regex mana yang mengembalikan nilai true atau false?</div>
+    <div class="qopts" id="q4">
+      <button class="qopt" onclick="ans(4,0)">.match() &mdash; mengembalikan array atau null</button>
+      <button class="qopt" onclick="ans(4,1)">.replace() &mdash; mengembalikan string baru</button>
+      <button class="qopt" onclick="ans(4,2)">.test() &mdash; mengembalikan boolean</button>
+      <button class="qopt" onclick="ans(4,3)">.exec() &mdash; mengembalikan array atau null</button>
+    </div>
+    <div class="qfb" id="qfb4"></div>
+  </div>
+
+  <!-- Score -->
+  <div class="score-box" id="score-box">
+    <div class="score-num" id="score-num">0/5</div>
+    <div class="score-label" id="score-label">Hitung skor...</div>
+  </div>
+
+  <!-- Milestone -->
+  <div class="milestone">
+    <span class="clabel cy">&#9670; MILESTONE F-02</span>
+    <div style="font-size:12px;color:#e6edf3;line-height:1.6">&#10003; Bisa menulis custom code di n8n Code Node tanpa harus Google setiap syntax</div>
+    <div style="font-size:10px;color:#6e7681;margin-top:6px">Kamu sudah menguasai: Variables, Data Types, Objects, Arrays, Functions, Array Methods, Async/Await, fetch(), try/catch, Date, Regex</div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<!-- NAV FOOTER -->
+<div class="nav-foot">
+  <button class="nbtn nbtn-p" id="btnp" onclick="prev()" disabled>&larr; PREV</button>
+  <div class="sindic" id="sindic">1 / 8</div>
+  <button class="nbtn nbtn-n" id="btnn" onclick="nxt()">NEXT &rarr;</button>
+</div>
+
+<!-- AI TUTOR -->
+<button class="ttbtn" id="ttbtn" onclick="toggleTutor()">&#129302;</button>
+<div class="tpanel" id="tpanel">
+  <div class="thdr">
+    <span class="ttitle">&#9670; AI TUTOR &mdash; SESI 3</span>
+    <button class="tclose" onclick="toggleTutor()">&#10005;</button>
+  </div>
+  <div class="tmsgs" id="tmsgs">
+    <div class="tmsg sys">Tanya apapun seputar Async/Await, fetch(), try/catch, Date, atau Regex. Saya siap bantu!</div>
+  </div>
+  <div class="tinput-area">
+    <textarea class="tinput" id="tinput" placeholder="Tulis pertanyaanmu..."></textarea>
+    <button class="tsend" onclick="sendTutor()">KIRIM</button>
+  </div>
+</div>
+
+<script>
+// ===== STATE =====
+var cur = 0;
+var N = 8;
+
+// ===== DEFAULT CODES =====
+var DEFS = {};
+
+DEFS['ed-1'] = [
+"// Async/await dengan delay (simulasi network request)",
+"function tunggu(ms) {",
+"  return new Promise(function(r) { setTimeout(r, ms); });",
+"}",
+"",
+"async function main() {",
+"  console.log(\"Step 1: Mulai proses...\");",
+"  await tunggu(400);",
+"  console.log(\"Step 2: Setelah 400ms\");",
+"  await tunggu(400);",
+"  console.log(\"Step 3: Selesai!\");",
+"  return \"Berhasil!\";",
+"}",
+"",
+"var hasil = await main();",
+"console.log(\"Return value:\", hasil);"
+].join('\n');
+
+DEFS['ed-2'] = [
+"// Fetch data dari JSONPlaceholder API",
+"async function ambilTodo() {",
+"  var res  = await fetch('https://jsonplaceholder.typicode.com/todos/5');",
+"  var data = await res.json();",
+"",
+"  console.log(\"ID:\",     data.id);",
+"  console.log(\"Todo:\",   data.title);",
+"  console.log(\"Selesai:\", data.completed);",
+"}",
+"",
+"await ambilTodo();"
+].join('\n');
+
+DEFS['ed-3'] = [
+"// Error handling dengan try/catch/finally",
+"async function fetchAman(url) {",
+"  try {",
+"    var res = await fetch(url);",
+"    if (!res.ok) throw new Error(\"HTTP \" + res.status);",
+"    var data = await res.json();",
+"    console.log(\"Sukses:\", data.title || data.name || \"OK\");",
+"  } catch (err) {",
+"    console.log(\"Error:\", err.message);",
+"  } finally {",
+"    console.log(\"--- request selesai ---\\n\");",
+"  }",
+"}",
+"",
+"// URL valid",
+"await fetchAman('https://jsonplaceholder.typicode.com/posts/1');",
+"// URL tidak valid (akan masuk catch)",
+"await fetchAman('not-a-valid-url');"
+].join('\n');
+
+DEFS['ed-4'] = [
+"// Date & Time manipulation",
+"var now  = new Date();",
+"",
+"var dd   = String(now.getDate()).padStart(2, '0');",
+"var mm   = String(now.getMonth() + 1).padStart(2, '0'); // +1 karena 0-indexed!",
+"var yyyy = now.getFullYear();",
+"var hh   = String(now.getHours()).padStart(2, '0');",
+"var min  = String(now.getMinutes()).padStart(2, '0');",
+"",
+"console.log(\"ISO:\",       now.toISOString());",
+"console.log(\"Format ID:\", dd + \"/\" + mm + \"/\" + yyyy);",
+"console.log(\"Jam:\",       hh + \":\" + min);",
+"console.log(\"Timestamp:\", Date.now());",
+"",
+"// Tambah 1 hari",
+"var besok = new Date(now.getTime() + 24 * 60 * 60 * 1000);",
+"console.log(\"Besok:\", besok.toDateString());"
+].join('\n');
+
+DEFS['ed-5'] = [
+"// Regex untuk parsing data automation",
+"var logLine = \"2024-06-15 ERROR user@company.com timeout 5000ms\";",
+"",
+"// Cari tanggal YYYY-MM-DD",
+"var tgl = logLine.match(/\\d{4}-\\d{2}-\\d{2}/);",
+"console.log(\"Tanggal:\", tgl ? tgl[0] : \"tidak ada\");",
+"",
+"// Cari email",
+"var email = logLine.match(/\\S+@\\S+\\.\\S+/);",
+"console.log(\"Email:\",   email ? email[0] : \"tidak ada\");",
+"",
+"// Cari semua angka",
+"var angka = logLine.match(/\\d+/g);",
+"console.log(\"Angka:\",   angka);",
+"",
+"// Apakah ada ERROR?",
+"console.log(\"Ada error?\", /error/i.test(logLine));",
+"",
+"// Bersihkan spasi berlebih",
+"var messy = \"  hello   world  \";",
+"console.log(\"Bersih:\", messy.trim().replace(/\\s+/g, \" \"));"
+].join('\n');
+
+DEFS['ed-6'] = [
+"// FULL PATTERN: Fetch API -> Process -> Format Output",
+"async function processData() {",
+"  var timestamp = new Date().toISOString();",
+"",
+"  try {",
+"    // 1. FETCH",
+"    var res = await fetch('https://jsonplaceholder.typicode.com/posts?userId=1&_limit=3');",
+"    if (!res.ok) throw new Error(\"API gagal: \" + res.status);",
+"    var posts = await res.json();",
+"    console.log(\"Dapat \" + posts.length + \" posts\");",
+"",
+"    // 2. PROCESS + REGEX",
+"    var hasil = posts.map(function(post) {",
+"      var wordCount = (post.body.match(/\\w+/g) || []).length;",
+"      var firstWord = (post.title.match(/\\w+/) || [\"?\"])[0];",
+"      return {",
+"        id:          post.id,",
+"        judul:       post.title,",
+"        wordCount:   wordCount,",
+"        firstWord:   firstWord,",
+"        processedAt: timestamp",
+"      };",
+"    });",
+"",
+"    // 3. OUTPUT",
+"    console.log(JSON.stringify(hasil, null, 2));",
+"",
+"  } catch (err) {",
+"    console.log(\"Error:\", err.message);",
+"  }",
+"}",
+"",
+"await processData();"
+].join('\n');
+
+DEFS['em-1'] = [
+"// MISI 1: Async + Date Format",
+"// Tampilkan timestamp (DD/MM/YYYY HH:mm) -> tunggu 500ms -> \"Selesai!\"",
+"",
+"function tunggu(ms) {",
+"  return new Promise(function(r) { setTimeout(r, ms); });",
+"}",
+"",
+"async function mission1() {",
+"  var now  = new Date();",
+"  // TODO: lengkapi format DD/MM/YYYY HH:mm",
+"  var dd   = String(now.getDate()).padStart(2, '0');",
+"  var mm   = \"??\"; // TODO: bulan (ingat getMonth() + 1)",
+"  var yyyy = \"??\"; // TODO: tahun",
+"  var hh   = \"??\"; // TODO: jam",
+"  var min  = \"??\"; // TODO: menit",
+"",
+"  var fmt = dd + \"/\" + mm + \"/\" + yyyy + \" \" + hh + \":\" + min;",
+"  console.log(\"Timestamp:\", fmt);",
+"",
+"  await tunggu(500);",
+"  console.log(\"Selesai!\");",
+"}",
+"",
+"await mission1();"
+].join('\n');
+
+DEFS['em-2'] = [
+"// MISI 2: Fetch User Data + try/catch",
+"// Ambil user dari JSONPlaceholder, tampilkan nama & email",
+"// Handle error jika request gagal",
+"",
+"async function mission2() {",
+"  try {",
+"    var res = await fetch('https://jsonplaceholder.typicode.com/users/1');",
+"    // TODO: cek res.ok, throw error jika tidak ok",
+"",
+"    var user = await res.json();",
+"    // TODO: console.log nama dan email user",
+"",
+"  } catch (err) {",
+"    // TODO: tampilkan pesan error",
+"  }",
+"}",
+"",
+"await mission2();"
+].join('\n');
+
+DEFS['em-3'] = [
+"// MISI 3: FULL PROJECT",
+"// 1. Fetch 10 posts dari JSONPlaceholder",
+"// 2. Filter: hanya userId === 1",
+"// 3. Extract kata 4+ huruf dari title (regex)",
+"// 4. Format output dengan timestamp",
+"// 5. Handle semua error",
+"",
+"async function mission3() {",
+"  var timestamp = new Date().toISOString();",
+"",
+"  try {",
+"    var res = await fetch('https://jsonplaceholder.typicode.com/posts?_limit=10');",
+"    if (!res.ok) throw new Error(\"HTTP \" + res.status);",
+"    var posts = await res.json();",
+"",
+"    var hasil = posts",
+"      .filter(function(p) {",
+"        return false; // TODO: filter userId === 1",
+"      })",
+"      .map(function(p) {",
+"        return {",
+"          id:       p.id,",
+"          keywords: p.title.match(/* TODO: regex kata 4+ huruf */),",
+"          ts:       timestamp",
+"        };",
+"      });",
+"",
+"    console.log(JSON.stringify(hasil, null, 2));",
+"",
+"  } catch (err) {",
+"    console.log(\"Error:\", err.message);",
+"  }",
+"}",
+"",
+"await mission3();"
+].join('\n');
+
+// ===== QUIZ DATA =====
+var QUIZ = [
+  { correct: 1, ok: "Tepat! 'await' hanya bisa dipakai di dalam function yang ditandai 'async'. Tanpa itu, JavaScript akan throw SyntaxError.", no: "Salah. Yang diwajibkan adalah keyword 'async' pada function. Tanpa 'async', 'await' akan throw SyntaxError." },
+  { correct: 2, ok: "Benar! res.json() mengembalikan Promise, jadi perlu await lagi. Pattern standar: dua kali await — satu untuk fetch(), satu untuk parse body.", no: "Salah. Setelah await fetch(), kamu perlu 'await res.json()' untuk parse body menjadi data JavaScript." },
+  { correct: 2, ok: "Tepat! 'finally' SELALU dijalankan — sukses maupun error. Cocok untuk cleanup: set loading = false, log selesai, tutup koneksi.", no: "Salah. 'finally' selalu dijalankan tanpa syarat, baik saat try sukses maupun saat catch menangkap error." },
+  { correct: 1, ok: "Benar! getMonth() adalah 0-indexed (0=Jan, 11=Des). Ini gotcha klasik — selalu ingat +1 saat menampilkan bulan ke user atau simpan ke database!", no: "Salah. JavaScript getMonth() mengembalikan 0-11, bukan 1-12. Solusinya sederhana: getMonth() + 1." },
+  { correct: 2, ok: "Tepat! .test() mengembalikan true/false — sempurna untuk validasi dan routing: if (/error/i.test(log)) { handleError(); }", no: "Salah. .test() adalah method yang mengembalikan boolean. .match() dan .exec() mengembalikan array, .replace() mengembalikan string." }
+];
+
+var qAnswers = [null, null, null, null, null];
+var qScore = 0;
+
+// ===== NAVIGATION =====
+function go(n) {
+  document.getElementById('step-' + cur).classList.remove('show');
+  for (var i = 0; i < N; i++) {
+    var d = document.getElementById('dot-' + i);
+    d.className = 'dot' + (i < n ? ' done' : i === n ? ' active' : '');
+  }
+  cur = n;
+  document.getElementById('step-' + cur).classList.add('show');
+  document.getElementById('pfill').style.width = ((cur + 1) / N * 100) + '%';
+  document.getElementById('sindic').textContent = (cur + 1) + ' / ' + N;
+  document.getElementById('btnp').disabled = cur === 0;
+  document.getElementById('btnn').textContent = cur === N - 1 ? 'SELESAI \u2713' : 'NEXT \u2192';
+  window.scrollTo(0, 0);
+}
+function nxt() { if (cur < N - 1) go(cur + 1); }
+function prev() { if (cur > 0) go(cur - 1); }
+
+// ===== CODE RUNNER =====
+async function run(edId) {
+  var sfx   = edId.replace('ed-', '').replace('em-', '');
+  var outId = edId.startsWith('em') ? 'om-' + sfx : 'out-' + sfx;
+  var code  = document.getElementById(edId).value;
+  var outEl = document.getElementById(outId);
+
+  var logs = [];
+  var origLog = console.log;
+  var origErr = console.error;
+  console.log = function() {
+    var args = Array.prototype.slice.call(arguments);
+    logs.push(args.map(function(a) {
+      return typeof a === 'object' ? JSON.stringify(a, null, 2) : String(a);
+    }).join(' '));
+  };
+  console.error = function() {
+    var args = Array.prototype.slice.call(arguments);
+    logs.push('[ERROR] ' + args.join(' '));
+  };
+
+  outEl.textContent = 'Menjalankan...';
+  outEl.style.color = '#6e7681';
+
+  try {
+    var AF = Object.getPrototypeOf(async function(){}).constructor;
+    await new AF(code)();
+    outEl.textContent = logs.length ? logs.join('\n') : '(tidak ada output)';
+    outEl.style.color = '#c9d1d9';
+  } catch(e) {
+    outEl.textContent = 'ERROR: ' + e.message;
+    outEl.style.color = '#f85149';
+  } finally {
+    console.log   = origLog;
+    console.error = origErr;
+  }
+}
+
+function rst(edId) {
+  var el = document.getElementById(edId);
+  if (el && DEFS[edId]) {
+    el.value = DEFS[edId];
+    var sfx   = edId.replace('ed-', '').replace('em-', '');
+    var outId = edId.startsWith('em') ? 'om-' + sfx : 'out-' + sfx;
+    var outEl = document.getElementById(outId);
+    if (outEl) { outEl.textContent = '// output akan muncul di sini...'; outEl.style.color = '#6e7681'; }
+  }
+}
+
+// Tab key support
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Tab' && e.target.classList.contains('ce')) {
+    e.preventDefault();
+    var t = e.target, s = t.selectionStart;
+    t.value = t.value.slice(0, s) + '  ' + t.value.slice(t.selectionEnd);
+    t.selectionStart = t.selectionEnd = s + 2;
+  }
+});
+
+// ===== QUIZ =====
+function ans(qIdx, aIdx) {
+  if (qAnswers[qIdx] !== null) return;
+  qAnswers[qIdx] = aIdx;
+  var q    = QUIZ[qIdx];
+  var opts = document.querySelectorAll('#q' + qIdx + ' button');
+  opts.forEach(function(btn, i) {
+    if (i === q.correct) btn.classList.add('correct');
+    else if (i === aIdx) btn.classList.add('wrong');
+    else btn.classList.add('dim');
+  });
+  var fb = document.getElementById('qfb' + qIdx);
+  var ok = aIdx === q.correct;
+  fb.className = 'qfb show ' + (ok ? 'ok' : 'no');
+  fb.textContent = (ok ? '\u2713 ' : '\u2717 ') + (ok ? q.ok : q.no);
+  if (ok) qScore++;
+  if (qAnswers.every(function(a) { return a !== null; })) showScore();
+}
+
+function showScore() {
+  var box = document.getElementById('score-box');
+  box.style.display = 'block';
+  document.getElementById('score-num').textContent = qScore + '/5';
+  var msgs = ['Perlu review lagi. Baca ulang materi di atas.', 'Hampir! Review topik yang salah.', 'Cukup baik! Terus latihan.', 'Bagus! Kamu memahami konsepnya.', 'Sempurna! Siap ke n8n!'];
+  document.getElementById('score-label').textContent = msgs[qScore] || msgs[4];
+}
+
+// ===== AI TUTOR =====
+var tOpen = false;
+var tHist = [];
+
+function toggleTutor() {
+  tOpen = !tOpen;
+  document.getElementById('tpanel').classList.toggle('open', tOpen);
+  document.getElementById('ttbtn').innerHTML = tOpen ? '&#10005;' : '&#129302;';
+}
+
+function appendMsg(role, text) {
+  var d = document.createElement('div');
+  d.className = 'tmsg ' + role;
+  d.textContent = text;
+  var box = document.getElementById('tmsgs');
+  box.appendChild(d);
+  box.scrollTop = box.scrollHeight;
+  return d;
+}
+
+async function sendTutor() {
+  var inp = document.getElementById('tinput');
+  var q   = inp.value.trim();
+  if (!q) return;
+  inp.value = '';
+  appendMsg('usr', q);
+  tHist.push({ role: 'user', content: q });
+  var loading = appendMsg('ai', '...');
+  try {
+    var res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: 'Kamu adalah AI Tutor untuk F-02 Sesi 3 dari AI Automation Bootcamp. Topik: Async/Await, fetch(), try/catch, Date manipulation, Regex. Bantu peserta memahami cara menulis logic di n8n Code Node. Bahasa: Indonesia. Gaya: sabar, concise, sertakan contoh kode ringkas jika relevan.',
+        messages: tHist
+      })
+    });
+    var data  = await res.json();
+    var reply = (data.content && data.content[0] && data.content[0].text) || 'Maaf, coba lagi.';
+    tHist.push({ role: 'assistant', content: reply });
+    loading.textContent = reply;
+  } catch(e) {
+    loading.textContent = 'Error: ' + e.message;
+  }
+}
+
+document.getElementById('tinput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendTutor(); }
+});
+
+// ===== INIT =====
+(function init() {
+  Object.keys(DEFS).forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.value = DEFS[id];
+  });
+  go(0);
+})();
+</script>
+</body>
+</html>
