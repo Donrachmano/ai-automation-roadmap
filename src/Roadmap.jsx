@@ -306,8 +306,8 @@ const modules = [
       {
         code: "F-02 · Sesi 3",
         title: "JS untuk Automation Context",
-        file: null,
-        status: "soon",
+        file: "f02-sesi3-js-automation-context.html",
+        status: "done",
       },
     ],
   },
