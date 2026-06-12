@@ -316,7 +316,7 @@ const modules = [
     phaseTitle: "n8n Mastery",
     color: "#69db7c",
     sessions: [
-      { code: "F-03 · Sesi 1", title: "Setup & Core Nodes", file: null, status: "soon" },
+      { code: "F-03 · Sesi 1", title: "Setup & Core Nodes", file: f03-sesi1-setup-core-nodes.html, status: "done" },
       { code: "F-03 · Sesi 2", title: "Integrasi Business Tools", file: null, status: "soon" },
       { code: "F-03 · Sesi 3", title: "Advanced n8n", file: null, status: "soon" },
       { code: "F-03 · Sesi 4", title: "AI Nodes di n8n", file: null, status: "soon" },
