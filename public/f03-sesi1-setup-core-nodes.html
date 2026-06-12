@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>F-03 Sesi 1 — Setup &amp; Core Nodes | n8n Mastery</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080c10;
+    --panel: #0d1f2d;
+    --panel2: #0a0f14;
+    --border: #1e3a4a;
+    --text: #c9d1d9;
+    --dim: #6e7681;
+    --bright: #e6edf3;
+    --accent: #69db7c;
+    --accent-dim: rgba(105, 219, 124, 0.13);
+    --accent-border: rgba(105, 219, 124, 0.4);
+    --cyan: #00e5ff;
+    --yellow: #ffeb3b;
+    --red: #ff6b6b;
+    --orange: #ff8c42;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    padding-bottom: 80px;
+  }
+  header {
+    position: sticky; top: 0; z-index: 50;
+    background: linear-gradient(180deg, #0d1f2d 0%, #080c10 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 18px 12px;
+  }
+  .hdr-row { display: flex; align-items: center; gap: 8px; margin-bottom: 3px; }
+  .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent); box-shadow: 0 0 8px var(--accent);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+  @media (prefers-reduced-motion: reduce) { .dot { animation: none; } }
+  .eyebrow { color: var(--accent); font-size: 10px; letter-spacing: 3px; text-transform: uppercase; }
+  h1 { font-size: clamp(15px, 4vw, 20px); color: var(--bright); letter-spacing: 1px; }
+  .sub { font-size: 10px; color: var(--dim); margin-top: 2px; }
+
+  nav.steps {
+    display: flex; gap: 5px; padding: 10px 18px;
+    overflow-x: auto; background: var(--panel2);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 64px; z-index: 49;
+  }
+  nav.steps button {
+    flex-shrink: 0; padding: 6px 11px;
+    background: var(--panel); border: 1px solid var(--border);
+    color: var(--dim); border-radius: 4px; cursor: pointer;
+    font-family: inherit; font-size: 10px; letter-spacing: 1px;
+    transition: all .15s;
+  }
+  nav.steps button.active {
+    color: var(--accent); border-color: var(--accent);
+    background: var(--accent-dim); box-shadow: 0 0 8px rgba(105,219,124,.25);
+  }
+  nav.steps button.done { color: var(--accent); }
+  nav.steps button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+  main { padding: 20px 18px; max-width: 860px; margin: 0 auto; }
+  section.step { display: none; }
+  section.step.visible { display: block; animation: fadein .25s ease; }
+  @keyframes fadein { from {opacity:0; transform: translateY(6px)} to {opacity:1; transform:none} }
+
+  h2 { color: var(--bright); font-size: 16px; margin: 4px 0 4px; }
+  h3 { color: var(--accent); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin: 22px 0 10px; }
+  p { margin-bottom: 10px; font-size: 12px; }
+  .step-tag { font-size: 9px; color: var(--accent); letter-spacing: 2px; }
+  ul.mat { list-style: none; margin: 8px 0 14px; }
+  ul.mat li { padding-left: 16px; position: relative; margin-bottom: 6px; font-size: 12px; }
+  ul.mat li::before { content: ">"; color: var(--accent); position: absolute; left: 0; }
+
+  .card {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px; margin: 12px 0;
+  }
+  .card.n8n-ctx { border-left: 3px solid var(--accent); background: rgba(13,42,26,.55); }
+  .card.warn { border-left: 3px solid var(--orange); }
+  .ctx-label { font-size: 9px; letter-spacing: 2px; color: var(--accent); margin-bottom: 6px; }
+  .warn .ctx-label { color: var(--orange); }
+
+  table.cmp { width: 100%; border-collapse: collapse; font-size: 11px; margin: 10px 0; }
+  table.cmp th, table.cmp td { border: 1px solid var(--border); padding: 7px 9px; text-align: left; vertical-align: top; }
+  table.cmp th { color: var(--accent); background: var(--panel2); font-weight: 500; letter-spacing: 1px; font-size: 10px; }
+
+  pre.code {
+    background: var(--panel2); border: 1px solid var(--border);
+    border-radius: 6px; padding: 12px; overflow-x: auto;
+    font-size: 11px; line-height: 1.55; margin: 10px 0;
+  }
+  .tk-key { color: var(--cyan); }
+  .tk-str { color: var(--accent); }
+  .tk-num { color: var(--orange); }
+  .tk-cmt { color: var(--dim); font-style: italic; }
+  .tk-bool { color: var(--yellow); }
+
+  .sim {
+    background: var(--panel2); border: 1px solid var(--accent-border);
+    border-radius: 8px; padding: 14px; margin: 14px 0;
+  }
+  .sim-title { font-size: 10px; letter-spacing: 2px; color: var(--accent); margin-bottom: 10px; }
+  .sim label { font-size: 10px; color: var(--dim); display: block; margin: 8px 0 3px; }
+  .sim select, .sim input[type=text], .sim textarea {
+    width: 100%; background: var(--bg); color: var(--bright);
+    border: 1px solid var(--border); border-radius: 4px;
+    padding: 7px 9px; font-family: inherit; font-size: 11px;
+  }
+  .sim textarea { resize: vertical; min-height: 110px; }
+  .sim select:focus, .sim input:focus, .sim textarea:focus { outline: 1px solid var(--accent); }
+  .btn {
+    display: inline-block; margin-top: 10px;
+    background: var(--accent-dim); color: var(--accent);
+    border: 1px solid var(--accent); border-radius: 5px;
+    padding: 8px 16px; cursor: pointer; font-family: inherit;
+    font-size: 11px; letter-spacing: 1px; transition: all .15s;
+  }
+  .btn:hover { box-shadow: 0 0 10px rgba(105,219,124,.35); }
+  .btn.ghost { background: transparent; color: var(--dim); border-color: var(--border); }
+  .out {
+    margin-top: 10px; background: var(--bg); border: 1px dashed var(--border);
+    border-radius: 5px; padding: 10px; font-size: 11px;
+    white-space: pre-wrap; word-break: break-word; min-height: 20px; color: var(--text);
+  }
+  .out.ok { border-color: var(--accent); }
+  .out.err { border-color: var(--red); color: var(--red); }
+
+  .quiz { margin: 16px 0; }
+  .q-item { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 13px; margin-bottom: 10px; }
+  .q-text { color: var(--bright); font-size: 12px; margin-bottom: 9px; }
+  .q-opt {
+    display: block; width: 100%; text-align: left;
+    background: var(--panel2); border: 1px solid var(--border);
+    color: var(--text); border-radius: 5px; padding: 8px 11px;
+    margin-bottom: 6px; cursor: pointer; font-family: inherit; font-size: 11px;
+    transition: all .15s;
+  }
+  .q-opt:hover { border-color: var(--accent); }
+  .q-opt.correct { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+  .q-opt.wrong { border-color: var(--red); color: var(--red); }
+  .q-fb { font-size: 10px; margin-top: 4px; min-height: 14px; }
+  .q-fb.ok { color: var(--accent); }
+  .q-fb.no { color: var(--red); }
+
+  .flow { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 10px 0; }
+  .fnode {
+    background: var(--panel2); border: 1px solid var(--accent-border);
+    border-radius: 6px; padding: 7px 11px; font-size: 10px; color: var(--bright);
+  }
+  .fnode.trig { border-color: var(--cyan); color: var(--cyan); }
+  .farrow { color: var(--dim); font-size: 12px; }
+
+  .mission { border: 1px solid var(--border); border-radius: 8px; padding: 13px; margin-bottom: 12px; background: var(--panel); }
+  .mission .m-code { font-size: 9px; letter-spacing: 2px; color: var(--accent); }
+  .mission .m-title { color: var(--bright); font-size: 13px; margin: 3px 0 7px; }
+  .check { display: flex; gap: 8px; align-items: flex-start; margin: 6px 0; font-size: 11px; cursor: pointer; }
+  .check input { accent-color: var(--accent); margin-top: 2px; }
+
+  .navbtns { display: flex; justify-content: space-between; gap: 10px; margin-top: 28px; }
+  .navbtns button {
+    flex: 1; padding: 11px; border-radius: 6px; cursor: pointer;
+    font-family: inherit; font-size: 11px; letter-spacing: 1px;
+    background: var(--panel); border: 1px solid var(--border); color: var(--text);
+  }
+  .navbtns button.next { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+  .navbtns button:disabled { opacity: .35; cursor: default; }
+
+  .progressbar { height: 3px; background: var(--border); border-radius: 2px; margin-top: 10px; overflow: hidden; }
+  .progressbar div { height: 100%; background: var(--accent); width: 0%; transition: width .3s; }
+
+  /* AI Tutor panel */
+  #tutorBtn {
+    position: fixed; bottom: 18px; right: 18px; z-index: 60;
+    background: var(--panel); border: 1px solid var(--accent);
+    color: var(--accent); border-radius: 50px; padding: 10px 16px;
+    font-family: inherit; font-size: 11px; cursor: pointer;
+    box-shadow: 0 0 14px rgba(105,219,124,.3);
+  }
+  #tutorPanel {
+    position: fixed; bottom: 64px; right: 18px; z-index: 60;
+    width: min(330px, calc(100vw - 36px));
+    background: var(--panel); border: 1px solid var(--accent-border);
+    border-radius: 10px; padding: 14px; display: none;
+    box-shadow: 0 8px 30px rgba(0,0,0,.6);
+  }
+  #tutorPanel.open { display: block; }
+  #tutorPanel h4 { color: var(--accent); font-size: 11px; letter-spacing: 2px; margin-bottom: 8px; }
+  #tutorTips { font-size: 11px; margin-bottom: 10px; }
+  #tutorPrompt {
+    background: var(--bg); border: 1px dashed var(--border); border-radius: 5px;
+    padding: 9px; font-size: 10px; color: var(--dim); margin-bottom: 8px;
+    word-break: break-word;
+  }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 9px; letter-spacing: 1px; border: 1px solid var(--accent); color: var(--accent); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr-row">
+    <div class="dot"></div>
+    <span class="eyebrow">F-03 &middot; n8n Mastery &middot; Main Weapon</span>
+  </div>
+  <h1>SESI 1 — SETUP &amp; CORE NODES</h1>
+  <div class="sub">Minggu 1–2 &middot; Goal: menguasai tool utama yang akan menghasilkan uang</div>
+  <div class="progressbar"><div id="pbar"></div></div>
+</header>
+
+<nav class="steps" id="stepNav"></nav>
+
+<main id="content">
+
+<!-- ============ STEP 1 : BRIEFING ============ -->
+<section class="step" data-step="0">
+  <span class="step-tag">STEP 1 / 8</span>
+  <h2>Briefing: Selamat Datang di Senjata Utama</h2>
+  <p>F-01 memberimu bahasa data (JSON, REST API, Webhook). F-02 memberimu logic (JS untuk Code Node). Sekarang semuanya bertemu di <span style="color:var(--accent)">n8n</span> — tool yang akan kamu jual jasanya.</p>
+
+  <div class="card n8n-ctx">
+    <div class="ctx-label">◈ CAKUPAN SESI INI (SESUAI ROADMAP)</div>
+    <ul class="mat">
+      <li>Instalasi n8n (cloud &amp; self-hosted)</li>
+      <li>Interface &amp; konsep dasar workflow</li>
+      <li>Node utama: HTTP Request, Set, IF, Merge</li>
+      <li>Trigger: Manual, Schedule, Webhook</li>
+      <li>Debug &amp; execution log</li>
+    </ul>
+    <div style="font-size:11px"><span class="badge">PROJECT</span> &nbsp;Buat 3 workflow dasar: data fetch → transform → output</div>
+  </div>
+
+  <div class="card">
+    <div class="ctx-label" style="color:var(--cyan)">◈ KONEKSI KE F-01 &amp; F-02</div>
+    <p style="margin:0">Setiap node n8n menerima dan mengeluarkan <b style="color:var(--cyan)">items</b> — yaitu array of JSON object (F-01 Sesi 1). HTTP Request node = Postman versi otomatis (F-01 Sesi 2). Webhook trigger = Webhook.site versi produksi (F-01 Sesi 3). Dan logic JS-mu (F-02) nanti hidup di dalam workflow ini.</p>
+  </div>
+
+  <p>Kamu sudah punya akun n8n — bagus, kita langsung praktik di n8n Cloud. Versi self-hosted tetap dibahas konsepnya karena itu penting untuk klien (data privacy &amp; biaya).</p>
+</section>
+
+<!-- ============ STEP 2 : INSTALASI ============ -->
+<section class="step" data-step="1">
+  <span class="step-tag">STEP 2 / 8</span>
+  <h2>Instalasi n8n: Cloud vs Self-Hosted</h2>
+  <p>Ada dua jalur menjalankan n8n. Sebagai calon automation expert, kamu harus paham keduanya — klien akan bertanya.</p>
+
+  <table class="cmp">
+    <tr><th></th><th>n8n CLOUD</th><th>SELF-HOSTED</th></tr>
+    <tr><td style="color:var(--dim)">Setup</td><td>Daftar di n8n.io → langsung jalan (kamu sudah di sini)</td><td>Install sendiri via Docker / npm di server (Railway, Render, VPS)</td></tr>
+    <tr><td style="color:var(--dim)">Biaya</td><td>Langganan bulanan per eksekusi/workflow</td><td>Software gratis (license fair-code), bayar server saja</td></tr>
+    <tr><td style="color:var(--dim)">Data</td><td>Lewat server n8n</td><td>100% di infrastruktur sendiri — penting untuk klien dengan data sensitif</td></tr>
+    <tr><td style="color:var(--dim)">Maintenance</td><td>Diurus n8n (update, uptime)</td><td>Kamu yang urus update, backup, monitoring</td></tr>
+    <tr><td style="color:var(--dim)">Webhook URL</td><td>Otomatis tersedia &amp; public</td><td>Perlu domain / tunnel agar bisa diakses publik</td></tr>
+  </table>
+
+  <div class="card n8n-ctx">
+    <div class="ctx-label">◈ KONTEKS BISNIS</div>
+    <p style="margin:0">Rute belajar: mulai di <b>Cloud</b> (fokus ke skill workflow, bukan server). Rute klien nanti: tawarkan <b>self-hosted</b> di Railway/Render saat klien butuh kontrol data atau volume eksekusi tinggi — ini ada di daftar tools fase F-03.</p>
+  </div>
+
+  <h3>Perintah self-hosted (cukup kenali dulu)</h3>
+  <pre class="code"><span class="tk-cmt"># Opsi 1: npm (butuh Node.js — sudah kamu kenal dari F-02)</span>
+npx n8n
+
+<span class="tk-cmt"># Opsi 2: Docker (cara paling umum di produksi)</span>
+docker run -it --rm -p 5678:5678 docker.n8n.io/n8nio/n8n</pre>
+  <p style="font-size:11px;color:var(--dim)">Belum perlu dipraktikkan sekarang. Deployment produksi dibahas di Sesi 3 (Advanced n8n).</p>
+
+  <div class="quiz" data-quiz="q1"></div>
+</section>
+
+<!-- ============ STEP 3 : INTERFACE & KONSEP ============ -->
+<section class="step" data-step="2">
+  <span class="step-tag">STEP 3 / 8</span>
+  <h2>Interface &amp; Konsep Dasar Workflow</h2>
+  <p>Buka editor n8n-mu. Yang kamu lihat adalah <b>canvas</b> — papan tempat menyusun workflow.</p>
+
+  <ul class="mat">
+    <li><b style="color:var(--bright)">Workflow</b> = rangkaian langkah otomatis, dari trigger sampai output</li>
+    <li><b style="color:var(--bright)">Node</b> = satu kotak = satu tugas (ambil data, ubah data, kirim data)</li>
+    <li><b style="color:var(--bright)">Connection</b> = garis antar node = jalur aliran data</li>
+    <li><b style="color:var(--bright)">Items</b> = data yang mengalir: selalu berupa array of JSON object</li>
+    <li><b style="color:var(--bright)">Execution</b> = satu kali workflow berjalan dari awal sampai akhir</li>
+  </ul>
+
+  <div class="flow">
+    <span class="fnode trig">TRIGGER</span><span class="farrow">→</span>
+    <span class="fnode">NODE A</span><span class="farrow">→</span>
+    <span class="fnode">NODE B</span><span class="farrow">→</span>
+    <span class="fnode">OUTPUT</span>
+  </div>
+
+  <div class="card n8n-ctx">
+    <div class="ctx-label">◈ KONSEP PALING PENTING: ITEMS</div>
+    <p style="margin:0 0 8px">Antar node, data n8n SELALU berbentuk seperti ini — array berisi object, dan datamu ada di dalam key <span class="tk-key">json</span>:</p>
+    <pre class="code" style="margin:0">[
+  { <span class="tk-key">"json"</span>: { <span class="tk-key">"nama"</span>: <span class="tk-str">"Andi"</span>, <span class="tk-key">"order"</span>: <span class="tk-num">150000</span> } },
+  { <span class="tk-key">"json"</span>: { <span class="tk-key">"nama"</span>: <span class="tk-str">"Budi"</span>, <span class="tk-key">"order"</span>: <span class="tk-num">90000</span> } }
+]</pre>
+    <p style="margin:8px 0 0;font-size:11px;color:var(--dim)">Familiar? Ini persis struktur yang kamu kuasai di F-01 Sesi 1, dan persis bentuk yang dikembalikan <span style="color:var(--cyan)">$input.all()</span> di F-02. Satu object = satu item. Node memproses item satu per satu.</p>
+  </div>
+
+  <div class="sim">
+    <div class="sim-title">⚡ SIMULATOR: LIHAT DATA SEBAGAI ITEMS</div>
+    <label>Tulis JSON array biasa (mis. hasil API), lalu konversi ke bentuk items n8n:</label>
+    <textarea id="itemsIn">[
+  { "produk": "Kopi", "harga": 25000 },
+  { "produk": "Teh", "harga": 15000 }
+]</textarea>
+    <button class="btn" id="itemsRun">KONVERSI KE ITEMS &raquo;</button>
+    <div class="out" id="itemsOut">Output akan muncul di sini...</div>
+  </div>
+
+  <div class="quiz" data-quiz="q2"></div>
+</section>
+
+<!-- ============ STEP 4 : CORE NODES ============ -->
+<section class="step" data-step="3">
+  <span class="step-tag">STEP 4 / 8</span>
+  <h2>4 Node Utama: HTTP Request, Set, IF, Merge</h2>
+  <p>Dengan 4 node ini saja kamu sudah bisa membangun mayoritas automation sederhana.</p>
+
+  <h3>1 — HTTP Request</h3>
+  <p>Postman-nya n8n. Method, URL, headers, body, authentication — semua istilah F-01 Sesi 2 dipakai persis di sini. Output-nya: response API sebagai items.</p>
+  <div class="sim">
+    <div class="sim-title">⚡ LIVE: HTTP REQUEST KE JSONPLACEHOLDER</div>
+    <label>GET https://jsonplaceholder.typicode.com/users/1 (API latihan dari F-01)</label>
+    <button class="btn" id="httpRun">EKSEKUSI REQUEST &raquo;</button>
+    <div class="out" id="httpOut">Klik tombol untuk melihat response sebagai item n8n...</div>
+  </div>
+
+  <h3>2 — Set (Edit Fields)</h3>
+  <p>Node transformasi: pilih, ganti nama, atau buat field baru. Untuk mengambil nilai dari item masuk, Set memakai referensi <span style="color:var(--accent)">{{ $json.namaField }}</span> — cukup kenali pola dasar ini dulu; pendalaman expressions ada di Sesi 3 (Advanced n8n).</p>
+  <div class="sim">
+    <div class="sim-title">⚡ SIMULATOR: SET NODE</div>
+    <label>Item masuk:</label>
+    <pre class="code" style="margin:4px 0 8px">{ "name": "Leanne Graham", "email": "Sincere@april.biz", "phone": "1-770-736-8031" }</pre>
+    <label>Field baru → isi dengan referensi field masuk:</label>
+    <input type="text" id="setField" value="nama_pelanggan" placeholder="nama field output">
+    <label>Nilai (pakai pola {{ $json.xxx }}):</label>
+    <input type="text" id="setExpr" value="{{ $json.name }}" placeholder="contoh: {{ $json.email }}">
+    <button class="btn" id="setRun">JALANKAN SET NODE &raquo;</button>
+    <div class="out" id="setOut">Output item akan muncul di sini...</div>
+  </div>
+
+  <h3>3 — IF</h3>
+  <p>Percabangan: item dicek terhadap kondisi, lalu keluar lewat output <b style="color:var(--accent)">true</b> atau <b style="color:var(--red)">false</b>. Ini if/else dari F-02 dalam bentuk visual.</p>
+  <div class="sim">
+    <div class="sim-title">⚡ SIMULATOR: IF NODE</div>
+    <label>Item masuk:</label>
+    <pre class="code" style="margin:4px 0 8px">{ "nama": "Andi", "totalOrder": 150000 }</pre>
+    <label>Kondisi: totalOrder ...</label>
+    <select id="ifOp">
+      <option value="gt">lebih besar dari (&gt;)</option>
+      <option value="lt">lebih kecil dari (&lt;)</option>
+      <option value="eq">sama dengan (=)</option>
+    </select>
+    <label>Nilai pembanding:</label>
+    <input type="text" id="ifVal" value="100000">
+    <button class="btn" id="ifRun">CEK KONDISI &raquo;</button>
+    <div class="out" id="ifOut">Item akan keluar lewat branch TRUE atau FALSE...</div>
+  </div>
+
+  <h3>4 — Merge</h3>
+  <p>Menggabungkan dua aliran data jadi satu. Dua mode paling sering dipakai:</p>
+  <ul class="mat">
+    <li><b style="color:var(--bright)">Append</b>: tumpuk semua item dari kedua input jadi satu daftar</li>
+    <li><b style="color:var(--bright)">Combine by key</b>: jodohkan item berdasarkan field yang sama (mirip JOIN)</li>
+  </ul>
+  <div class="sim">
+    <div class="sim-title">⚡ SIMULATOR: MERGE NODE</div>
+    <label>Input 1: data pelanggan &nbsp;|&nbsp; Input 2: data order (key: id)</label>
+    <select id="mergeMode">
+      <option value="append">Mode: Append</option>
+      <option value="combine">Mode: Combine by key (id)</option>
+    </select>
+    <button class="btn" id="mergeRun">GABUNGKAN &raquo;</button>
+    <div class="out" id="mergeOut">Hasil merge akan muncul di sini...</div>
+  </div>
+
+  <div class="quiz" data-quiz="q3"></div>
+</section>
+
+<!-- ============ STEP 5 : TRIGGER ============ -->
+<section class="step" data-step="4">
+  <span class="step-tag">STEP 5 / 8</span>
+  <h2>Trigger: Manual, Schedule, Webhook</h2>
+  <p>Setiap workflow dimulai dari trigger — node pertama yang menentukan KAPAN workflow berjalan.</p>
+
+  <table class="cmp">
+    <tr><th>TRIGGER</th><th>KAPAN JALAN</th><th>CONTOH KASUS</th></tr>
+    <tr><td style="color:var(--cyan)">Manual</td><td>Saat kamu klik tombol Execute</td><td>Testing &amp; development workflow</td></tr>
+    <tr><td style="color:var(--cyan)">Schedule</td><td>Otomatis sesuai jadwal (tiap jam, tiap hari 08:00, dst.)</td><td>Laporan harian, sinkronisasi data rutin</td></tr>
+    <tr><td style="color:var(--cyan)">Webhook</td><td>Saat sistem luar mengirim HTTP request ke URL n8n-mu</td><td>Form submission, notifikasi payment gateway</td></tr>
+  </table>
+
+  <div class="card n8n-ctx">
+    <div class="ctx-label">◈ KONEKSI F-01 SESI 3</div>
+    <p style="margin:0">Masih ingat trigger-based vs polling? <b>Webhook trigger</b> = trigger-based (sistem luar yang mendorong data, real-time). <b>Schedule trigger + HTTP Request</b> = pola polling (kamu yang rutin menjemput data). Sekarang teorinya jadi node nyata.</p>
+  </div>
+
+  <div class="card warn">
+    <div class="ctx-label">◈ PENTING: TEST URL vs PRODUCTION URL</div>
+    <p style="margin:0;font-size:11px">Webhook node punya dua URL. <b>Test URL</b> hanya aktif saat kamu klik "Listen for test event" di editor. <b>Production URL</b> baru aktif setelah workflow di-set <b style="color:var(--accent)">Active</b>. Ini sumber kebingungan #1 pemula n8n.</p>
+  </div>
+
+  <div class="quiz" data-quiz="q4"></div>
+</section>
+
+<!-- ============ STEP 6 : DEBUG ============ -->
+<section class="step" data-step="5">
+  <span class="step-tag">STEP 6 / 8</span>
+  <h2>Debug &amp; Execution Log</h2>
+  <p>Skill yang membedakan amatir dan profesional: bukan menulis workflow tanpa error, tapi <b>cepat menemukan di mana error terjadi</b>.</p>
+
+  <ul class="mat">
+    <li>Klik node setelah eksekusi → lihat <b style="color:var(--bright)">input &amp; output data</b> per node</li>
+    <li>Node merah = node tempat error terjadi; baca pesan errornya, jangan ditebak</li>
+    <li>Menu <b style="color:var(--bright)">Executions</b> = riwayat semua eksekusi (sukses/gagal) beserta datanya</li>
+    <li><b style="color:var(--bright)">Pin data</b>: kunci output sebuah node agar testing node berikutnya tidak perlu memanggil API berulang kali (hemat rate limit — F-01 Sesi 3)</li>
+    <li>Status eksekusi mengikuti pola yang sudah kamu tahu: error API umumnya soal status code 4xx/5xx</li>
+  </ul>
+
+  <div class="sim">
+    <div class="sim-title">⚡ LATIHAN: BACA EXECUTION LOG</div>
+    <label>Sebuah eksekusi gagal. Ini lognya:</label>
+    <pre class="code" style="margin:4px 0 8px"><span class="tk-cmt">Workflow: Lead Sync</span>
+[OK]   Schedule Trigger     1 item
+[OK]   HTTP Request         12 items
+[FAIL] Set (Edit Fields)    Error: Can't get data for expression
+       {{ $json.customer.email }} - <span class="tk-str">"customer" is undefined [item 7]</span>
+[SKIP] IF</pre>
+    <label>Di mana akar masalahnya?</label>
+    <select id="dbgPick">
+      <option value="">-- pilih jawaban --</option>
+      <option value="a">Schedule Trigger salah konfigurasi jadwal</option>
+      <option value="b">Item ke-7 dari API tidak punya field "customer", expression di Set tidak aman</option>
+      <option value="c">Node IF rusak karena di-skip</option>
+    </select>
+    <button class="btn" id="dbgRun">PERIKSA &raquo;</button>
+    <div class="out" id="dbgOut">Analisis kamu akan dinilai di sini...</div>
+  </div>
+
+  <div class="quiz" data-quiz="q5"></div>
+</section>
+
+<!-- ============ STEP 7 : PROJECT ============ -->
+<section class="step" data-step="6">
+  <span class="step-tag">STEP 7 / 8</span>
+  <h2>Project Praktik: 3 Workflow Dasar</h2>
+  <p>Sesuai roadmap: <b>data fetch → transform → output</b>. Kerjakan langsung di akun n8n Cloud-mu. Pakai API latihan dari F-01 supaya fokus ke n8n, bukan ke API baru.</p>
+
+  <div class="mission">
+    <span class="m-code">WORKFLOW A — POLA DASAR</span>
+    <div class="m-title">User Fetcher</div>
+    <div class="flow">
+      <span class="fnode trig">Manual Trigger</span><span class="farrow">→</span>
+      <span class="fnode">HTTP Request</span><span class="farrow">→</span>
+      <span class="fnode">Set</span>
+    </div>
+    <p style="font-size:11px;margin:6px 0">GET <span style="color:var(--cyan)">https://jsonplaceholder.typicode.com/users</span> → di Set node, buat output rapi: hanya field <b>nama</b>, <b>email</b>, <b>kota</b> (kota ada di dalam address.city — nested object, F-01!).</p>
+    <label class="check"><input type="checkbox" data-ck="a1"> Workflow berjalan tanpa error (semua node hijau)</label>
+    <label class="check"><input type="checkbox" data-ck="a2"> Output Set hanya berisi 3 field yang diminta</label>
+  </div>
+
+  <div class="mission">
+    <span class="m-code">WORKFLOW B — POLLING + PERCABANGAN</span>
+    <div class="m-title">Kurs Watcher</div>
+    <div class="flow">
+      <span class="fnode trig">Schedule Trigger</span><span class="farrow">→</span>
+      <span class="fnode">HTTP Request</span><span class="farrow">→</span>
+      <span class="fnode">IF</span><span class="farrow">→</span>
+      <span class="fnode">Set</span>
+    </div>
+    <p style="font-size:11px;margin:6px 0">Schedule tiap 1 jam → GET <span style="color:var(--cyan)">https://api.frankfurter.dev/v1/latest?base=USD&amp;symbols=IDR</span> → IF: kurs IDR lebih besar dari ambang pilihanmu → branch true: Set membuat field <b>status: "ALERT"</b>, branch false: <b>status: "NORMAL"</b>. Test dengan Execute manual dulu.</p>
+    <label class="check"><input type="checkbox" data-ck="b1"> IF mengarah ke branch yang benar saat ambang diubah-ubah</label>
+    <label class="check"><input type="checkbox" data-ck="b2"> Cek tab Executions: minimal 1 riwayat eksekusi tercatat</label>
+  </div>
+
+  <div class="mission">
+    <span class="m-code">WORKFLOW C — WEBHOOK + MERGE</span>
+    <div class="m-title">Order Combiner</div>
+    <div class="flow">
+      <span class="fnode trig">Webhook</span><span class="farrow">→</span>
+      <span class="fnode">Set (data order)</span><span class="farrow">→</span>
+      <span class="fnode">Merge</span>
+    </div>
+    <p style="font-size:11px;margin:6px 0">Webhook menerima POST berisi JSON order (kirim test pakai Postman/Hoppscotch — tools F-01). Cabang kedua: HTTP Request mengambil data user JSONPlaceholder. Merge mode <b>Combine</b> menjodohkan keduanya lewat field id. Coba juga mode Append untuk merasakan bedanya.</p>
+    <label class="check"><input type="checkbox" data-ck="c1"> Webhook test URL menerima POST dari Postman/Hoppscotch</label>
+    <label class="check"><input type="checkbox" data-ck="c2"> Output Merge berisi gabungan kedua sumber data</label>
+  </div>
+
+  <div class="sim">
+    <div class="sim-title">⚡ VALIDATOR: CEK WORKFLOW JSON-MU</div>
+    <label>Di n8n: buka workflow → menu ... → Download (atau Ctrl+A lalu Ctrl+C di canvas) → paste JSON-nya di sini. Validator mengecek node yang dipakai:</label>
+    <textarea id="wfIn" placeholder='Paste JSON workflow n8n di sini...'></textarea>
+    <button class="btn" id="wfRun">VALIDASI WORKFLOW &raquo;</button>
+    <div class="out" id="wfOut">Hasil validasi akan muncul di sini...</div>
+  </div>
+
+  <div class="card n8n-ctx">
+    <div class="ctx-label">◈ PROGRESS MISI</div>
+    <div id="missionProgress" style="font-size:12px">0 / 6 checklist selesai</div>
+  </div>
+</section>
+
+<!-- ============ STEP 8 : CHECKPOINT ============ -->
+<section class="step" data-step="7">
+  <span class="step-tag">STEP 8 / 8</span>
+  <h2>Checkpoint Sesi 1</h2>
+  <p>Quiz akhir — gabungan seluruh materi sesi ini.</p>
+
+  <div class="quiz" data-quiz="q6"></div>
+
+  <div class="card n8n-ctx" style="margin-top:20px">
+    <div class="ctx-label">◈ SKOR &amp; STATUS</div>
+    <div id="finalScore" style="font-size:13px;color:var(--bright)">Selesaikan semua quiz untuk melihat skor total.</div>
+  </div>
+
+  <div class="card">
+    <div class="ctx-label" style="color:var(--cyan)">◈ SESI BERIKUTNYA</div>
+    <p style="margin:0;font-size:11px">F-03 Sesi 2 — <b>Integrasi Business Tools</b>: Google Sheets, Gmail/Outlook, Slack/Telegram, Airtable, error handling &amp; fallback workflow. Project: Lead management system (Form → Sheet → Email → Slack notif).</p>
+  </div>
+</section>
+
+</main>
+
+<div class="navbtns" style="max-width:860px;margin:0 auto;padding:0 18px">
+  <button id="prevBtn">&laquo; SEBELUMNYA</button>
+  <button id="nextBtn" class="next">BERIKUTNYA &raquo;</button>
+</div>
+
+<button id="tutorBtn">◈ AI TUTOR</button>
+<div id="tutorPanel">
+  <h4>AI TUTOR — F-03 SESI 1</h4>
+  <div id="tutorTips"></div>
+  <div id="tutorPrompt"></div>
+  <button class="btn" id="copyPrompt" style="margin-top:0">SALIN PROMPT</button>
+  <button class="btn ghost" id="closeTutor" style="margin-top:0">TUTUP</button>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var STEPS = ["BRIEF", "INSTAL", "KONSEP", "NODES", "TRIGGER", "DEBUG", "PROJECT", "CHECK"];
+  var current = 0;
+  var quizScores = {};
+
+  // ---------- Navigation ----------
+  var nav = document.getElementById("stepNav");
+  var sections = document.querySelectorAll("section.step");
+  var pbar = document.getElementById("pbar");
+
+  function renderNav() {
+    nav.innerHTML = "";
+    for (var i = 0; i < STEPS.length; i++) {
+      (function (idx) {
+        var b = document.createElement("button");
+        b.textContent = (idx + 1) + ". " + STEPS[idx];
+        if (idx === current) b.className = "active";
+        else if (idx < current) b.className = "done";
+        b.addEventListener("click", function () { goTo(idx); });
+        nav.appendChild(b);
+      })(i);
+    }
+  }
+
+  function goTo(idx) {
+    current = idx;
+    for (var i = 0; i < sections.length; i++) {
+      sections[i].className = "step" + (i === idx ? " visible" : "");
+    }
+    renderNav();
+    pbar.style.width = Math.round(((idx + 1) / STEPS.length) * 100) + "%";
+    document.getElementById("prevBtn").disabled = idx === 0;
+    document.getElementById("nextBtn").disabled = idx === STEPS.length - 1;
+    window.scrollTo(0, 0);
+    updateTutor();
+  }
+
+  document.getElementById("prevBtn").addEventListener("click", function () {
+    if (current > 0) goTo(current - 1);
+  });
+  document.getElementById("nextBtn").addEventListener("click", function () {
+    if (current < STEPS.length - 1) goTo(current + 1);
+  });
+
+  // ---------- Quiz engine ----------
+  var QUIZZES = {
+    q1: [
+      {
+        q: "Klien perusahaan keuangan tidak mau data lewat server pihak ketiga. Solusi n8n yang tepat?",
+        opts: ["n8n Cloud paket tertinggi", "Self-hosted di server milik klien", "Tidak bisa pakai n8n"],
+        a: 1,
+        fb: "Self-hosted: data 100% di infrastruktur klien. Ini selling point penting."
+      },
+      {
+        q: "Kenapa kamu mulai belajar di n8n Cloud, bukan self-hosted?",
+        opts: ["Cloud punya fitur lebih banyak", "Fokus ke skill workflow dulu, bukan urusan server", "Self-hosted berbayar mahal"],
+        a: 1,
+        fb: "Benar. Software self-hosted-nya sendiri gratis; yang dibayar servernya. Tapi fokus belajar = workflow dulu."
+      }
+    ],
+    q2: [
+      {
+        q: "Di n8n, data yang mengalir antar node disebut...",
+        opts: ["records", "items (array of JSON object)", "rows"],
+        a: 1,
+        fb: "Items: setiap item adalah object dengan key json di dalamnya."
+      },
+      {
+        q: "Satu kali workflow berjalan dari trigger sampai selesai disebut...",
+        opts: ["execution", "connection", "deployment"],
+        a: 0,
+        fb: "Execution. Riwayatnya bisa dilihat di menu Executions."
+      }
+    ],
+    q3: [
+      {
+        q: "Node mana yang paling tepat untuk memanggil REST API eksternal?",
+        opts: ["Set", "Merge", "HTTP Request"],
+        a: 2,
+        fb: "HTTP Request = Postman versi node. Method, URL, headers, auth - semuanya konsep F-01."
+      },
+      {
+        q: "Kamu punya data pelanggan dari API dan data order dari webhook, ingin dijodohkan per id. Node + mode yang tepat?",
+        opts: ["IF dengan kondisi id", "Merge mode Combine by key", "Set dengan field id"],
+        a: 1,
+        fb: "Merge Combine = JOIN berdasarkan field yang sama."
+      },
+      {
+        q: "Item keluar dari IF node lewat...",
+        opts: ["satu output campuran", "output true atau false sesuai hasil kondisi", "output error"],
+        a: 1,
+        fb: "Dua branch: true dan false. If/else versi visual."
+      }
+    ],
+    q4: [
+      {
+        q: "Laporan penjualan harus terkirim otomatis tiap hari jam 08:00. Trigger yang tepat?",
+        opts: ["Manual", "Schedule", "Webhook"],
+        a: 1,
+        fb: "Schedule trigger: berjalan sesuai jadwal tanpa campur tangan."
+      },
+      {
+        q: "Payment gateway mengirim notifikasi real-time saat ada pembayaran. Trigger yang tepat?",
+        opts: ["Webhook (trigger-based)", "Schedule (polling)", "Manual"],
+        a: 0,
+        fb: "Sistem luar yang mendorong data = webhook. Konsep F-01 Sesi 3 jadi nyata."
+      },
+      {
+        q: "Webhook Production URL baru aktif ketika...",
+        opts: ["Editor n8n sedang terbuka", "Workflow di-set Active", "Test URL sudah dipakai sekali"],
+        a: 1,
+        fb: "Workflow harus Active. Test URL untuk development, Production URL untuk dunia nyata."
+      }
+    ],
+    q5: [
+      {
+        q: "Eksekusi gagal di node ke-3 dari 5. Langkah pertama yang benar?",
+        opts: ["Hapus node ke-3 dan buat ulang", "Klik node merah, baca pesan error dan periksa input datanya", "Jalankan ulang sampai berhasil"],
+        a: 1,
+        fb: "Selalu baca error + cek data input node yang gagal. Jangan menebak."
+      },
+      {
+        q: "Fungsi Pin data saat development adalah...",
+        opts: ["Mengunci workflow agar tidak diedit", "Menyimpan output node agar testing tidak memanggil API berulang", "Menandai node favorit"],
+        a: 1,
+        fb: "Hemat kuota & rate limit API (ingat F-01 Sesi 3) dan mempercepat testing."
+      }
+    ],
+    q6: [
+      {
+        q: "Urutan paling logis untuk Workflow A (User Fetcher)?",
+        opts: ["Set lalu HTTP Request lalu Manual Trigger", "Manual Trigger lalu HTTP Request lalu Set", "HTTP Request lalu Manual Trigger lalu Set"],
+        a: 1,
+        fb: "Trigger selalu pertama, fetch data, baru transform."
+      },
+      {
+        q: "Pola Schedule trigger + HTTP Request rutin menjemput data adalah pola...",
+        opts: ["trigger-based", "polling", "streaming"],
+        a: 1,
+        fb: "Polling: kamu yang rutin bertanya ke API. Webhook = trigger-based."
+      },
+      {
+        q: "Data antar node n8n berbentuk...",
+        opts: ["array of JSON object (items)", "string CSV", "satu object tunggal"],
+        a: 0,
+        fb: "Selalu items. Fondasi F-01 dipakai di setiap node."
+      },
+      {
+        q: "Error muncul: \"customer is undefined [item 7]\". Diagnosis terbaik?",
+        opts: ["Server n8n down", "Sebagian item tidak punya field customer, referensi field perlu diamankan", "Internet lambat"],
+        a: 1,
+        fb: "Data tidak seragam adalah penyebab error paling umum di automation nyata."
+      }
+    ]
+  };
+
+  function renderQuiz(container, key) {
+    var data = QUIZZES[key];
+    quizScores[key] = { done: 0, correct: 0, total: data.length };
+    var title = document.createElement("h3");
+    title.textContent = "QUIZ - " + data.length + " PERTANYAAN";
+    container.appendChild(title);
+
+    for (var i = 0; i < data.length; i++) {
+      (function (qd) {
+        var box = document.createElement("div");
+        box.className = "q-item";
+        var qt = document.createElement("div");
+        qt.className = "q-text";
+        qt.textContent = qd.q;
+        box.appendChild(qt);
+        var fb = document.createElement("div");
+        fb.className = "q-fb";
+        var answered = false;
+
+        for (var j = 0; j < qd.opts.length; j++) {
+          (function (optIdx) {
+            var btn = document.createElement("button");
+            btn.className = "q-opt";
+            btn.textContent = String.fromCharCode(65 + optIdx) + ". " + qd.opts[optIdx];
+            btn.addEventListener("click", function () {
+              if (answered) return;
+              answered = true;
+              quizScores[key].done += 1;
+              if (optIdx === qd.a) {
+                btn.className = "q-opt correct";
+                fb.className = "q-fb ok";
+                fb.textContent = "BENAR - " + qd.fb;
+                quizScores[key].correct += 1;
+              } else {
+                btn.className = "q-opt wrong";
+                fb.className = "q-fb no";
+                fb.textContent = "KURANG TEPAT - " + qd.fb;
+                var all = box.querySelectorAll(".q-opt");
+                all[qd.a].className = "q-opt correct";
+              }
+              updateFinalScore();
+            });
+            box.appendChild(btn);
+          })(j);
+        }
+        box.appendChild(fb);
+        container.appendChild(box);
+      })(data[i]);
+    }
+  }
+
+  var quizEls = document.querySelectorAll(".quiz");
+  for (var qi = 0; qi < quizEls.length; qi++) {
+    renderQuiz(quizEls[qi], quizEls[qi].getAttribute("data-quiz"));
+  }
+
+  function updateFinalScore() {
+    var done = 0, correct = 0, total = 0;
+    for (var k in quizScores) {
+      if (quizScores.hasOwnProperty(k)) {
+        done += quizScores[k].done;
+        correct += quizScores[k].correct;
+        total += quizScores[k].total;
+      }
+    }
+    var el = document.getElementById("finalScore");
+    if (done < total) {
+      el.textContent = "Terjawab " + done + " / " + total + " pertanyaan. Skor sementara: " + correct + " benar.";
+    } else {
+      var pct = Math.round((correct / total) * 100);
+      var status = pct >= 80 ? "LULUS CHECKPOINT - lanjut ke Sesi 2!" : "Ulangi materi yang masih merah sebelum lanjut.";
+      el.textContent = "SKOR AKHIR: " + correct + " / " + total + " (" + pct + "%) - " + status;
+    }
+  }
+
+  // ---------- Simulator: items ----------
+  document.getElementById("itemsRun").addEventListener("click", function () {
+    var out = document.getElementById("itemsOut");
+    var raw = document.getElementById("itemsIn").value;
+    try {
+      var arr = JSON.parse(raw);
+      if (!(arr instanceof Array)) arr = [arr];
+      var items = [];
+      for (var i = 0; i < arr.length; i++) items.push({ json: arr[i] });
+      out.className = "out ok";
+      out.textContent = "// " + items.length + " item siap mengalir antar node:\n" + JSON.stringify(items, null, 2);
+    } catch (e) {
+      out.className = "out err";
+      out.textContent = "JSON tidak valid: " + e.message + "\nCek tanda kutip dan koma (skill F-01 Sesi 1).";
+    }
+  });
+
+  // ---------- Simulator: HTTP ----------
+  document.getElementById("httpRun").addEventListener("click", function () {
+    var out = document.getElementById("httpOut");
+    out.className = "out";
+    out.textContent = "Mengirim GET request...";
+    fetch("https://jsonplaceholder.typicode.com/users/1")
+      .then(function (res) {
+        if (!res.ok) throw new Error("Status " + res.status);
+        return res.json();
+      })
+      .then(function (data) {
+        var item = [{ json: data }];
+        out.className = "out ok";
+        out.textContent = "// Status 200 OK - response jadi 1 item:\n" + JSON.stringify(item, null, 2).slice(0, 700) + "\n...";
+      })
+      .catch(function (err) {
+        out.className = "out err";
+        out.textContent = "Request gagal: " + err.message + "\n(Jika dibuka via file://, fetch bisa diblokir - buka versi Vercel.)";
+      });
+  });
+
+  // ---------- Simulator: Set node ----------
+  var SET_INPUT = { name: "Leanne Graham", email: "Sincere@april.biz", phone: "1-770-736-8031" };
+  document.getElementById("setRun").addEventListener("click", function () {
+    var out = document.getElementById("setOut");
+    var field = document.getElementById("setField").value.trim();
+    var expr = document.getElementById("setExpr").value.trim();
+    if (!field) {
+      out.className = "out err";
+      out.textContent = "Nama field output belum diisi.";
+      return;
+    }
+    var m = expr.match(/^\{\{\s*\$json\.([A-Za-z_][A-Za-z0-9_]*)\s*\}\}$/);
+    var value;
+    if (m) {
+      var key = m[1];
+      if (SET_INPUT.hasOwnProperty(key)) {
+        value = SET_INPUT[key];
+      } else {
+        out.className = "out err";
+        out.textContent = "Field \"" + key + "\" tidak ada di item masuk.\nYang tersedia: name, email, phone.";
+        return;
+      }
+    } else {
+      value = expr; // nilai statis biasa
+    }
+    var result = {};
+    result[field] = value;
+    out.className = "out ok";
+    out.textContent = "// Output Set node (1 item):\n" + JSON.stringify([{ json: result }], null, 2);
+  });
+
+  // ---------- Simulator: IF node ----------
+  document.getElementById("ifRun").addEventListener("click", function () {
+    var out = document.getElementById("ifOut");
+    var op = document.getElementById("ifOp").value;
+    var val = parseFloat(document.getElementById("ifVal").value);
+    if (isNaN(val)) {
+      out.className = "out err";
+      out.textContent = "Nilai pembanding harus angka.";
+      return;
+    }
+    var total = 150000;
+    var pass;
+    if (op === "gt") pass = total > val;
+    else if (op === "lt") pass = total < val;
+    else pass = total === val;
+    out.className = "out ok";
+    out.textContent = "totalOrder = 150000\nHasil kondisi: " + (pass ? "TRUE" : "FALSE") +
+      "\nItem keluar lewat branch: " + (pass ? "[TRUE] -> lanjut ke node branch atas" : "[FALSE] -> lanjut ke node branch bawah");
+  });
+
+  // ---------- Simulator: Merge ----------
+  var MERGE_A = [{ id: 1, nama: "Andi" }, { id: 2, nama: "Budi" }];
+  var MERGE_B = [{ id: 1, order: 150000 }, { id: 2, order: 90000 }];
+  document.getElementById("mergeRun").addEventListener("click", function () {
+    var out = document.getElementById("mergeOut");
+    var mode = document.getElementById("mergeMode").value;
+    var result = [];
+    var i;
+    if (mode === "append") {
+      for (i = 0; i < MERGE_A.length; i++) result.push({ json: MERGE_A[i] });
+      for (i = 0; i < MERGE_B.length; i++) result.push({ json: MERGE_B[i] });
+      out.textContent = "// Append: 2 + 2 = 4 item terpisah:\n" + JSON.stringify(result, null, 2);
+    } else {
+      for (i = 0; i < MERGE_A.length; i++) {
+        var a = MERGE_A[i];
+        for (var j = 0; j < MERGE_B.length; j++) {
+          if (MERGE_B[j].id === a.id) {
+            result.push({ json: { id: a.id, nama: a.nama, order: MERGE_B[j].order } });
+          }
+        }
+      }
+      out.textContent = "// Combine by key (id): item dijodohkan jadi " + result.length + " item:\n" + JSON.stringify(result, null, 2);
+    }
+    out.className = "out ok";
+  });
+
+  // ---------- Debug exercise ----------
+  document.getElementById("dbgRun").addEventListener("click", function () {
+    var out = document.getElementById("dbgOut");
+    var pick = document.getElementById("dbgPick").value;
+    if (!pick) {
+      out.className = "out err";
+      out.textContent = "Pilih jawaban dulu.";
+      return;
+    }
+    if (pick === "b") {
+      out.className = "out ok";
+      out.textContent = "TEPAT. Log menunjuk item 7: field customer tidak ada, jadi expression di Set gagal.\nPelajaran: data API tidak selalu seragam. (Di F-02 kamu sudah kenal solusi pola amannya: optional chaining.)";
+    } else {
+      out.className = "out err";
+      out.textContent = "Kurang tepat. Baca lagi barisnya: [FAIL] ada di Set node, dan pesan error menyebut item 7 + field customer yang undefined. Node IF di-skip hanya karena node sebelumnya gagal.";
+    }
+  });
+
+  // ---------- Mission checklist ----------
+  var checks = document.querySelectorAll("input[data-ck]");
+  function updateMissions() {
+    var doneCount = 0;
+    for (var i = 0; i < checks.length; i++) if (checks[i].checked) doneCount++;
+    var el = document.getElementById("missionProgress");
+    el.textContent = doneCount + " / " + checks.length + " checklist selesai" +
+      (doneCount === checks.length ? " - SEMUA MISI TUNTAS! Lanjut ke Checkpoint." : "");
+  }
+  for (var ci = 0; ci < checks.length; ci++) {
+    checks[ci].addEventListener("change", updateMissions);
+  }
+
+  // ---------- Workflow JSON validator ----------
+  document.getElementById("wfRun").addEventListener("click", function () {
+    var out = document.getElementById("wfOut");
+    var raw = document.getElementById("wfIn").value;
+    if (!raw.trim()) {
+      out.className = "out err";
+      out.textContent = "Paste JSON workflow dulu.";
+      return;
+    }
+    var data;
+    try {
+      data = JSON.parse(raw);
+    } catch (e) {
+      out.className = "out err";
+      out.textContent = "JSON tidak valid: " + e.message;
+      return;
+    }
+    var nodes = data.nodes;
+    if (!nodes || !(nodes instanceof Array)) {
+      out.className = "out err";
+      out.textContent = "Tidak menemukan array \"nodes\". Pastikan kamu paste JSON workflow n8n (hasil Download / copy canvas).";
+      return;
+    }
+    var types = "";
+    for (var i = 0; i < nodes.length; i++) {
+      if (nodes[i] && typeof nodes[i].type === "string") types += nodes[i].type.toLowerCase() + "|";
+    }
+    function has(s) { return types.indexOf(s) !== -1; }
+
+    var report = [];
+    report.push((has("manualtrigger") || has("scheduletrigger") || has("webhook")) ?
+      "[OK]   Trigger ditemukan (manual/schedule/webhook)" :
+      "[MISS] Trigger tidak ditemukan");
+    report.push(has("httprequest") ? "[OK]   HTTP Request node" : "[--]   HTTP Request node tidak ada (wajib di Workflow A & B)");
+    report.push(has(".set") ? "[OK]   Set node" : "[--]   Set node tidak ada");
+    report.push(has(".if") ? "[OK]   IF node" : "[--]   IF node tidak ada (dipakai di Workflow B)");
+    report.push(has("merge") ? "[OK]   Merge node" : "[--]   Merge node tidak ada (dipakai di Workflow C)");
+    report.push("");
+    report.push("Total node: " + nodes.length);
+    out.className = "out ok";
+    out.textContent = report.join("\n");
+  });
+
+  // ---------- AI Tutor ----------
+  var TUTOR = [
+    {
+      tip: "Sesi ini menghubungkan semua yang sudah kamu pelajari: JSON (F-01) jadi items, REST API jadi HTTP Request node, webhook jadi Webhook trigger.",
+      prompt: "Saya sedang belajar F-03 Sesi 1 (n8n Setup & Core Nodes). Jelaskan hubungan antara konsep items di n8n dengan struktur JSON yang saya pelajari di F-01, pakai contoh data sederhana."
+    },
+    {
+      tip: "Cloud untuk belajar, self-hosted untuk jualan. Pahami trade-off-nya, klien pasti bertanya soal data privacy dan biaya.",
+      prompt: "Jelaskan perbandingan n8n Cloud vs self-hosted dari sudut pandang konsultan automation yang menawarkan jasa ke klien, termasuk kapan merekomendasikan masing-masing."
+    },
+    {
+      tip: "Hafalkan satu kalimat: data antar node selalu array of object, datamu di dalam key json. Semua kebingungan n8n pemula berakar dari sini.",
+      prompt: "Saya bingung dengan struktur items di n8n. Beri saya 3 contoh items dengan kompleksitas bertingkat (flat, nested, array di dalam item) dan jelaskan cara membacanya."
+    },
+    {
+      tip: "Latih 4 node ini sampai refleks: HTTP Request (ambil), Set (rapikan), IF (cabangkan), Merge (gabungkan). 80% workflow sederhana cuma butuh ini.",
+      prompt: "Beri saya 5 mini-skenario bisnis, dan minta saya menentukan kombinasi node n8n (HTTP Request/Set/IF/Merge) yang tepat untuk masing-masing. Koreksi jawaban saya satu per satu."
+    },
+    {
+      tip: "Pilih trigger berdasarkan SIAPA yang memulai: kamu (Manual), waktu (Schedule), atau sistem luar (Webhook).",
+      prompt: "Uji pemahaman saya tentang trigger n8n: beri 6 kasus nyata dan saya akan jawab trigger mana yang tepat (Manual/Schedule/Webhook), lalu nilai jawaban saya."
+    },
+    {
+      tip: "Debugging = baca, bukan tebak. Node merah, pesan error, dan data input node itu adalah 90% jawaban.",
+      prompt: "Buatkan saya 3 skenario error eksekusi n8n (dengan log palsu) dan minta saya mendiagnosis akar masalahnya, lalu koreksi analisis saya."
+    },
+    {
+      tip: "Kerjakan 3 workflow di akun n8n Cloud-mu, jangan hanya dibaca. Gunakan validator di bawah untuk mengecek hasil export-mu.",
+      prompt: "Saya sedang membangun Workflow B (Schedule -> HTTP Request -> IF -> Set) dengan API Frankfurter untuk kurs USD-IDR. Pandu saya langkah demi langkah konfigurasi setiap node-nya."
+    },
+    {
+      tip: "Skor 80%+ = lanjut Sesi 2 (Integrasi Business Tools). Di bawah itu, ulangi step yang masih lemah.",
+      prompt: "Saya baru menyelesaikan F-03 Sesi 1 n8n (setup, core nodes, trigger, debug). Beri saya checkpoint review: 8 pertanyaan campuran konsep dan kasus, nilai jawaban saya, dan tentukan apakah saya siap ke Sesi 2."
+    }
+  ];
+
+  var tutorPanel = document.getElementById("tutorPanel");
+  function updateTutor() {
+    document.getElementById("tutorTips").textContent = TUTOR[current].tip;
+    document.getElementById("tutorPrompt").textContent = TUTOR[current].prompt;
+  }
+  document.getElementById("tutorBtn").addEventListener("click", function () {
+    tutorPanel.className = tutorPanel.className === "open" ? "" : "open";
+    updateTutor();
+  });
+  document.getElementById("closeTutor").addEventListener("click", function () {
+    tutorPanel.className = "";
+  });
+  document.getElementById("copyPrompt").addEventListener("click", function () {
+    var txt = TUTOR[current].prompt;
+    var btn = this;
+    function flash(msg) {
+      btn.textContent = msg;
+      setTimeout(function () { btn.textContent = "SALIN PROMPT"; }, 1500);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(txt).then(function () { flash("TERSALIN!"); }, function () { flash("GAGAL SALIN"); });
+    } else {
+      flash("SALIN MANUAL");
+    }
+  });
+
+  // ---------- Init ----------
+  goTo(0);
+})();
+</script>
+</body>
+</html>
