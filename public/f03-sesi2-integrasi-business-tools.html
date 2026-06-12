@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>F-03 Sesi 2 &middot; Integrasi Business Tools</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080c10;
+    --panel: #0d1f2d;
+    --panel2: #0a0f14;
+    --border: #1e3a4a;
+    --text: #c9d1d9;
+    --muted: #6e7681;
+    --soft: #8b949e;
+    --bright: #e6edf3;
+    --accent: #69db7c;
+    --accent-dim: rgba(105, 219, 124, 0.13);
+    --accent-border: rgba(105, 219, 124, 0.4);
+    --warn: #ffeb3b;
+    --err: #ff6b6b;
+    --blue: #00e5ff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.6;
+    padding-bottom: 80px;
+  }
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  header {
+    position: sticky; top: 0; z-index: 50;
+    background: linear-gradient(180deg, #0d1f2d 0%, #080c10 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 20px 12px;
+  }
+  .hdr-tag { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+  .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent); box-shadow: 0 0 8px var(--accent);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+  @media (prefers-reduced-motion: reduce) { .dot { animation: none; } }
+  .hdr-tag span {
+    color: var(--accent); font-size: 10px;
+    letter-spacing: 3px; text-transform: uppercase;
+  }
+  h1 { font-size: clamp(15px, 4vw, 21px); color: var(--bright); letter-spacing: 1px; }
+  .hdr-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .progress-wrap {
+    margin-top: 10px; height: 4px; background: var(--panel2);
+    border-radius: 2px; overflow: hidden;
+  }
+  .progress-bar {
+    height: 100%; width: 12.5%;
+    background: linear-gradient(90deg, var(--accent), #b8f5c2);
+    transition: width .3s;
+  }
+
+  .stepnav {
+    display: flex; gap: 6px; padding: 12px 20px;
+    overflow-x: auto; background: var(--panel2);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 92px; z-index: 40;
+  }
+  .stepnav button {
+    flex-shrink: 0; padding: 6px 12px;
+    background: var(--panel); border: 1px solid var(--border);
+    color: var(--muted); border-radius: 4px; cursor: pointer;
+    font-family: inherit; font-size: 11px; letter-spacing: 1px;
+    transition: all .2s;
+  }
+  .stepnav button.active {
+    background: var(--accent-dim); border-color: var(--accent);
+    color: var(--accent); box-shadow: 0 0 8px rgba(105,219,124,.27);
+  }
+  .stepnav button.done { color: var(--accent); border-color: var(--accent-border); }
+  .stepnav button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  main { max-width: 860px; margin: 0 auto; padding: 24px 20px; }
+  section.step { display: none; }
+  section.step.active { display: block; animation: fadein .25s; }
+  @keyframes fadein { from {opacity:0; transform: translateY(6px)} to {opacity:1; transform:none} }
+  @media (prefers-reduced-motion: reduce) { section.step.active { animation: none; } }
+
+  .eyebrow {
+    font-size: 10px; color: var(--accent); letter-spacing: 2px;
+    text-transform: uppercase; margin-bottom: 6px;
+  }
+  h2 { font-size: 18px; color: var(--bright); margin-bottom: 14px; }
+  h3 { font-size: 14px; color: var(--bright); margin: 22px 0 8px; }
+  p { margin-bottom: 12px; font-size: 13px; }
+  .hl { color: var(--accent); }
+  .hly { color: var(--warn); }
+  .hlb { color: var(--blue); }
+  code.inline {
+    background: var(--panel); border: 1px solid var(--border);
+    padding: 1px 6px; border-radius: 3px; font-size: 12px; color: #b8f5c2;
+  }
+  ul.mat { list-style: none; margin: 0 0 14px; }
+  ul.mat li {
+    padding-left: 18px; position: relative; margin-bottom: 6px; font-size: 13px;
+  }
+  ul.mat li::before { content: ">"; position: absolute; left: 0; color: var(--accent); }
+
+  .codeblock {
+    background: var(--panel2); border: 1px solid var(--border);
+    border-radius: 6px; margin: 12px 0; overflow: hidden;
+  }
+  .codeblock .cb-title {
+    padding: 6px 12px; font-size: 10px; letter-spacing: 1px;
+    color: var(--muted); border-bottom: 1px solid var(--border);
+    background: var(--panel); display: flex; justify-content: space-between;
+  }
+  .codeblock pre {
+    padding: 12px 14px; overflow-x: auto; font-size: 12px;
+    line-height: 1.55; font-family: inherit;
+  }
+  .k { color: #ff7b72; }          /* keyword */
+  .s { color: #a5d6ff; }          /* string */
+  .f { color: #d2a8ff; }          /* function */
+  .c { color: #6e7681; }          /* comment */
+  .n { color: #79c0ff; }          /* number/prop */
+  .v { color: #ffa657; }          /* variable */
+
+  .ctxbox {
+    background: var(--accent-dim); border: 1px solid var(--accent-border);
+    border-left: 3px solid var(--accent);
+    border-radius: 6px; padding: 12px 14px; margin: 16px 0; font-size: 12px;
+  }
+  .ctxbox .ctx-title {
+    font-size: 10px; letter-spacing: 2px; color: var(--accent); margin-bottom: 6px;
+  }
+  .warnbox {
+    background: rgba(255,235,59,.07); border: 1px solid rgba(255,235,59,.3);
+    border-left: 3px solid var(--warn);
+    border-radius: 6px; padding: 12px 14px; margin: 16px 0; font-size: 12px;
+  }
+  .warnbox .ctx-title { font-size: 10px; letter-spacing: 2px; color: var(--warn); margin-bottom: 6px; }
+
+  table.cmp {
+    width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 12px;
+  }
+  table.cmp th, table.cmp td {
+    border: 1px solid var(--border); padding: 7px 10px; text-align: left;
+  }
+  table.cmp th { background: var(--panel); color: var(--accent); font-size: 11px; letter-spacing: 1px; }
+  table.cmp td { color: var(--text); }
+
+  .editor { margin: 16px 0; }
+  .editor textarea {
+    width: 100%; min-height: 170px; background: var(--panel2);
+    border: 1px solid var(--border); border-radius: 6px 6px 0 0;
+    color: #b8f5c2; font-family: inherit; font-size: 12px;
+    padding: 12px; resize: vertical; line-height: 1.5;
+  }
+  .editor textarea:focus { outline: none; border-color: var(--accent); }
+  .editor .ed-bar {
+    display: flex; gap: 8px; padding: 8px;
+    background: var(--panel); border: 1px solid var(--border); border-top: none;
+  }
+  .btn {
+    padding: 7px 16px; background: var(--accent-dim);
+    border: 1px solid var(--accent); color: var(--accent);
+    border-radius: 4px; cursor: pointer; font-family: inherit;
+    font-size: 11px; letter-spacing: 1px; transition: all .2s;
+  }
+  .btn:hover { background: rgba(105,219,124,.25); }
+  .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .btn.ghost { background: var(--panel2); border-color: var(--border); color: var(--soft); }
+  .ed-out {
+    background: #05080b; border: 1px solid var(--border); border-top: none;
+    border-radius: 0 0 6px 6px; padding: 12px; font-size: 12px;
+    min-height: 40px; white-space: pre-wrap; word-break: break-word; color: var(--soft);
+  }
+  .ed-out.ok { color: #b8f5c2; }
+  .ed-out.err { color: var(--err); }
+
+  .quiz {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 6px; padding: 16px; margin: 20px 0;
+  }
+  .quiz .q-title { font-size: 10px; letter-spacing: 2px; color: var(--accent); margin-bottom: 8px; }
+  .quiz .q-text { font-size: 13px; color: var(--bright); margin-bottom: 12px; }
+  .quiz label {
+    display: block; padding: 9px 12px; margin-bottom: 6px;
+    background: var(--panel2); border: 1px solid var(--border);
+    border-radius: 4px; cursor: pointer; font-size: 12px; transition: all .15s;
+  }
+  .quiz label:hover { border-color: var(--accent-border); }
+  .quiz label.correct { border-color: var(--accent); background: var(--accent-dim); color: var(--accent); }
+  .quiz label.wrong { border-color: var(--err); background: rgba(255,107,107,.08); color: var(--err); }
+  .quiz input { margin-right: 8px; accent-color: var(--accent); }
+  .q-feedback { font-size: 12px; margin-top: 8px; display: none; }
+  .q-feedback.show { display: block; }
+
+  .mission {
+    background: linear-gradient(180deg, rgba(105,219,124,.08), transparent);
+    border: 1px solid var(--accent-border); border-radius: 8px;
+    padding: 18px; margin: 18px 0;
+  }
+  .mission .m-title { font-size: 10px; letter-spacing: 2px; color: var(--accent); margin-bottom: 8px; }
+
+  .navbtns { display: flex; justify-content: space-between; gap: 10px; margin-top: 30px; }
+  .navbtns .btn { flex: 1; padding: 11px; }
+
+  .tutor-fab {
+    position: fixed; right: 16px; bottom: 16px; z-index: 60;
+    width: 52px; height: 52px; border-radius: 50%;
+    background: var(--accent); color: #08130b; border: none;
+    font-family: inherit; font-weight: 700; font-size: 11px;
+    cursor: pointer; box-shadow: 0 0 18px rgba(105,219,124,.5);
+  }
+  .tutor-panel {
+    position: fixed; right: 16px; bottom: 78px; z-index: 60;
+    width: min(340px, calc(100vw - 32px)); max-height: 60vh; overflow-y: auto;
+    background: var(--panel); border: 1px solid var(--accent-border);
+    border-radius: 8px; padding: 14px; display: none;
+    box-shadow: 0 8px 30px rgba(0,0,0,.6);
+  }
+  .tutor-panel.open { display: block; }
+  .tutor-panel h4 { font-size: 11px; letter-spacing: 2px; color: var(--accent); margin-bottom: 10px; }
+  .tutor-q {
+    width: 100%; text-align: left; background: var(--panel2);
+    border: 1px solid var(--border); color: var(--text);
+    border-radius: 4px; padding: 8px 10px; margin-bottom: 6px;
+    cursor: pointer; font-family: inherit; font-size: 11px;
+  }
+  .tutor-q:hover { border-color: var(--accent-border); }
+  .tutor-a {
+    display: none; font-size: 11px; color: var(--soft);
+    padding: 8px 10px; margin: -2px 0 8px;
+    border-left: 2px solid var(--accent); background: var(--panel2);
+  }
+  .tutor-a.show { display: block; }
+
+  .arch {
+    background: var(--panel2); border: 1px solid var(--border);
+    border-radius: 6px; padding: 14px; margin: 14px 0;
+    font-size: 12px; overflow-x: auto; white-space: pre; line-height: 1.7;
+    color: var(--soft);
+  }
+  .badge {
+    display: inline-block; padding: 2px 8px; border-radius: 3px;
+    font-size: 10px; letter-spacing: 1px; margin-right: 6px;
+    background: var(--accent-dim); border: 1px solid var(--accent-border); color: var(--accent);
+  }
+  .checklist label {
+    display: flex; gap: 10px; align-items: flex-start;
+    padding: 8px 10px; margin-bottom: 6px; font-size: 12px;
+    background: var(--panel2); border: 1px solid var(--border); border-radius: 4px;
+    cursor: pointer;
+  }
+  .checklist input { accent-color: var(--accent); margin-top: 2px; }
+  .score-big { font-size: 32px; color: var(--accent); font-weight: 700; margin: 8px 0; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr-tag"><div class="dot"></div><span>F-03 &middot; n8n Mastery &middot; Main Weapon</span></div>
+  <h1>SESI 2 &mdash; INTEGRASI BUSINESS TOOLS</h1>
+  <div class="hdr-sub">Minggu 3&ndash;5 &middot; Sheets &middot; Email &middot; Slack/Telegram &middot; Airtable &middot; Error Handling</div>
+  <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+</header>
+
+<nav class="stepnav" id="stepNav" aria-label="Navigasi step"></nav>
+
+<main>
+
+<!-- ============ STEP 1: OVERVIEW ============ -->
+<section class="step active" id="step-1">
+  <div class="eyebrow">Step 1 / 8 &middot; Briefing</div>
+  <h2>Dari Workflow Mainan ke Workflow Bisnis</h2>
+  <p>Di Sesi 1 kamu sudah bisa membuat workflow dasar: <span class="hl">fetch data &rarr; transform &rarr; output</span>. Tapi workflow itu masih "berbicara dengan dirinya sendiri". Sesi ini mengubah n8n-mu menjadi penghubung tools yang dipakai bisnis sungguhan setiap hari.</p>
+
+  <h3>Materi sesi ini (sesuai roadmap)</h3>
+  <ul class="mat">
+    <li>Google Sheets: baca, tulis, update</li>
+    <li>Gmail &amp; Outlook: kirim email otomatis</li>
+    <li>Slack &amp; Telegram: notifikasi &amp; bot</li>
+    <li>Airtable: database automation</li>
+    <li>Error handling &amp; fallback workflow</li>
+  </ul>
+
+  <h3>Project akhir sesi</h3>
+  <div class="ctxbox">
+    <div class="ctx-title">&loz; PROJECT PRAKTIK</div>
+    <strong class="hl">Lead Management System</strong>: Form &rarr; Sheet &rarr; Email &rarr; Slack notif.
+    Persis tipe workflow yang paling sering diminta klien di Upwork &mdash; portofolio pertama F-03-mu.
+  </div>
+
+  <h3>Konsep kunci: Credentials</h3>
+  <p>Semua integrasi di sesi ini butuh <span class="hl">credentials</span> &mdash; izin akses yang kamu simpan sekali di n8n, lalu dipakai banyak node. Dua tipe yang akan kamu temui:</p>
+  <table class="cmp">
+    <tr><th>Tipe</th><th>Cara kerja</th><th>Dipakai oleh</th></tr>
+    <tr><td><span class="hl">OAuth2</span></td><td>Login lewat popup akun (Sign in with Google), token di-refresh otomatis</td><td>Google Sheets, Gmail, Outlook, Slack</td></tr>
+    <tr><td><span class="hl">API Key / Token</span></td><td>String rahasia dari dashboard layanan, ditempel manual</td><td>Airtable (PAT), Telegram (Bot Token)</td></tr>
+  </table>
+  <p>Ini lanjutan langsung dari F-01 Sesi 2 (Authentication: API Key, Bearer Token) &mdash; bedanya sekarang n8n yang mengurus header-nya untukmu.</p>
+
+  <div class="warnbox">
+    <div class="ctx-title">&#9888; PERSIAPAN SEBELUM LANJUT</div>
+    Pastikan kamu punya: akun n8n Cloud (sudah ada dari Sesi 1), akun Google, workspace Slack gratis ATAU akun Telegram, dan akun Airtable free tier. Semua gratis.
+  </div>
+</section>
+
+<!-- ============ STEP 2: GOOGLE SHEETS ============ -->
+<section class="step" id="step-2">
+  <div class="eyebrow">Step 2 / 8 &middot; Materi 1</div>
+  <h2>Google Sheets: Baca, Tulis, Update</h2>
+  <p>Google Sheets adalah "database"-nya UKM. Klien non-teknis hampir selalu menyimpan data di Sheets, jadi node ini akan jadi salah satu yang paling sering kamu pakai.</p>
+
+  <h3>3 operasi inti node Google Sheets</h3>
+  <table class="cmp">
+    <tr><th>Operasi</th><th>Fungsi</th><th>Analogi API (F-01)</th></tr>
+    <tr><td><span class="hl">Get Row(s)</span></td><td>Baca data dari sheet</td><td>GET</td></tr>
+    <tr><td><span class="hl">Append Row</span></td><td>Tambah baris baru di akhir</td><td>POST</td></tr>
+    <tr><td><span class="hl">Update Row</span></td><td>Ubah baris yang sudah ada (butuh kolom pencocok)</td><td>PUT/PATCH</td></tr>
+  </table>
+
+  <p>Aturan main yang penting: <span class="hly">baris 1 sheet = nama kolom</span>. n8n membaca header itu dan mengubah setiap baris menjadi JSON &mdash; persis struktur yang kamu kuasai di F-01.</p>
+
+  <div class="codeblock">
+    <div class="cb-title"><span>OUTPUT NODE "GET ROW(S)" &rarr; JSON</span><span>read-only</span></div>
+    <pre><span class="c">// Sheet berisi kolom: nama | email | status</span>
+<span class="c">// n8n mengubahnya jadi array of items:</span>
+[
+  { <span class="n">"json"</span>: { <span class="n">"nama"</span>: <span class="s">"Budi"</span>, <span class="n">"email"</span>: <span class="s">"budi@toko.id"</span>, <span class="n">"status"</span>: <span class="s">"baru"</span> } },
+  { <span class="n">"json"</span>: { <span class="n">"nama"</span>: <span class="s">"Sari"</span>, <span class="n">"email"</span>: <span class="s">"sari@toko.id"</span>, <span class="n">"status"</span>: <span class="s">"follow-up"</span> } }
+]</pre>
+  </div>
+
+  <h3>Menyiapkan data sebelum Append (Code Node)</h3>
+  <p>Sering kali data dari API/form tidak cocok dengan kolom sheet. Di sinilah skill F-02-mu bekerja:</p>
+
+  <div class="editor" id="ed1-wrap">
+    <div class="codeblock" style="margin-bottom:0">
+      <div class="cb-title"><span>CODE NODE &middot; rapikan data form &rarr; format kolom sheet</span><span>editable</span></div>
+    </div>
+    <textarea id="ed1-code" spellcheck="false">// $input.all() = data dari node sebelumnya (form submission)
+// Target kolom sheet: Nama | Email | Sumber | Tanggal
+
+const items = $input.all();
+
+return items.map(item => {
+  const d = item.json;
+  return {
+    json: {
+      Nama: d.full_name.trim(),
+      Email: d.email.toLowerCase(),
+      Sumber: d.source || "website",
+      Tanggal: new Date().toISOString().slice(0, 10)
+    }
+  };
+});</textarea>
+    <div class="ed-bar">
+      <button class="btn" onclick="runEditor('ed1')">&#9654; RUN</button>
+      <button class="btn ghost" onclick="resetEditor('ed1')">RESET</button>
+    </div>
+    <div class="ed-out" id="ed1-out">Output akan muncul di sini...</div>
+  </div>
+
+  <div class="ctxbox">
+    <div class="ctx-title">&loz; N8N CONTEXT</div>
+    Di node Google Sheets, kolom bisa diisi dengan <span class="hl">expression</span>:
+    <code class="inline">{{ $json.Nama }}</code> &mdash; artinya "ambil field Nama dari item saat ini".
+    Mode <strong>Map Automatically</strong> mencocokkan nama field JSON ke header kolom secara otomatis. Itulah kenapa Code Node di atas menamai field persis seperti header sheet.
+  </div>
+
+  <div class="quiz" data-quiz="q1">
+    <div class="q-title">&loz; QUIZ CEPAT</div>
+    <div class="q-text">Kamu ingin mengubah status lead "baru" menjadi "dihubungi" pada baris yang SUDAH ADA di sheet. Operasi apa yang tepat?</div>
+    <label><input type="radio" name="q1" value="a"> Append Row &mdash; tambah baris baru dengan status terbaru</label>
+    <label><input type="radio" name="q1" value="b" data-correct="1"> Update Row &mdash; dengan kolom pencocok (mis. Email) untuk menemukan barisnya</label>
+    <label><input type="radio" name="q1" value="c"> Get Row(s) &mdash; karena membaca dulu pasti mengubah data</label>
+    <div class="q-feedback"></div>
+  </div>
+</section>
+
+<!-- ============ STEP 3: GMAIL & OUTLOOK ============ -->
+<section class="step" id="step-3">
+  <div class="eyebrow">Step 3 / 8 &middot; Materi 2</div>
+  <h2>Gmail &amp; Outlook: Kirim Email Otomatis</h2>
+  <p>Email otomatis = follow-up lead, notifikasi order, laporan harian. Node <span class="hl">Gmail</span> dan <span class="hl">Microsoft Outlook</span> di n8n cara pakainya hampir identik &mdash; kuasai satu, kamu bisa keduanya.</p>
+
+  <h3>Anatomi node Send Email</h3>
+  <ul class="mat">
+    <li><strong>To</strong> &mdash; biasanya dinamis: <code class="inline">{{ $json.Email }}</code></li>
+    <li><strong>Subject</strong> &mdash; bisa campur teks + expression</li>
+    <li><strong>Message</strong> &mdash; teks biasa atau HTML</li>
+    <li><strong>Credentials</strong> &mdash; OAuth2 (login akun Google/Microsoft sekali)</li>
+  </ul>
+
+  <h3>Personalisasi dengan template literals (F-02 Sesi 1)</h3>
+  <div class="editor" id="ed2-wrap">
+    <div class="codeblock" style="margin-bottom:0">
+      <div class="cb-title"><span>CODE NODE &middot; bangun isi email per lead</span><span>editable</span></div>
+    </div>
+    <textarea id="ed2-code" spellcheck="false">// Satu item per lead dari Google Sheets
+const items = $input.all();
+
+return items.map(item => {
+  const lead = item.json;
+  const subject = `Halo ${lead.Nama}, terima kasih sudah menghubungi kami`;
+
+  const body = [
+    `Hai ${lead.Nama},`,
+    ``,
+    `Kami menerima permintaan kamu via ${lead.Sumber}.`,
+    `Tim kami akan menghubungi dalam 1x24 jam.`,
+    ``,
+    `Salam,`,
+    `Tim Support`
+  ].join("\n");
+
+  return { json: { to: lead.Email, subject: subject, body: body } };
+});</textarea>
+    <div class="ed-bar">
+      <button class="btn" onclick="runEditor('ed2')">&#9654; RUN</button>
+      <button class="btn ghost" onclick="resetEditor('ed2')">RESET</button>
+    </div>
+    <div class="ed-out" id="ed2-out">Output akan muncul di sini...</div>
+  </div>
+
+  <div class="ctxbox">
+    <div class="ctx-title">&loz; N8N CONTEXT</div>
+    Setelah Code Node ini, node Gmail tinggal diisi:
+    To = <code class="inline">{{ $json.to }}</code>,
+    Subject = <code class="inline">{{ $json.subject }}</code>,
+    Message = <code class="inline">{{ $json.body }}</code>.
+    Karena ada 2 lead = 2 items, node Gmail otomatis jalan <strong>2 kali</strong> &mdash; satu email per item. Ini perilaku default n8n: node dieksekusi per item.
+  </div>
+
+  <div class="warnbox">
+    <div class="ctx-title">&#9888; ANTI-SPAM</div>
+    Untuk volume besar, jangan kirim ratusan email sekaligus dari akun pribadi &mdash; akun bisa dibatasi Google/Microsoft. Praktik aman: batasi jumlah per eksekusi, beri jeda (node Wait), dan selalu sediakan konteks kenapa penerima mendapat email itu.
+  </div>
+
+  <div class="quiz" data-quiz="q2">
+    <div class="q-title">&loz; QUIZ CEPAT</div>
+    <div class="q-text">Node Gmail menerima 5 items dari node sebelumnya. Apa yang terjadi saat workflow dijalankan?</div>
+    <label><input type="radio" name="q2" value="a"> Hanya item pertama yang dikirim, sisanya diabaikan</label>
+    <label><input type="radio" name="q2" value="b"> Kelima item digabung menjadi 1 email panjang</label>
+    <label><input type="radio" name="q2" value="c" data-correct="1"> Node berjalan 5 kali &mdash; satu email per item</label>
+    <div class="q-feedback"></div>
+  </div>
+</section>
+
+<!-- ============ STEP 4: SLACK & TELEGRAM ============ -->
+<section class="step" id="step-4">
+  <div class="eyebrow">Step 4 / 8 &middot; Materi 3</div>
+  <h2>Slack &amp; Telegram: Notifikasi &amp; Bot</h2>
+  <p>Email itu untuk pelanggan; <span class="hl">Slack/Telegram itu untuk tim</span>. "Ada lead baru!", "Server error!", "Order masuk!" &mdash; notifikasi real-time adalah salah satu automation paling cepat terasa nilainya bagi klien.</p>
+
+  <table class="cmp">
+    <tr><th></th><th>Slack</th><th>Telegram</th></tr>
+    <tr><td>Credential</td><td>OAuth2 (atau Bot Token)</td><td>Bot Token dari @BotFather</td></tr>
+    <tr><td>Target</td><td>Channel (mis. #leads)</td><td>Chat ID (user/grup)</td></tr>
+    <tr><td>Format teks</td><td>Markdown ala Slack: *tebal*</td><td>Markdown/HTML: &lt;b&gt;tebal&lt;/b&gt;</td></tr>
+    <tr><td>Cocok untuk</td><td>Tim kantor / klien korporat</td><td>Personal, UKM, klien Indonesia</td></tr>
+  </table>
+
+  <h3>Bukan cuma notifikasi: Telegram sebagai TRIGGER</h3>
+  <p>Node <span class="hl">Telegram Trigger</span> membuat workflow berjalan saat seseorang mengirim pesan ke bot-mu. Ini webhook (F-01 Sesi 3) yang dikelola n8n secara otomatis &mdash; dasar untuk membuat bot interaktif.</p>
+
+  <div class="arch">[Telegram Trigger] --> [Code: parse perintah] --> [IF: perintah valid?]
+                                                  |-- true  --> [proses] --> [Telegram: balas hasil]
+                                                  |-- false --> [Telegram: balas "perintah tidak dikenal"]</div>
+
+  <h3>Merangkum banyak item jadi SATU pesan</h3>
+  <p>Kebalikan dari email tadi: notifikasi tim biasanya ingin <span class="hly">satu ringkasan</span>, bukan 10 pesan terpisah. Polanya: kembalikan satu item saja.</p>
+
+  <div class="editor" id="ed3-wrap">
+    <div class="codeblock" style="margin-bottom:0">
+      <div class="cb-title"><span>CODE NODE &middot; 3 leads &rarr; 1 pesan ringkasan Slack</span><span>editable</span></div>
+    </div>
+    <textarea id="ed3-code" spellcheck="false">const items = $input.all();
+
+const lines = items.map((item, i) => {
+  const d = item.json;
+  return `${i + 1}. ${d.Nama} (${d.Email}) - via ${d.Sumber}`;
+});
+
+const text = [
+  `*${items.length} lead baru hari ini:*`,
+  ...lines
+].join("\n");
+
+// return SATU item -> node Slack hanya kirim SATU pesan
+return [{ json: { text: text } }];</textarea>
+    <div class="ed-bar">
+      <button class="btn" onclick="runEditor('ed3')">&#9654; RUN</button>
+      <button class="btn ghost" onclick="resetEditor('ed3')">RESET</button>
+    </div>
+    <div class="ed-out" id="ed3-out">Output akan muncul di sini...</div>
+  </div>
+
+  <div class="ctxbox">
+    <div class="ctx-title">&loz; N8N CONTEXT</div>
+    Pola <strong>banyak item &rarr; satu item</strong> ini sering disebut "aggregate". Selain Code Node, n8n punya node bawaan <span class="hl">Aggregate</span> dan <span class="hl">Summarize</span> untuk kasus sederhana &mdash; tapi Code Node memberi kontrol format penuh, dan kamu sudah punya skill-nya.
+  </div>
+
+  <div class="quiz" data-quiz="q3">
+    <div class="q-title">&loz; QUIZ CEPAT</div>
+    <div class="q-text">Klien ingin tim sales menerima SATU pesan Telegram berisi rekap semua order pagi ini (15 order). Pola yang benar?</div>
+    <label><input type="radio" name="q3" value="a"> Hubungkan langsung ke node Telegram &mdash; 15 items = 15 pesan tidak masalah</label>
+    <label><input type="radio" name="q3" value="b" data-correct="1"> Code Node menggabungkan 15 items menjadi 1 item berisi teks rekap, baru ke node Telegram</label>
+    <label><input type="radio" name="q3" value="c"> Pakai 15 node Telegram terpisah, satu per order</label>
+    <div class="q-feedback"></div>
+  </div>
+</section>
+
+<!-- ============ STEP 5: AIRTABLE ============ -->
+<section class="step" id="step-5">
+  <div class="eyebrow">Step 5 / 8 &middot; Materi 4</div>
+  <h2>Airtable: Database Automation</h2>
+  <p>Airtable = spreadsheet yang berperilaku seperti database. Kalau Google Sheets mulai "kewalahan" (relasi antar tabel, tipe field, view berbeda per tim), klien biasanya naik kelas ke Airtable &mdash; dan kamu harus siap.</p>
+
+  <h3>Hirarki Airtable</h3>
+  <div class="arch">Workspace
+  '-- Base          (mis. "CRM Toko")        --> seperti 1 file database
+      '-- Table     (mis. "Leads", "Orders") --> seperti sheet/tab
+          '-- Record (1 baris data)          --> punya ID unik: recXXXXXXXX
+              '-- Field (kolom bertipe: text, email, select, date...)</div>
+
+  <p>Dua hal yang membedakannya dari Sheets dan membuatnya terasa seperti "API sungguhan" (F-01):</p>
+  <ul class="mat">
+    <li>Setiap record punya <span class="hl">ID unik</span> (<code class="inline">recXXXX</code>) &mdash; update tidak perlu "kolom pencocok", cukup ID</li>
+    <li>Pencarian pakai <span class="hl">filterByFormula</span> &mdash; query langsung di sisi server</li>
+  </ul>
+
+  <div class="codeblock">
+    <div class="cb-title"><span>CONTOH filterByFormula DI NODE AIRTABLE (operasi Search)</span><span>read-only</span></div>
+    <pre><span class="c">// Cari semua lead berstatus "baru" dari sumber "website":</span>
+<span class="f">AND</span>({Status} = <span class="s">"baru"</span>, {Sumber} = <span class="s">"website"</span>)
+
+<span class="c">// Email mengandung domain tertentu:</span>
+<span class="f">FIND</span>(<span class="s">"@toko.id"</span>, {Email}) > <span class="n">0</span>
+
+<span class="c">// Dibuat dalam 7 hari terakhir:</span>
+<span class="f">IS_AFTER</span>({Tanggal}, <span class="f">DATEADD</span>(<span class="f">TODAY</span>(), -<span class="n">7</span>, <span class="s">"days"</span>))</pre>
+  </div>
+
+  <h3>Operasi node Airtable di n8n</h3>
+  <table class="cmp">
+    <tr><th>Operasi</th><th>Fungsi</th><th>Padanan Sheets</th></tr>
+    <tr><td>Search / List</td><td>Ambil records (bisa + filterByFormula)</td><td>Get Row(s)</td></tr>
+    <tr><td>Create</td><td>Tambah record baru</td><td>Append Row</td></tr>
+    <tr><td>Update</td><td>Ubah record via record ID</td><td>Update Row</td></tr>
+    <tr><td><span class="hl">Upsert</span></td><td>Update jika ada, create jika belum &mdash; anti duplikat</td><td>(tidak ada)</td></tr>
+  </table>
+
+  <div class="ctxbox">
+    <div class="ctx-title">&loz; N8N CONTEXT</div>
+    Credential Airtable memakai <span class="hl">Personal Access Token (PAT)</span> &mdash; dibuat di airtable.com/create/tokens dengan scope <code class="inline">data.records:read</code> dan <code class="inline">data.records:write</code>. Ini contoh nyata prinsip F-01: beri token izin <strong>seminimal yang dibutuhkan</strong>.
+    Output node Airtable selalu menyertakan <code class="inline">id</code> record &mdash; simpan itu kalau nanti mau Update.
+  </div>
+
+  <div class="quiz" data-quiz="q4">
+    <div class="q-title">&loz; QUIZ CEPAT</div>
+    <div class="q-text">Form bisa dikirim 2x oleh orang yang sama. Kamu ingin data lead di Airtable tidak pernah duplikat (1 email = 1 record). Operasi paling tepat?</div>
+    <label><input type="radio" name="q4" value="a"> Create &mdash; biarkan duplikat, nanti dibersihkan manual</label>
+    <label><input type="radio" name="q4" value="b" data-correct="1"> Upsert dengan Email sebagai field pencocok</label>
+    <label><input type="radio" name="q4" value="c"> Update &mdash; karena selalu ada record yang bisa diubah</label>
+    <div class="q-feedback"></div>
+  </div>
+</section>
+
+<!-- ============ STEP 6: ERROR HANDLING & FALLBACK ============ -->
+<section class="step" id="step-6">
+  <div class="eyebrow">Step 6 / 8 &middot; Materi 5</div>
+  <h2>Error Handling &amp; Fallback Workflow</h2>
+  <p>Workflow yang jalan di laptopmu itu latihan. Workflow yang <span class="hl">tetap selamat saat API down jam 3 pagi</span> &mdash; itu yang dibayar klien. Ini materi yang memisahkan amatir dari profesional.</p>
+
+  <h3>3 lapis pertahanan di n8n</h3>
+
+  <p><span class="badge">LAPIS 1</span><strong>Pengaturan di level node</strong> &mdash; buka tab Settings di node mana pun:</p>
+  <ul class="mat">
+    <li><span class="hl">Retry On Fail</span> &mdash; coba ulang otomatis (mis. 3x, jeda 5 detik). Obat untuk error sementara: timeout, rate limit 429 (ingat F-01 Sesi 3)</li>
+    <li><span class="hl">On Error &rarr; Continue</span> &mdash; workflow tidak berhenti; item gagal tetap mengalir dan bisa diarahkan ke jalur error</li>
+  </ul>
+
+  <p><span class="badge">LAPIS 2</span><strong>try/catch di Code Node</strong> &mdash; skill F-02 Sesi 3-mu, langsung terpakai:</p>
+
+  <div class="editor" id="ed4-wrap">
+    <div class="codeblock" style="margin-bottom:0">
+      <div class="cb-title"><span>CODE NODE &middot; proses tiap item, tandai yang gagal (jangan crash)</span><span>editable</span></div>
+    </div>
+    <textarea id="ed4-code" spellcheck="false">const items = $input.all();
+const results = [];
+
+for (const item of items) {
+  try {
+    const d = item.json;
+    // validasi: email wajib ada dan mengandung "@"
+    if (!d.email || d.email.indexOf("@") === -1) {
+      throw new Error("Email tidak valid: " + String(d.email));
+    }
+    results.push({
+      json: { ...d, valid: true, error: null }
+    });
+  } catch (err) {
+    // item gagal TIDAK menghentikan item lain
+    results.push({
+      json: { ...item.json, valid: false, error: err.message }
+    });
+  }
+}
+
+return results;</textarea>
+    <div class="ed-bar">
+      <button class="btn" onclick="runEditor('ed4')">&#9654; RUN</button>
+      <button class="btn ghost" onclick="resetEditor('ed4')">RESET</button>
+    </div>
+    <div class="ed-out" id="ed4-out">Output akan muncul di sini... (perhatikan: 1 dari 3 item sengaja dibuat error)</div>
+  </div>
+
+  <p style="margin-top:16px"><span class="badge">LAPIS 3</span><strong>Error Workflow</strong> &mdash; workflow terpisah dengan node <span class="hl">Error Trigger</span>. Di Settings workflow utama, pilih dia sebagai "Error Workflow". Saat eksekusi mana pun gagal total, dia otomatis berjalan membawa info error: nama workflow, node yang gagal, dan pesan errornya.</p>
+
+  <div class="arch">WORKFLOW UTAMA (gagal total) ........ memicu .......> ERROR WORKFLOW
+                                                      [Error Trigger]
+                                                            |
+                                                      [Slack/Telegram]
+                                                "Workflow X gagal di node Y: pesan Z"</div>
+
+  <h3>Pola fallback: jalur cadangan</h3>
+  <p>Fallback = rencana B di dalam workflow. Contoh: jika Slack gagal mengirim, kirim lewat Telegram; jika keduanya gagal, catat ke sheet "failed_notifications".</p>
+  <div class="arch">[Slack] --(On Error: Continue)--> [IF: ada field error?]
+                                   |-- false --> selesai (sukses)
+                                   |-- true  --> [Telegram] --> [Sheets: log kegagalan]</div>
+
+  <div class="ctxbox">
+    <div class="ctx-title">&loz; N8N CONTEXT</div>
+    Saat node di-set <code class="inline">On Error: Continue (using error output)</code>, node mendapat <strong>output kedua</strong> berwarna merah khusus untuk item gagal &mdash; jalur fallback dirangkai dari output itu. Inilah implementasi visual dari konsep try/catch.
+  </div>
+
+  <div class="quiz" data-quiz="q5">
+    <div class="q-title">&loz; QUIZ CEPAT</div>
+    <div class="q-text">API klien sering melempar error 429 (rate limit) selama beberapa detik lalu normal lagi. Pertahanan PALING tepat untuk kasus ini?</div>
+    <label><input type="radio" name="q5" value="a" data-correct="1"> Retry On Fail dengan jeda antar percobaan</label>
+    <label><input type="radio" name="q5" value="b"> Error Workflow &mdash; biarkan gagal lalu kabari tim</label>
+    <label><input type="radio" name="q5" value="c"> Hapus node yang error supaya workflow tidak pernah gagal</label>
+    <div class="q-feedback"></div>
+  </div>
+</section>
+
+<!-- ============ STEP 7: MISSION ============ -->
+<section class="step" id="step-7">
+  <div class="eyebrow">Step 7 / 8 &middot; Project Praktik</div>
+  <h2>Mission: Lead Management System</h2>
+  <p>Project resmi sesi ini dari roadmap: <span class="hl">Form &rarr; Sheet &rarr; Email &rarr; Slack notif</span>. Arsitektur lengkapnya:</p>
+
+  <div class="arch">[Webhook/Form Trigger]
+        |
+[Code: validasi + format]   &lt;-- yang kamu kerjakan di mission ini
+        |
+[Google Sheets: Append]
+        |
+[Gmail: email sambutan ke lead]
+        |
+[Code: ringkasan] --> [Slack: notif tim #leads]</div>
+
+  <div class="mission">
+    <div class="m-title">&loz; MISSION BRIEF</div>
+    <p style="margin-bottom:8px">Tulis Code Node "validasi + format" dengan aturan:</p>
+    <ul class="mat">
+      <li>Buang lead yang emailnya tidak mengandung <code class="inline">"@"</code> (pakai <code class="inline">.filter()</code>)</li>
+      <li>Setiap lead valid menghasilkan field: <code class="inline">Nama</code> (trim), <code class="inline">Email</code> (lowercase), <code class="inline">Sumber</code> (default <code class="inline">"website"</code> jika kosong)</li>
+      <li>Return array of items format n8n: <code class="inline">{ json: {...} }</code></li>
+    </ul>
+    <p style="font-size:12px;color:var(--soft)">Data uji berisi 4 lead: 1 email rusak, 1 tanpa sumber, 1 nama berspasi berlebih. Output benar = 3 item bersih.</p>
+  </div>
+
+  <div class="editor" id="ed5-wrap">
+    <div class="codeblock" style="margin-bottom:0">
+      <div class="cb-title"><span>CODE NODE &middot; MISSION &middot; tulis solusimu di sini</span><span>divalidasi otomatis</span></div>
+    </div>
+    <textarea id="ed5-code" spellcheck="false">// Data uji ($input) sudah disiapkan oleh validator.
+// item.json berisi: full_name, email, source
+
+const items = $input.all();
+
+// TULIS KODEMU DI SINI
+// 1) filter email valid (mengandung "@")
+// 2) map ke format { json: { Nama, Email, Sumber } }
+// 3) return hasilnya
+
+return items;</textarea>
+    <div class="ed-bar">
+      <button class="btn" onclick="runMission()">&#9654; RUN &amp; VALIDASI</button>
+      <button class="btn ghost" onclick="resetEditor('ed5')">RESET</button>
+      <button class="btn ghost" onclick="toggleHint()">HINT</button>
+    </div>
+    <div class="ed-out" id="ed5-out">Hasil validasi akan muncul di sini...</div>
+  </div>
+
+  <div id="missionHint" style="display:none" class="warnbox">
+    <div class="ctx-title">&#9670; HINT</div>
+    Pola: <code class="inline">items.filter(i =&gt; i.json.email &amp;&amp; i.json.email.indexOf("@") !== -1)</code> lalu
+    <code class="inline">.map(i =&gt; ({ json: { Nama: i.json.full_name.trim(), Email: i.json.email.toLowerCase(), Sumber: i.json.source || "website" } }))</code>
+  </div>
+
+  <h3>Setelah lulus validator: rakit di n8n Cloud</h3>
+  <div class="checklist">
+    <label><input type="checkbox"> Buat sheet "Leads" dengan header: Nama | Email | Sumber | Tanggal</label>
+    <label><input type="checkbox"> Workflow baru: Form Trigger (atau Webhook) sebagai pintu masuk</label>
+    <label><input type="checkbox"> Tempel Code Node solusimu setelah trigger</label>
+    <label><input type="checkbox"> Google Sheets &rarr; Append Row (Map Automatically)</label>
+    <label><input type="checkbox"> Gmail &rarr; kirim email sambutan ke <code class="inline">{{ $json.Email }}</code></label>
+    <label><input type="checkbox"> Code Node ringkasan &rarr; Slack/Telegram notif ke tim</label>
+    <label><input type="checkbox"> Set Retry On Fail di node Sheets &amp; Gmail (3x, jeda 5 detik)</label>
+    <label><input type="checkbox"> Bonus: buat Error Workflow dengan Error Trigger &rarr; notif Telegram</label>
+  </div>
+</section>
+
+<!-- ============ STEP 8: FINAL QUIZ & RANGKUMAN ============ -->
+<section class="step" id="step-8">
+  <div class="eyebrow">Step 8 / 8 &middot; Checkpoint</div>
+  <h2>Final Quiz &amp; Rangkuman Sesi</h2>
+
+  <div class="quiz" data-quiz="f1">
+    <div class="q-title">&loz; FINAL 1/4</div>
+    <div class="q-text">Mengapa nama field di output Code Node sebaiknya sama persis dengan header kolom Google Sheets?</div>
+    <label><input type="radio" name="f1" value="a" data-correct="1"> Supaya mode Map Automatically bisa mencocokkan field ke kolom tanpa mapping manual</label>
+    <label><input type="radio" name="f1" value="b"> Karena n8n error jika nama berbeda</label>
+    <label><input type="radio" name="f1" value="c"> Hanya kebiasaan estetika, tidak ada efek teknis</label>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="quiz" data-quiz="f2">
+    <div class="q-title">&loz; FINAL 2/4</div>
+    <div class="q-text">Perbedaan kunci credential Telegram vs Gmail di n8n?</div>
+    <label><input type="radio" name="f2" value="a"> Keduanya OAuth2, tidak ada bedanya</label>
+    <label><input type="radio" name="f2" value="b" data-correct="1"> Telegram pakai Bot Token statis dari @BotFather; Gmail pakai OAuth2 dengan refresh token otomatis</label>
+    <label><input type="radio" name="f2" value="c"> Telegram tidak butuh credential sama sekali</label>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="quiz" data-quiz="f3">
+    <div class="q-title">&loz; FINAL 3/4</div>
+    <div class="q-text">Airtable Upsert dipilih dibanding Create ketika...</div>
+    <label><input type="radio" name="f3" value="a"> Data harus selalu jadi record baru tanpa pengecualian</label>
+    <label><input type="radio" name="f3" value="b"> Ingin menghapus record lama secara massal</label>
+    <label><input type="radio" name="f3" value="c" data-correct="1"> Data bisa datang berulang dan kita ingin mencegah duplikat berdasarkan field kunci</label>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="quiz" data-quiz="f4">
+    <div class="q-title">&loz; FINAL 4/4</div>
+    <div class="q-text">Urutan eskalasi error handling yang paling masuk akal untuk workflow produksi?</div>
+    <label><input type="radio" name="f4" value="a" data-correct="1"> Retry di node &rarr; fallback path via error output &rarr; Error Workflow untuk notifikasi kegagalan total</label>
+    <label><input type="radio" name="f4" value="b"> Error Workflow dulu, retry tidak perlu</label>
+    <label><input type="radio" name="f4" value="c"> Cukup try/catch, fitur n8n lainnya redundan</label>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="mission" id="finalScoreBox">
+    <div class="m-title">&loz; SKOR SESI</div>
+    <div class="score-big" id="scoreText">0 / 9</div>
+    <p style="font-size:12px;color:var(--soft)" id="scoreNote">Jawab semua quiz (5 quiz materi + 4 final) dan lulus mission untuk menyelesaikan sesi.</p>
+  </div>
+
+  <h3>Rangkuman 1 layar</h3>
+  <ul class="mat">
+    <li><strong>Sheets</strong>: Get / Append / Update &mdash; header baris 1 = nama field JSON</li>
+    <li><strong>Gmail/Outlook</strong>: OAuth2, field dinamis via expression, 1 item = 1 email</li>
+    <li><strong>Slack/Telegram</strong>: notifikasi tim; aggregate banyak item jadi 1 pesan; Telegram Trigger untuk bot</li>
+    <li><strong>Airtable</strong>: Base &gt; Table &gt; Record (ID unik), filterByFormula, Upsert anti-duplikat, PAT scope minimal</li>
+    <li><strong>Error handling</strong>: Retry On Fail &rarr; error output/fallback &rarr; Error Workflow</li>
+  </ul>
+
+  <div class="ctxbox">
+    <div class="ctx-title">&loz; NEXT: F-03 SESI 3</div>
+    Advanced n8n (Minggu 6&ndash;8): sub-workflows &amp; modularity, loop &amp; batching, expressions &amp; formula, custom variables &amp; environments, production deployment &amp; monitoring. Project: CRM automation lengkap dengan error handling &amp; logging.
+  </div>
+</section>
+
+  <div class="navbtns">
+    <button class="btn ghost" id="btnPrev" onclick="gotoStep(currentStep - 1)">&larr; SEBELUMNYA</button>
+    <button class="btn" id="btnNext" onclick="gotoStep(currentStep + 1)">BERIKUTNYA &rarr;</button>
+  </div>
+</main>
+
+<button class="tutor-fab" onclick="toggleTutor()" aria-label="Buka AI Tutor">AI<br>TUTOR</button>
+<div class="tutor-panel" id="tutorPanel">
+  <h4>&loz; AI TUTOR &middot; F-03 SESI 2</h4>
+  <div id="tutorQA"></div>
+</div>
+
+<script>
+"use strict";
+
+/* ---------- STEP NAVIGATION ---------- */
+var TOTAL_STEPS = 8;
+var currentStep = 1;
+var stepLabels = ["1.BRIEF", "2.SHEETS", "3.EMAIL", "4.SLACK/TG", "5.AIRTABLE", "6.ERROR", "7.MISSION", "8.QUIZ"];
+var visited = {};
+
+function buildNav() {
+  var nav = document.getElementById("stepNav");
+  for (var i = 1; i <= TOTAL_STEPS; i++) {
+    var b = document.createElement("button");
+    b.textContent = stepLabels[i - 1];
+    b.setAttribute("data-step", String(i));
+    b.onclick = (function (n) { return function () { gotoStep(n); }; })(i);
+    nav.appendChild(b);
+  }
+  refreshNav();
+}
+
+function gotoStep(n) {
+  if (n < 1 || n > TOTAL_STEPS) return;
+  var old = document.getElementById("step-" + currentStep);
+  if (old) old.classList.remove("active");
+  currentStep = n;
+  visited[n] = true;
+  var cur = document.getElementById("step-" + n);
+  if (cur) cur.classList.add("active");
+  document.getElementById("progressBar").style.width = (n / TOTAL_STEPS * 100) + "%";
+  refreshNav();
+  window.scrollTo(0, 0);
+  document.getElementById("btnPrev").style.visibility = (n === 1) ? "hidden" : "visible";
+  document.getElementById("btnNext").style.visibility = (n === TOTAL_STEPS) ? "hidden" : "visible";
+}
+
+function refreshNav() {
+  var btns = document.querySelectorAll("#stepNav button");
+  for (var i = 0; i < btns.length; i++) {
+    var n = parseInt(btns[i].getAttribute("data-step"), 10);
+    btns[i].classList.toggle("active", n === currentStep);
+    btns[i].classList.toggle("done", !!visited[n] && n !== currentStep);
+  }
+}
+
+/* ---------- MOCK $input PER EDITOR ---------- */
+var MOCK_DATA = {
+  ed1: [
+    { json: { full_name: "  Budi Santoso ", email: "BUDI@toko.id", source: "instagram" } },
+    { json: { full_name: "Sari Dewi", email: "Sari.Dewi@gmail.com", source: "" } }
+  ],
+  ed2: [
+    { json: { Nama: "Budi Santoso", Email: "budi@toko.id", Sumber: "instagram" } },
+    { json: { Nama: "Sari Dewi", Email: "sari.dewi@gmail.com", Sumber: "website" } }
+  ],
+  ed3: [
+    { json: { Nama: "Budi Santoso", Email: "budi@toko.id", Sumber: "instagram" } },
+    { json: { Nama: "Sari Dewi", Email: "sari.dewi@gmail.com", Sumber: "website" } },
+    { json: { Nama: "Andi Wijaya", Email: "andi@usaha.co.id", Sumber: "referral" } }
+  ],
+  ed4: [
+    { json: { nama: "Budi", email: "budi@toko.id" } },
+    { json: { nama: "Tanpa Email", email: null } },
+    { json: { nama: "Sari", email: "sari@gmail.com" } }
+  ],
+  ed5: [
+    { json: { full_name: "  Budi Santoso ", email: "BUDI@toko.id", source: "instagram" } },
+    { json: { full_name: "Email Rusak", email: "bukan-email", source: "ads" } },
+    { json: { full_name: "Sari Dewi", email: "Sari.Dewi@gmail.com", source: "" } },
+    { json: { full_name: "Andi Wijaya  ", email: "andi@usaha.co.id", source: "referral" } }
+  ]
+};
+
+var INITIAL_CODE = {};
+
+function makeInput(id) {
+  var data = MOCK_DATA[id] || [];
+  // deep copy supaya RUN berulang tidak saling mengotori
+  var copy = JSON.parse(JSON.stringify(data));
+  return { all: function () { return copy; } };
+}
+
+function fmtVal(v) {
+  if (typeof v === "string") return v;
+  try { return JSON.stringify(v, null, 2); } catch (e) { return String(v); }
+}
+
+function execCode(id) {
+  var code = document.getElementById(id + "-code").value;
+  var logs = [];
+  var fakeConsole = {
+    log: function () {
+      var parts = [];
+      for (var i = 0; i < arguments.length; i++) parts.push(fmtVal(arguments[i]));
+      logs.push(parts.join(" "));
+    }
+  };
+  var fn = new Function("$input", "console", code);
+  var result = fn(makeInput(id), fakeConsole);
+  return { result: result, logs: logs };
+}
+
+function runEditor(id) {
+  var out = document.getElementById(id + "-out");
+  try {
+    var r = execCode(id);
+    var text = "";
+    if (r.logs.length) text += "// console.log:\n" + r.logs.join("\n") + "\n\n";
+    text += "// return value:\n" + fmtVal(r.result);
+    out.textContent = text;
+    out.className = "ed-out ok";
+  } catch (err) {
+    out.textContent = "ERROR: " + err.message;
+    out.className = "ed-out err";
+  }
+}
+
+function resetEditor(id) {
+  document.getElementById(id + "-code").value = INITIAL_CODE[id];
+  var out = document.getElementById(id + "-out");
+  out.textContent = "Output akan muncul di sini...";
+  out.className = "ed-out";
+}
+
+/* ---------- MISSION VALIDATOR ---------- */
+var missionPassed = false;
+
+function runMission() {
+  var out = document.getElementById("ed5-out");
+  var checks = [];
+  var pass = true;
+
+  function check(label, ok) {
+    checks.push((ok ? "[OK]   " : "[FAIL] ") + label);
+    if (!ok) pass = false;
+  }
+
+  try {
+    var r = execCode("ed5");
+    var res = r.result;
+
+    check("Return berupa array", Array.isArray(res));
+    if (!Array.isArray(res)) throw new Error("stop");
+
+    check("Jumlah item = 3 (email rusak terbuang)", res.length === 3);
+
+    var shapeOk = res.every(function (it) {
+      return it && typeof it === "object" && it.json && typeof it.json === "object";
+    });
+    check("Setiap item berformat { json: {...} }", shapeOk);
+
+    if (shapeOk && res.length === 3) {
+      var j0 = res[0].json, j1 = res[1].json, j2 = res[2].json;
+      check("Nama di-trim (tanpa spasi pinggir)", j0.Nama === "Budi Santoso" && j2.Nama === "Andi Wijaya");
+      check("Email lowercase", j0.Email === "budi@toko.id" && j1.Email === "sari.dewi@gmail.com");
+      check("Sumber kosong jadi default \"website\"", j1.Sumber === "website");
+      check("Sumber terisi tetap dipertahankan", j0.Sumber === "instagram" && j2.Sumber === "referral");
+    }
+  } catch (err) {
+    if (err.message !== "stop") checks.push("[FAIL] Kode error: " + err.message);
+    pass = false;
+  }
+
+  missionPassed = pass;
+  out.textContent = checks.join("\n") + "\n\n" + (pass
+    ? "===== MISSION PASSED =====\nKode ini siap ditempel ke Code Node di n8n Cloud. Lanjut rakit workflow sesuai checklist di bawah."
+    : "===== BELUM LULUS =====\nPerbaiki poin [FAIL] di atas. Buka HINT jika buntu.");
+  out.className = pass ? "ed-out ok" : "ed-out err";
+  updateScore();
+}
+
+function toggleHint() {
+  var h = document.getElementById("missionHint");
+  h.style.display = (h.style.display === "none") ? "block" : "none";
+}
+
+/* ---------- QUIZ ENGINE ---------- */
+var quizState = {};   // quizId -> true (benar)
+var QUIZ_TOTAL = 9;   // 5 materi + 4 final... mission dihitung terpisah? -> total skor 9 = 8 quiz + 1 mission
+
+function initQuizzes() {
+  var quizzes = document.querySelectorAll(".quiz[data-quiz]");
+  for (var q = 0; q < quizzes.length; q++) {
+    (function (quizEl) {
+      var qid = quizEl.getAttribute("data-quiz");
+      var labels = quizEl.querySelectorAll("label");
+      for (var i = 0; i < labels.length; i++) {
+        (function (label) {
+          var input = label.querySelector("input");
+          input.addEventListener("change", function () {
+            var correct = input.hasAttribute("data-correct");
+            var all = quizEl.querySelectorAll("label");
+            for (var k = 0; k < all.length; k++) all[k].classList.remove("correct", "wrong");
+            var fb = quizEl.querySelector(".q-feedback");
+            if (correct) {
+              label.classList.add("correct");
+              fb.textContent = "Benar. " + correctNote(qid);
+              fb.style.color = "var(--accent)";
+              quizState[qid] = true;
+            } else {
+              label.classList.add("wrong");
+              fb.textContent = "Belum tepat - coba pikirkan lagi analogi/polanya, lalu pilih ulang.";
+              fb.style.color = "var(--err)";
+              quizState[qid] = false;
+            }
+            fb.classList.add("show");
+            updateScore();
+          });
+        })(labels[i]);
+      }
+    })(quizzes[q]);
+  }
+}
+
+function correctNote(qid) {
+  var notes = {
+    q1: "Update Row butuh kolom pencocok unik - Email pilihan paling umum.",
+    q2: "Eksekusi per item adalah perilaku default hampir semua node n8n.",
+    q3: "Aggregate dulu di Code Node, baru kirim - tim tidak kebanjiran 15 notifikasi.",
+    q4: "Upsert = update jika cocok, create jika belum ada. Senjata anti-duplikat.",
+    q5: "Error 429 bersifat sementara - retry dengan jeda adalah obat yang tepat.",
+    f1: "Map Automatically mencocokkan berdasarkan nama - disiplin penamaan menghemat kerja manual.",
+    f2: "Token statis vs OAuth2 - dua tipe credential dari Step 1.",
+    f3: "Form yang sama bisa dikirim berkali-kali; Upsert menjaga 1 email = 1 record.",
+    f4: "Eskalasi: coba pulih sendiri -> jalur cadangan -> kabari manusia."
+  };
+  return notes[qid] || "";
+}
+
+function updateScore() {
+  var score = 0;
+  for (var k in quizState) { if (quizState[k]) score++; }
+  if (missionPassed) score++;
+  document.getElementById("scoreText").textContent = score + " / " + QUIZ_TOTAL;
+  var note = document.getElementById("scoreNote");
+  if (score === QUIZ_TOTAL) {
+    note.textContent = "SESI 2 SELESAI. Rakit workflow Lead Management di n8n Cloud, lalu lanjut ke F-03 Sesi 3: Advanced n8n.";
+    note.style.color = "var(--accent)";
+  }
+}
+
+/* ---------- AI TUTOR (offline Q&A) ---------- */
+var TUTOR_QA = [
+  ["Kenapa header sheet harus di baris 1?", "Node Google Sheets membaca baris 1 sebagai nama field JSON. Tanpa header yang rapi, mapping otomatis tidak bisa bekerja dan output jadi kolom tanpa nama."],
+  ["OAuth2 itu sebenarnya apa?", "Cara memberi izin aplikasi mengakses akunmu TANPA memberikan password. Kamu login lewat popup resmi Google/Microsoft, n8n menerima token akses yang bisa dicabut kapan saja dari pengaturan akunmu."],
+  ["Bedanya expression {{ }} dan Code Node?", "Expression untuk transformasi kecil langsung di field node (ambil 1 nilai, gabung string). Code Node untuk logika lebih besar: loop, filter, validasi, restrukturisasi banyak item."],
+  ["Dapat Chat ID Telegram dari mana?", "Kirim pesan apa pun ke bot-mu, lalu jalankan workflow dengan Telegram Trigger - Chat ID muncul di output execution. Alternatif: bot @userinfobot menampilkan ID-mu."],
+  ["Kapan pilih Airtable, kapan Sheets?", "Sheets: data sederhana, klien sangat awam, butuh formula spreadsheet. Airtable: butuh relasi antar tabel, tipe field ketat, view berbeda per tim, atau data mulai ribuan record."],
+  ["Apa beda On Error: Continue vs Retry?", "Retry mencoba ULANG operasi yang sama (cocok untuk error sementara). Continue MENERIMA kegagalan dan mengalirkan item gagal ke jalur lain (cocok untuk fallback). Keduanya sering dipakai bersama."],
+  ["Mission: filter saya kok hasilnya 4 item?", "Cek kondisi filter-mu. Email rusak bernilai \"bukan-email\" (string ada isinya tapi tanpa \"@\"). Jadi cek keberadaan \"@\"-nya: email.indexOf(\"@\") !== -1, bukan sekadar cek email tidak kosong."]
+];
+
+function buildTutor() {
+  var wrap = document.getElementById("tutorQA");
+  for (var i = 0; i < TUTOR_QA.length; i++) {
+    (function (qa) {
+      var btn = document.createElement("button");
+      btn.className = "tutor-q";
+      btn.textContent = "Q: " + qa[0];
+      var ans = document.createElement("div");
+      ans.className = "tutor-a";
+      ans.textContent = qa[1];
+      btn.onclick = function () { ans.classList.toggle("show"); };
+      wrap.appendChild(btn);
+      wrap.appendChild(ans);
+    })(TUTOR_QA[i]);
+  }
+}
+
+function toggleTutor() {
+  document.getElementById("tutorPanel").classList.toggle("open");
+}
+
+/* ---------- INIT ---------- */
+function init() {
+  var ids = ["ed1", "ed2", "ed3", "ed4", "ed5"];
+  for (var i = 0; i < ids.length; i++) {
+    INITIAL_CODE[ids[i]] = document.getElementById(ids[i] + "-code").value;
+  }
+  buildNav();
+  initQuizzes();
+  buildTutor();
+  visited[1] = true;
+  gotoStep(1);
+}
+document.addEventListener("DOMContentLoaded", init);
+</script>
+</body>
+</html>
