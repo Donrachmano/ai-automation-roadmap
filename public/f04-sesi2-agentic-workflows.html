@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>F-04 Sesi 2 - Agentic Workflows</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#080c10;
+    --bg2:#0d141a;
+    --panel:#0d1f2d;
+    --line:#1e3a4a;
+    --txt:#c9d1d9;
+    --dim:#6e7681;
+    --bright:#e6edf3;
+    --acc:#da77f2;
+    --acc-dim:#da77f244;
+    --acc-soft:#da77f211;
+    --ok:#3fb950;
+    --warn:#ffb454;
+    --err:#ff6b6b;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);
+    color:var(--txt);
+    font-family:'JetBrains Mono',monospace;
+    line-height:1.6;
+    padding-bottom:80px;
+  }
+  ::-webkit-scrollbar{width:6px;height:6px}
+  ::-webkit-scrollbar-track{background:var(--bg)}
+  ::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px}
+
+  /* HEADER */
+  .top{
+    border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg,#1a0d24 0%,var(--bg) 100%);
+    padding:18px 20px 14px;
+    position:sticky;top:0;z-index:50;
+  }
+  .crumb{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--acc);box-shadow:0 0 8px var(--acc);animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+  .crumb span{color:var(--acc);font-size:10px;letter-spacing:3px;text-transform:uppercase}
+  .top h1{font-size:clamp(15px,4vw,20px);color:var(--bright);letter-spacing:1px;font-weight:800}
+  .top p{font-size:10px;color:var(--dim);margin-top:3px;letter-spacing:1px}
+
+  /* PROGRESS */
+  .progwrap{padding:12px 20px 0;background:var(--bg2);border-bottom:1px solid var(--line)}
+  .progbar{height:4px;background:#10222e;border-radius:2px;overflow:hidden}
+  .progfill{height:100%;width:12.5%;background:linear-gradient(90deg,#9d4edd,var(--acc));transition:width .4s ease;border-radius:2px}
+  .steps{display:flex;gap:5px;overflow-x:auto;padding:10px 0 12px;scrollbar-width:none}
+  .steps::-webkit-scrollbar{display:none}
+  .stepbtn{
+    flex-shrink:0;min-width:30px;height:30px;border:1px solid var(--line);
+    background:var(--panel);color:var(--dim);border-radius:6px;cursor:pointer;
+    font-family:inherit;font-size:11px;font-weight:600;transition:all .2s;
+  }
+  .stepbtn.active{border-color:var(--acc);background:var(--acc-soft);color:var(--acc);box-shadow:0 0 8px var(--acc-dim)}
+  .stepbtn.done{border-color:var(--ok);color:var(--ok)}
+
+  /* CONTENT */
+  .wrap{max-width:780px;margin:0 auto;padding:22px 18px 40px}
+  .panel{display:none;animation:fade .35s ease}
+  .panel.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+  .eyebrow{font-size:10px;color:var(--acc);letter-spacing:3px;text-transform:uppercase;margin-bottom:8px}
+  h2.title{font-size:clamp(18px,5vw,26px);color:var(--bright);font-weight:800;letter-spacing:.5px;margin-bottom:4px;line-height:1.25}
+  .sub{font-size:11px;color:var(--dim);margin-bottom:20px;letter-spacing:1px}
+
+  p.body{font-size:13px;color:var(--txt);margin:12px 0}
+  p.body b{color:var(--bright)}
+  .hl{color:var(--acc);font-weight:600}
+  .hl2{color:var(--warn);font-weight:600}
+
+  h3.sec{font-size:13px;color:var(--bright);font-weight:700;margin:24px 0 8px;letter-spacing:.5px;display:flex;align-items:center;gap:8px}
+  h3.sec::before{content:"";width:14px;height:2px;background:var(--acc)}
+
+  ul.list{list-style:none;margin:10px 0}
+  ul.list li{font-size:12.5px;color:var(--txt);padding:5px 0 5px 18px;position:relative;line-height:1.5}
+  ul.list li::before{content:"\203A";position:absolute;left:0;color:var(--acc);font-weight:700}
+  ul.list li b{color:var(--bright)}
+
+  /* CODE */
+  .codewrap{margin:14px 0;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#0a1218}
+  .codehead{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:#0e1a22;border-bottom:1px solid var(--line)}
+  .codehead .fn{font-size:10px;color:var(--dim);letter-spacing:1px}
+  .codehead .lang{font-size:9px;color:var(--acc);letter-spacing:1px;text-transform:uppercase}
+  pre{padding:14px;overflow-x:auto;font-size:12px;line-height:1.6}
+  code{font-family:'JetBrains Mono',monospace}
+  .kw{color:#da77f2}.str{color:#7ee787}.num{color:#ffb454}.com{color:#586069;font-style:italic}.fnc{color:#79c0ff}.var2{color:#e6edf3}.op{color:#ff7b72}
+
+  /* RUNNER */
+  .runner{margin:14px 0;border:1px solid var(--acc-dim);border-radius:8px;overflow:hidden}
+  .runhead{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--acc-soft);border-bottom:1px solid var(--acc-dim)}
+  .runhead .t{font-size:10px;color:var(--acc);letter-spacing:1px;text-transform:uppercase}
+  .runbtn{background:var(--acc);color:#1a0d24;border:none;padding:5px 14px;border-radius:5px;font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:1px}
+  .runbtn:active{transform:scale(.96)}
+  textarea.editor{width:100%;background:#0a1218;color:#e6edf3;border:none;padding:14px;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.6;resize:vertical;min-height:120px;outline:none}
+  .output{padding:12px 14px;background:#06090c;border-top:1px solid var(--line);font-size:11.5px;min-height:40px;white-space:pre-wrap;word-break:break-word}
+  .output .ln{color:#9fb3c8}
+  .output .ok{color:var(--ok)}
+  .output .er{color:var(--err)}
+
+  /* N8N BOX */
+  .n8nbox{margin:16px 0;border:1px solid #2a4a3a;border-left:3px solid var(--ok);border-radius:6px;background:#0c1f15;padding:13px 14px}
+  .n8nbox .lbl{font-size:9px;color:var(--ok);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+  .n8nbox p{font-size:12px;color:var(--txt);line-height:1.55}
+  .n8nbox code{background:#0a2a1a;color:#7ee787;padding:1px 6px;border-radius:3px;font-size:11px}
+
+  /* INFO / WARN BOX */
+  .infobox{margin:16px 0;border:1px solid var(--acc-dim);border-left:3px solid var(--acc);border-radius:6px;background:var(--acc-soft);padding:13px 14px}
+  .infobox .lbl{font-size:9px;color:var(--acc);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
+  .infobox p{font-size:12px;color:var(--txt);line-height:1.55}
+
+  /* QUIZ */
+  .quiz{margin:20px 0;border:1px solid var(--line);border-radius:8px;background:var(--panel);padding:16px}
+  .quiz .qlbl{font-size:9px;color:var(--acc);letter-spacing:2px;margin-bottom:10px}
+  .quiz .q{font-size:13px;color:var(--bright);font-weight:600;margin-bottom:12px;line-height:1.4}
+  .opt{display:block;width:100%;text-align:left;background:#0a1218;border:1px solid var(--line);color:var(--txt);padding:11px 13px;border-radius:6px;margin-bottom:7px;cursor:pointer;font-family:inherit;font-size:12px;transition:all .15s;line-height:1.4}
+  .opt:hover{border-color:var(--acc-dim)}
+  .opt.correct{border-color:var(--ok);background:#0c1f15;color:#7ee787}
+  .opt.wrong{border-color:var(--err);background:#1f0c0c;color:#ff9b9b}
+  .feedback{font-size:11.5px;margin-top:8px;padding:10px;border-radius:5px;display:none;line-height:1.5}
+  .feedback.show{display:block}
+  .feedback.good{background:#0c1f15;color:#7ee787;border:1px solid #2a4a3a}
+  .feedback.bad{background:#1f0c0c;color:#ff9b9b;border:1px solid #4a2a2a}
+
+  /* MISSION */
+  .mission{margin:20px 0;border:1px dashed var(--acc-dim);border-radius:8px;background:var(--acc-soft);padding:16px}
+  .mission .ml{font-size:9px;color:var(--acc);letter-spacing:2px;margin-bottom:8px}
+  .mission h4{font-size:13px;color:var(--bright);margin-bottom:8px}
+  .mission p{font-size:12px;color:var(--txt);margin-bottom:6px}
+  .checkbtn{background:transparent;border:1px solid var(--acc);color:var(--acc);padding:7px 16px;border-radius:5px;font-family:inherit;font-size:11px;font-weight:600;cursor:pointer;margin-top:8px;letter-spacing:1px}
+
+  /* NAV */
+  .nav{display:flex;justify-content:space-between;gap:10px;margin-top:32px}
+  .navbtn{flex:1;padding:12px;border:1px solid var(--line);background:var(--panel);color:var(--txt);border-radius:8px;font-family:inherit;font-size:11px;cursor:pointer;letter-spacing:1px;transition:all .2s}
+  .navbtn:disabled{opacity:.35;cursor:default}
+  .navbtn.next{background:var(--acc-soft);border-color:var(--acc-dim);color:var(--acc)}
+
+  /* AI TUTOR */
+  .tutorfab{position:fixed;bottom:18px;right:18px;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#9d4edd,var(--acc));border:none;cursor:pointer;box-shadow:0 4px 20px var(--acc-dim);z-index:60;font-size:22px}
+  .tutorpanel{position:fixed;bottom:80px;right:18px;width:min(340px,calc(100vw - 36px));max-height:60vh;background:var(--bg2);border:1px solid var(--acc-dim);border-radius:12px;z-index:60;display:none;flex-direction:column;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.6)}
+  .tutorpanel.open{display:flex}
+  .tutorhead{padding:12px 14px;background:var(--acc-soft);border-bottom:1px solid var(--acc-dim);display:flex;justify-content:space-between;align-items:center}
+  .tutorhead .tt{font-size:11px;color:var(--acc);letter-spacing:1px;font-weight:700}
+  .tutorhead .cls{background:none;border:none;color:var(--dim);cursor:pointer;font-size:16px}
+  .tutorbody{padding:12px 14px;overflow-y:auto;font-size:12px;line-height:1.6}
+  .tutorbody .qbtn{display:block;width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);color:var(--txt);padding:9px 11px;border-radius:6px;margin-bottom:7px;cursor:pointer;font-family:inherit;font-size:11.5px}
+  .tutorbody .ans{background:var(--acc-soft);border:1px solid var(--acc-dim);border-radius:6px;padding:11px;margin:8px 0;font-size:11.5px;color:var(--txt);display:none}
+  .tutorbody .ans.show{display:block}
+
+  .endcard{text-align:center;padding:28px 20px;border:1px solid var(--acc-dim);border-radius:12px;background:var(--acc-soft);margin-top:8px}
+  .endcard .big{font-size:40px;margin-bottom:10px}
+  .endcard h3{color:var(--bright);font-size:16px;margin-bottom:8px}
+  .endcard p{font-size:12px;color:var(--txt);line-height:1.6}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="crumb"><span class="dot"></span><span>F-04 / AI INTEGRATION / SESI 2</span></div>
+  <h1>AGENTIC WORKFLOWS</h1>
+  <p>Dari LLM call biasa menjadi agent yang merencanakan, memakai tool, dan mengingat.</p>
+</div>
+
+<div class="progwrap">
+  <div class="progbar"><div class="progfill" id="progfill"></div></div>
+  <div class="steps" id="steps"></div>
+</div>
+
+<div class="wrap">
+
+<!-- STEP 1 -->
+<section class="panel active" data-step="1">
+  <div class="eyebrow">Step 01 / Fondasi</div>
+  <h2 class="title">LLM Biasa vs Agent</h2>
+  <div class="sub">Memahami batas antara "memanggil model" dan "menjalankan agent"</div>
+
+  <p class="body">Di Sesi 1 kamu sudah bisa memanggil Claude/OpenAI API: kirim prompt, terima jawaban. Itu <b>satu langkah, satu output</b>. Agent berbeda: ia <span class="hl">memutuskan langkah berikutnya sendiri</span> berdasarkan hasil sebelumnya, sampai tujuan tercapai.</p>
+
+  <h3 class="sec">Perbedaan inti</h3>
+  <ul class="list">
+    <li><b>LLM call:</b> input -> output. Tidak ada aksi ke dunia luar.</li>
+    <li><b>Agent:</b> loop <span class="hl2">think -> act -> observe -> repeat</span> sampai selesai.</li>
+    <li>Agent bisa <b>memanggil tool</b> (cari web, baca DB, hitung) lalu memakai hasilnya untuk berpikir lagi.</li>
+    <li>Agent punya <b>memory</b> supaya tahu apa yang sudah dikerjakan.</li>
+  </ul>
+
+  <div class="infobox">
+    <div class="lbl">Mental model</div>
+    <p>Bayangkan LLM = karyawan yang menjawab satu pertanyaan. Agent = karyawan yang kamu beri <i>tujuan</i> ("buat laporan riset topik X"), lalu ia sendiri yang menentukan: cari dulu, baca, rangkum, tulis. Tugasmu sebagai automation engineer: merancang loop dan tool-nya, bukan mengerjakan tiap langkah manual.</p>
+  </div>
+
+  <h3 class="sec">Anatomi sebuah agent</h3>
+  <div class="codewrap">
+    <div class="codehead"><span class="fn">agent-loop.js</span><span class="lang">js</span></div>
+    <pre><code><span class="com">// Loop agent paling dasar (pseudocode yang bisa dijalankan)</span>
+<span class="kw">async function</span> <span class="fnc">runAgent</span>(goal) {
+  <span class="kw">let</span> state = { goal, steps: [], done: <span class="kw">false</span> };
+  <span class="kw">while</span> (!state.done &amp;&amp; state.steps.length &lt; <span class="num">8</span>) {
+    <span class="kw">const</span> decision = <span class="kw">await</span> <span class="fnc">think</span>(state);   <span class="com">// LLM memilih aksi</span>
+    <span class="kw">const</span> result   = <span class="kw">await</span> <span class="fnc">act</span>(decision);   <span class="com">// jalankan tool</span>
+    state.steps.<span class="fnc">push</span>({ decision, result }); <span class="com">// observe</span>
+    state.done = decision.type === <span class="str">"finish"</span>;
+  }
+  <span class="kw">return</span> state;
+}</code></pre>
+  </div>
+
+  <div class="n8nbox">
+    <div class="lbl">Konteks n8n</div>
+    <p>Di n8n, loop ini tidak kamu tulis manual. Node <code>AI Agent</code> sudah membungkus loop think-act-observe. Tugasmu: pasang <b>Chat Model</b>, daftarkan <b>Tools</b>, dan colok <b>Memory</b>. Sesi ini mengajarkan apa yang terjadi <i>di dalam</i> node itu supaya kamu bisa debug saat agent "nyasar".</p>
+  </div>
+
+  <div class="quiz" data-quiz>
+    <div class="qlbl">CEK PEMAHAMAN</div>
+    <div class="q">Apa yang membedakan agent dari LLM call biasa?</div>
+    <button class="opt" data-correct="false">Agent memakai model yang lebih besar</button>
+    <button class="opt" data-correct="true">Agent menjalankan loop berulang dan bisa memakai tool berdasarkan hasil sebelumnya</button>
+    <button class="opt" data-correct="false">Agent selalu lebih cepat dari LLM call</button>
+    <button class="opt" data-correct="false">Agent tidak butuh prompt</button>
+    <div class="feedback"></div>
+  </div>
+</section>
+
+<!-- STEP 2 -->
+<section class="panel" data-step="2">
+  <div class="eyebrow">Step 02 / Pattern</div>
+  <h2 class="title">AI Agent Design Patterns</h2>
+  <div class="sub">Pola berpikir yang membuat agent andal, bukan asal jalan</div>
+
+  <p class="body">Agent yang baik bukan satu prompt panjang. Ada <span class="hl">pola desain</span> yang sudah terbukti. Empat yang paling sering dipakai di automation:</p>
+
+  <h3 class="sec">1. ReAct (Reason + Act)</h3>
+  <p class="body">Agent menuliskan <b>alasan</b> sebelum tiap aksi: "Aku perlu data harga, jadi aku panggil tool weather". Membuat keputusan transparan dan mudah di-debug.</p>
+
+  <h3 class="sec">2. Planning (rencana dulu, eksekusi kemudian)</h3>
+  <p class="body">Agent membuat daftar langkah di awal, lalu mengeksekusinya satu per satu. Cocok untuk tugas panjang seperti research report.</p>
+
+  <h3 class="sec">3. Reflection (kritik diri)</h3>
+  <p class="body">Setelah menghasilkan output, agent mengevaluasi kualitasnya sendiri dan memperbaiki. "Laporan ini kurang sumber, tambahkan 2 referensi."</p>
+
+  <h3 class="sec">4. Routing (pilih jalur)</h3>
+  <p class="body">Agent mengklasifikasi input lalu mengarahkan ke handler yang tepat. Mirip switchboard.</p>
+
+  <div class="codewrap">
+    <div class="codehead"><span class="fn">react-pattern.js</span><span class="lang">js</span></div>
+    <pre><code><span class="com">// Bentuk output ReAct yang diminta dari LLM</span>
+<span class="kw">const</span> step = {
+  thought: <span class="str">"Aku butuh data terbaru soal topik ini"</span>,
+  action:  <span class="str">"web_search"</span>,
+  input:   { query: <span class="str">"AI automation 2026 trend"</span> }
+};
+<span class="com">// Setelah tool jalan, agent mengamati lalu berpikir lagi</span>
+<span class="kw">const</span> observation = { results: <span class="num">5</span>, top: <span class="str">"n8n + AI agent"</span> };</code></pre>
+  </div>
+
+  <div class="runner" data-runner>
+    <div class="runhead"><span class="t">Routing pattern - jalankan</span><button class="runbtn" data-run>RUN</button></div>
+    <textarea class="editor" spellcheck="false">// Router sederhana: arahkan permintaan ke handler yang tepat
+function routeIntent(text) {
+  const t = text.toLowerCase();
+  if (t.indexOf("harga") !== -1) return "tool_pricing";
+  if (t.indexOf("riset") !== -1 || t.indexOf("cari") !== -1) return "tool_research";
+  if (t.indexOf("email") !== -1) return "tool_email";
+  return "fallback_chat";
+}
+
+console.log(routeIntent("Tolong riset tren AI 2026"));
+console.log(routeIntent("Berapa harga paket pro?"));
+console.log(routeIntent("Halo apa kabar"));</textarea>
+    <div class="output" data-output>// output muncul di sini</div>
+  </div>
+
+  <div class="n8nbox">
+    <div class="lbl">Konteks n8n</div>
+    <p>Pattern <b>Routing</b> di n8n = node <code>Switch</code> atau <code>AI Agent</code> dengan multiple tools. Pattern <b>Reflection</b> = sub-workflow kedua yang meninjau output workflow pertama sebelum dikirim ke klien.</p>
+  </div>
+
+  <div class="quiz" data-quiz>
+    <div class="qlbl">CEK PEMAHAMAN</div>
+    <div class="q">Pattern mana yang paling cocok untuk tugas panjang dengan banyak langkah seperti research report?</div>
+    <button class="opt" data-correct="false">Routing</button>
+    <button class="opt" data-correct="true">Planning</button>
+    <button class="opt" data-correct="false">Tidak butuh pattern, satu prompt cukup</button>
+    <button class="opt" data-correct="false">Reflection saja</button>
+    <div class="feedback"></div>
+  </div>
+</section>
+
+<!-- STEP 3 -->
+<section class="panel" data-step="3">
+  <div class="eyebrow">Step 03 / Tools</div>
+  <h2 class="title">Tool Calling &amp; Function Calling</h2>
+  <div class="sub">Cara agent menyentuh dunia nyata</div>
+
+  <p class="body">Tool calling = kamu <span class="hl">mendeskripsikan fungsi</span> ke LLM (nama, kegunaan, parameter). LLM tidak menjalankan fungsi; ia <b>memilih</b> fungsi mana dan <b>mengisi argumennya</b>. Kode kamu yang mengeksekusi, lalu hasilnya dikembalikan ke LLM.</p>
+
+  <h3 class="sec">Alur tool calling</h3>
+  <ul class="list">
+    <li><b>1.</b> Kamu kirim prompt + daftar tool (schema).</li>
+    <li><b>2.</b> LLM balas: "panggil <span class="hl">get_weather</span> dengan {city: 'Jakarta'}".</li>
+    <li><b>3.</b> Kode kamu jalankan fungsi sungguhan, dapat hasil.</li>
+    <li><b>4.</b> Hasil dikirim balik ke LLM untuk jawaban final.</li>
+  </ul>
+
+  <div class="codewrap">
+    <div class="codehead"><span class="fn">tool-schema.js</span><span class="lang">js</span></div>
+    <pre><code><span class="com">// Schema tool yang dikirim ke Claude/OpenAI</span>
+<span class="kw">const</span> tools = [{
+  name: <span class="str">"get_weather"</span>,
+  description: <span class="str">"Ambil cuaca terkini sebuah kota"</span>,
+  input_schema: {
+    type: <span class="str">"object"</span>,
+    properties: {
+      city: { type: <span class="str">"string"</span>, description: <span class="str">"Nama kota"</span> }
+    },
+    required: [<span class="str">"city"</span>]
+  }
+}];</code></pre>
+  </div>
+
+  <div class="runner" data-runner>
+    <div class="runhead"><span class="t">Tool dispatcher - jalankan</span><button class="runbtn" data-run>RUN</button></div>
+    <textarea class="editor" spellcheck="false">// Simulasi: LLM memilih tool, kode kamu yang eksekusi
+const toolbox = {
+  get_weather: (args) => "Cuaca " + args.city + ": 31C cerah",
+  add: (args) => "Hasil: " + (args.a + args.b)
+};
+
+function dispatch(toolName, args) {
+  const fn = toolbox[toolName];
+  if (!fn) return "ERROR: tool tidak dikenal -> " + toolName;
+  return fn(args);
+}
+
+// Anggap ini keputusan dari LLM:
+console.log(dispatch("get_weather", { city: "Bandung" }));
+console.log(dispatch("add", { a: 7, b: 5 }));
+console.log(dispatch("delete_db", {}));</textarea>
+    <div class="output" data-output>// output muncul di sini</div>
+  </div>
+
+  <div class="infobox">
+    <div class="lbl">Prinsip aman</div>
+    <p>Selalu validasi tool yang diminta LLM. Jangan pernah <code>eval</code> nama tool langsung. Pakai whitelist (object lookup) seperti <span class="hl">toolbox[name]</span> agar LLM tidak bisa memanggil fungsi yang tidak kamu izinkan.</p>
+  </div>
+
+  <div class="n8nbox">
+    <div class="lbl">Konteks n8n</div>
+    <p>Di n8n, setiap tool = satu node yang kamu colok ke port <b>Tool</b> milik AI Agent: <code>HTTP Request Tool</code>, <code>Code Tool</code>, <code>Google Sheets Tool</code>. Deskripsi node = "description" di schema. Agent membaca deskripsi itu untuk memutuskan kapan memakainya. Maka <b>tulis deskripsi tool sejelas mungkin</b> - itu penentu agent pintar atau bingung.</p>
+  </div>
+
+  <div class="quiz" data-quiz>
+    <div class="qlbl">CEK PEMAHAMAN</div>
+    <div class="q">Saat tool calling, siapa yang benar-benar menjalankan fungsinya?</div>
+    <button class="opt" data-correct="false">LLM menjalankan fungsi langsung</button>
+    <button class="opt" data-correct="true">Kode kita yang eksekusi; LLM hanya memilih tool dan mengisi argumen</button>
+    <button class="opt" data-correct="false">Tool berjalan otomatis tanpa kode</button>
+    <button class="opt" data-correct="false">n8n tidak mendukung tool calling</button>
+    <div class="feedback"></div>
+  </div>
+</section>
+
+<!-- STEP 4 -->
+<section class="panel" data-step="4">
+  <div class="eyebrow">Step 04 / Orchestration</div>
+  <h2 class="title">Multi-Agent Orchestration</h2>
+  <div class="sub">Beberapa agent kecil mengalahkan satu agent raksasa</div>
+
+  <p class="body">Daripada satu agent mengerjakan semuanya, pecah jadi <span class="hl">beberapa agent spesialis</span> dengan satu agent <b>orchestrator</b> yang membagi tugas. Lebih mudah di-debug, di-test, dan tiap agent punya prompt yang fokus.</p>
+
+  <h3 class="sec">Pola umum</h3>
+  <ul class="list">
+    <li><b>Orchestrator -> Worker:</b> satu agent membagi tugas ke beberapa worker, lalu menggabungkan.</li>
+    <li><b>Pipeline:</b> output agent A jadi input agent B (riset -> tulis -> edit).</li>
+    <li><b>Supervisor:</b> agent peninjau memeriksa hasil sebelum keluar.</li>
+  </ul>
+
+  <div class="codewrap">
+    <div class="codehead"><span class="fn">pipeline.js</span><span class="lang">js</span></div>
+    <pre><code><span class="com">// Pipeline 3 agent: riset -> tulis -> edit</span>
+<span class="kw">async function</span> <span class="fnc">pipeline</span>(topic) {
+  <span class="kw">const</span> facts  = <span class="kw">await</span> <span class="fnc">researchAgent</span>(topic);
+  <span class="kw">const</span> draft  = <span class="kw">await</span> <span class="fnc">writerAgent</span>(facts);
+  <span class="kw">const</span> final  = <span class="kw">await</span> <span class="fnc">editorAgent</span>(draft);
+  <span class="kw">return</span> final;
+}</code></pre>
+  </div>
+
+  <div class="runner" data-runner>
+    <div class="runhead"><span class="t">Mini orchestrator - jalankan</span><button class="runbtn" data-run>RUN</button></div>
+    <textarea class="editor" spellcheck="false">// Orchestrator membagi 1 topik ke 3 worker spesialis
+function researcher(topic) { return ["fakta-A:" + topic, "fakta-B:" + topic]; }
+function writer(facts)     { return "Draf: " + facts.join(" | "); }
+function editor(draft)     { return draft.replace("Draf:", "FINAL:"); }
+
+function orchestrate(topic) {
+  const facts = researcher(topic);
+  const draft = writer(facts);
+  const out   = editor(draft);
+  return out;
+}
+
+console.log(orchestrate("Agentic Workflow"));</textarea>
+    <div class="output" data-output>// output muncul di sini</div>
+  </div>
+
+  <div class="n8nbox">
+    <div class="lbl">Konteks n8n</div>
+    <p>Tiap agent = satu <code>sub-workflow</code> (ingat F-03 Sesi 3: modularity). Orchestrator memanggilnya lewat node <code>Execute Sub-workflow</code>. Pipeline = workflow utama yang merangkai sub-workflow secara berurutan. Memecah agent jadi sub-workflow membuat tiap bagian bisa kamu test sendiri.</p>
+  </div>
+
+  <div class="quiz" data-quiz>
+    <div class="qlbl">CEK PEMAHAMAN</div>
+    <div class="q">Kenapa multi-agent sering lebih baik daripada satu agent besar?</div>
+    <button class="opt" data-correct="false">Karena memakai lebih sedikit token</button>
+    <button class="opt" data-correct="true">Tiap agent fokus, lebih mudah di-debug dan di-test secara terpisah</button>
+    <button class="opt" data-correct="false">Karena tidak butuh prompt sama sekali</button>
+    <button class="opt" data-correct="false">Karena selalu lebih murah</button>
+    <div class="feedback"></div>
+  </div>
+</section>
+
+<!-- STEP 5 -->
+<section class="panel" data-step="5">
+  <div class="eyebrow">Step 05 / Kontrol</div>
+  <h2 class="title">Human-in-the-Loop Design</h2>
+  <div class="sub">Kapan agent harus berhenti dan menunggu manusia</div>
+
+  <p class="body">Agent otonom itu bagus, sampai ia mengirim email salah ke 500 klien. <span class="hl">Human-in-the-loop (HITL)</span> menaruh titik persetujuan manusia di langkah berisiko: kirim uang, hapus data, balas pelanggan.</p>
+
+  <h3 class="sec">Kapan butuh HITL</h3>
+  <ul class="list">
+    <li>Aksi <b>irreversible</b> (hapus, kirim, bayar).</li>
+    <li>Output menyentuh <b>orang luar</b> (email klien, posting publik).</li>
+    <li>Agent <b>tidak yakin</b> (confidence rendah) - minta konfirmasi.</li>
+    <li>Nilai transaksi melewati <b>threshold</b> tertentu.</li>
+  </ul>
+
+  <div class="runner" data-runner>
+    <div class="runhead"><span class="t">Approval gate - jalankan</span><button class="runbtn" data-run>RUN</button></div>
+    <textarea class="editor" spellcheck="false">// Gate: aksi berisiko butuh approval, sisanya auto
+function needsApproval(action) {
+  const risky = ["send_email", "delete", "payment"];
+  return risky.indexOf(action.type) !== -1 || action.amount > 1000000;
+}
+
+function handle(action) {
+  if (needsApproval(action)) {
+    return "PAUSE -> tunggu approval manusia: " + action.type;
+  }
+  return "AUTO -> jalankan: " + action.type;
+}
+
+console.log(handle({ type: "read_sheet" }));
+console.log(handle({ type: "send_email" }));
+console.log(handle({ type: "transfer", amount: 5000000 }));</textarea>
+    <div class="output" data-output>// output muncul di sini</div>
+  </div>
+
+  <div class="n8nbox">
+    <div class="lbl">Konteks n8n</div>
+    <p>n8n punya node khusus: <code>Wait</code> dan <code>Send and Wait for Response</code>. Agent berjalan sampai langkah berisiko, lalu kirim pesan Slack/email "Setujui? Ya/Tidak", dan workflow <b>berhenti</b> sampai manusia klik. Setelah disetujui, workflow lanjut otomatis. Ini fitur jualan besar ke klien yang takut otomasi penuh.</p>
+  </div>
+
+  <div class="quiz" data-quiz>
+    <div class="qlbl">CEK PEMAHAMAN</div>
+    <div class="q">Aksi mana yang paling wajib pakai human-in-the-loop?</div>
+    <button class="opt" data-correct="false">Membaca isi Google Sheet</button>
+    <button class="opt" data-correct="false">Menghitung rata-rata angka</button>
+    <button class="opt" data-correct="true">Mengirim transfer dana otomatis ke vendor</button>
+    <button class="opt" data-correct="false">Mengubah format tanggal</button>
+    <div class="feedback"></div>
+  </div>
+</section>
+
+<!-- STEP 6 -->
+<section class="panel" data-step="6">
+  <div class="eyebrow">Step 06 / Memory</div>
+  <h2 class="title">Agent Memory: Short &amp; Long Term</h2>
+  <div class="sub">Agar agent tidak pikun di tengah percakapan</div>
+
+  <p class="body">Tanpa memory, tiap langkah agent seperti amnesia. Dua jenis memory:</p>
+
+  <h3 class="sec">Short-term (working memory)</h3>
+  <p class="body">Riwayat percakapan/langkah dalam <b>satu sesi</b>. Dikirim ulang ke LLM tiap turn. Terbatas oleh context window, jadi sering perlu <span class="hl">diringkas</span> kalau panjang.</p>
+
+  <h3 class="sec">Long-term memory</h3>
+  <p class="body">Pengetahuan yang bertahan <b>lintas sesi</b>: profil klien, dokumen, preferensi. Disimpan di database/vector store, lalu <span class="hl">diambil saat relevan</span> (retrieval).</p>
+
+  <div class="codewrap">
+    <div class="codehead"><span class="fn">memory.js</span><span class="lang">js</span></div>
+    <pre><code><span class="com">// Short-term: simpan turn, ringkas kalau kepanjangan</span>
+<span class="kw">function</span> <span class="fnc">buildContext</span>(history, maxTurns) {
+  <span class="kw">if</span> (history.length &lt;= maxTurns) <span class="kw">return</span> history;
+  <span class="kw">const</span> recent = history.<span class="fnc">slice</span>(-maxTurns);
+  <span class="kw">const</span> summary = <span class="str">"[ringkasan "</span> + (history.length - maxTurns) + <span class="str">" turn awal]"</span>;
+  <span class="kw">return</span> [summary, ...recent];
+}</code></pre>
+  </div>
+
+  <div class="runner" data-runner>
+    <div class="runhead"><span class="t">Memory window - jalankan</span><button class="runbtn" data-run>RUN</button></div>
+    <textarea class="editor" spellcheck="false">// Jaga short-term memory tetap muat di context window
+function trimMemory(history, maxTurns) {
+  if (history.length <= maxTurns) return history;
+  const recent = history.slice(-maxTurns);
+  const dropped = history.length - maxTurns;
+  return ["[ringkasan " + dropped + " turn lama]"].concat(recent);
+}
+
+const chat = ["t1","t2","t3","t4","t5","t6"];
+console.log(trimMemory(chat, 3));
+console.log(trimMemory(["a","b"], 3));</textarea>
+    <div class="output" data-output>// output muncul di sini</div>
+  </div>
+
+  <div class="n8nbox">
+    <div class="lbl">Konteks n8n</div>
+    <p>Short-term = node <code>Window Buffer Memory</code> yang dicolok ke AI Agent (menyimpan N pesan terakhir). Long-term = <code>Vector Store</code> (Pinecone/Qdrant/Postgres) + node retrieval. Untuk profil klien sederhana, <code>Google Sheets</code> atau <code>Airtable</code> (F-03 Sesi 2) sudah cukup sebagai long-term store.</p>
+  </div>
+
+  <div class="quiz" data-quiz>
+    <div class="qlbl">CEK PEMAHAMAN</div>
+    <div class="q">Memory jenis apa yang dipakai untuk mengingat preferensi klien lintas sesi berbeda?</div>
+    <button class="opt" data-correct="false">Short-term / working memory</button>
+    <button class="opt" data-correct="true">Long-term memory (disimpan di DB/vector store)</button>
+    <button class="opt" data-correct="false">Tidak perlu memory</button>
+    <button class="opt" data-correct="false">Context window saja sudah cukup selamanya</button>
+    <div class="feedback"></div>
+  </div>
+</section>
+
+<!-- STEP 7 -->
+<section class="panel" data-step="7">
+  <div class="eyebrow">Step 07 / Project</div>
+  <h2 class="title">Project: Research Agent</h2>
+  <div class="sub">Input topik -&gt; riset web -&gt; laporan otomatis</div>
+
+  <p class="body">Sekarang gabungkan semuanya. Research Agent menerima sebuah <b>topik</b>, merencanakan pencarian, memakai tool web search, menyimpan temuan di memory, lalu menyusun <span class="hl">laporan terstruktur</span>. Ini project resmi F-04 Sesi 2.</p>
+
+  <h3 class="sec">Arsitektur (5 konsep digabung)</h3>
+  <ul class="list">
+    <li><b>Planning:</b> pecah topik jadi 2-3 sub-pertanyaan.</li>
+    <li><b>Tool calling:</b> <code>web_search</code> untuk tiap sub-pertanyaan.</li>
+    <li><b>Memory:</b> kumpulkan hasil di array temuan.</li>
+    <li><b>HITL (opsional):</b> minta approval sebelum publish.</li>
+    <li><b>Reflection:</b> cek apakah laporan punya cukup sumber.</li>
+  </ul>
+
+  <div class="runner" data-runner>
+    <div class="runhead"><span class="t">Research agent (simulasi) - jalankan</span><button class="runbtn" data-run>RUN</button></div>
+    <textarea class="editor" spellcheck="false">// Research agent: planning -> search -> memory -> report
+function planQuestions(topic) {
+  return ["apa itu " + topic, "manfaat " + topic, "tren " + topic + " 2026"];
+}
+
+// simulasi tool web_search (di n8n: HTTP Request Tool)
+function webSearch(q) {
+  return { q: q, hits: ["sumber-1 utk " + q, "sumber-2 utk " + q] };
+}
+
+function researchAgent(topic) {
+  const questions = planQuestions(topic);
+  const memory = [];
+  for (let i = 0; i < questions.length; i++) {
+    memory.push(webSearch(questions[i]));   // observe + simpan
+  }
+  // reflection: hitung total sumber
+  let sources = 0;
+  for (let i = 0; i < memory.length; i++) sources += memory[i].hits.length;
+  const enough = sources >= 4 ? "OK" : "kurang sumber";
+
+  return {
+    topic: topic,
+    sections: memory.length,
+    totalSources: sources,
+    review: enough,
+    report: "LAPORAN: " + topic + " (" + memory.length + " bagian, " + sources + " sumber)"
+  };
+}
+
+console.log(JSON.stringify(researchAgent("AI Automation"), null, 2));</textarea>
+    <div class="output" data-output>// output muncul di sini</div>
+  </div>
+
+  <div class="mission" data-mission>
+    <div class="ml">MISI PRAKTIK</div>
+    <h4>Tambahkan langkah HITL ke research agent</h4>
+    <p>Modifikasi kode di runner atas: sebelum mengembalikan <code>report</code>, tambahkan field <code>status</code> bernilai <span class="hl">"PENDING_APPROVAL"</span> jika <code>totalSources</code> lebih dari 5, selain itu <span class="hl">"AUTO_PUBLISH"</span>.</p>
+    <p style="color:var(--dim);font-size:11px">Klik cek setelah kamu menambahkan logika status &amp; menjalankannya.</p>
+    <button class="checkbtn" data-checkmission>CEK MISI</button>
+    <div class="feedback" data-missionfb></div>
+  </div>
+
+  <div class="n8nbox">
+    <div class="lbl">Konteks n8n - bentuk workflow nyata</div>
+    <p><code>Webhook/Form</code> (input topik) -&gt; <code>AI Agent</code> (chat model + Window Buffer Memory) dengan <code>HTTP Request Tool</code> (web search) -&gt; <code>Code</code> (susun laporan) -&gt; <code>Send and Wait</code> (approval) -&gt; <code>Google Docs/Sheets</code> (simpan laporan). Itulah Research Agent versi produksi yang bisa kamu tunjukkan ke klien.</p>
+  </div>
+</section>
+
+<!-- STEP 8 -->
+<section class="panel" data-step="8">
+  <div class="eyebrow">Step 08 / Recap</div>
+  <h2 class="title">Recap &amp; Quiz Akhir</h2>
+  <div class="sub">Kunci Sesi 2 sebelum lanjut</div>
+
+  <ul class="list">
+    <li><b>Agent</b> = loop think-act-observe sampai tujuan tercapai, bukan satu LLM call.</li>
+    <li><b>Pattern:</b> ReAct, Planning, Reflection, Routing.</li>
+    <li><b>Tool calling:</b> LLM memilih, kode kamu eksekusi (pakai whitelist, jangan eval).</li>
+    <li><b>Multi-agent:</b> spesialis kecil + orchestrator/pipeline lebih mudah di-debug.</li>
+    <li><b>HITL:</b> gate manusia di aksi irreversible/berisiko.</li>
+    <li><b>Memory:</b> short-term (working) vs long-term (DB/vector store).</li>
+  </ul>
+
+  <div class="quiz" data-quiz>
+    <div class="qlbl">QUIZ AKHIR 1/2</div>
+    <div class="q">Agent memilih memanggil <code>get_weather</code> tapi kota tidak diisi. Praktik terbaik?</div>
+    <button class="opt" data-correct="true">Validasi argumen sebelum eksekusi, kembalikan pesan error yang jelas ke agent</button>
+    <button class="opt" data-correct="false">Tetap jalankan dengan kota kosong</button>
+    <button class="opt" data-correct="false">Hentikan seluruh workflow tanpa pesan</button>
+    <button class="opt" data-correct="false">Ganti ke model lebih besar</button>
+    <div class="feedback"></div>
+  </div>
+
+  <div class="quiz" data-quiz>
+    <div class="qlbl">QUIZ AKHIR 2/2</div>
+    <div class="q">Di n8n, komponen apa yang memberi AI Agent kemampuan "ingat percakapan dalam sesi"?</div>
+    <button class="opt" data-correct="false">HTTP Request node</button>
+    <button class="opt" data-correct="true">Window Buffer Memory yang dicolok ke AI Agent</button>
+    <button class="opt" data-correct="false">Switch node</button>
+    <button class="opt" data-correct="false">Schedule Trigger</button>
+    <div class="feedback"></div>
+  </div>
+
+  <div class="endcard">
+    <div class="big">&#9670;</div>
+    <h3>Sesi 2 Selesai</h3>
+    <p>Kamu sudah paham anatomi agent, tool calling, orchestration, HITL, dan memory - plus Research Agent sebagai project. Lanjut ke <b>F-04 Sesi 3: Niche Specialization</b> untuk memilih vertikal dan mengemas solusi.</p>
+  </div>
+</section>
+
+  <div class="nav">
+    <button class="navbtn" id="prevBtn" disabled>&#8592; SEBELUMNYA</button>
+    <button class="navbtn next" id="nextBtn">BERIKUTNYA &#8594;</button>
+  </div>
+</div>
+
+<!-- AI TUTOR -->
+<button class="tutorfab" id="tutorFab">&#129302;</button>
+<div class="tutorpanel" id="tutorPanel">
+  <div class="tutorhead"><span class="tt">AI TUTOR - SESI 2</span><button class="cls" id="tutorClose">&#10005;</button></div>
+  <div class="tutorbody" id="tutorBody">
+    <button class="qbtn" data-ans="Tool calling: kamu kirim daftar fungsi (nama+deskripsi+parameter) ke LLM. LLM tidak menjalankan, ia hanya memilih fungsi mana dan mengisi argumennya. Kode kamu yang benar-benar mengeksekusi, lalu hasilnya dikirim balik ke LLM untuk jawaban final. Di n8n ini jadi node Tool yang dicolok ke AI Agent.">Apa beda tool calling dan function calling?</button>
+    <button class="qbtn" data-ans="ReAct = agent menulis 'thought' (alasan) sebelum tiap 'action'. Membuat keputusan transparan: kamu bisa lihat kenapa agent memilih suatu tool. Bagus untuk debugging karena kalau agent nyasar, kamu langsung lihat di alasan mana logikanya melenceng.">Jelaskan pattern ReAct singkat</button>
+    <button class="qbtn" data-ans="Pakai short-term (Window Buffer Memory) kalau cukup ingat percakapan dalam satu sesi. Pakai long-term (vector store / DB) kalau perlu ingat lintas sesi: profil klien, dokumen, histori lama. Banyak workflow produksi pakai keduanya bersamaan.">Kapan pakai long-term vs short-term memory?</button>
+    <button class="qbtn" data-ans="Taruh HITL di aksi yang irreversible atau menyentuh orang luar: kirim email/uang, hapus data, posting publik. Di n8n pakai node 'Send and Wait for Response' - workflow berhenti sampai manusia klik setuju, lalu lanjut otomatis.">Di mana harus pasang human-in-the-loop?</button>
+    <div class="ans" id="tutorAns"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var TOTAL = 8;
+  var current = 1;
+  var done = {};
+
+  // build step buttons
+  var stepsEl = document.getElementById("steps");
+  for (var i = 1; i <= TOTAL; i++) {
+    var b = document.createElement("button");
+    b.className = "stepbtn" + (i === 1 ? " active" : "");
+    b.textContent = i;
+    b.setAttribute("data-go", String(i));
+    stepsEl.appendChild(b);
+  }
+
+  var panels = document.querySelectorAll(".panel");
+  var stepBtns = document.querySelectorAll(".stepbtn");
+  var progfill = document.getElementById("progfill");
+  var prevBtn = document.getElementById("prevBtn");
+  var nextBtn = document.getElementById("nextBtn");
+
+  function show(n) {
+    if (n < 1) n = 1;
+    if (n > TOTAL) n = TOTAL;
+    current = n;
+    for (var i = 0; i < panels.length; i++) {
+      panels[i].classList.toggle("active", Number(panels[i].getAttribute("data-step")) === n);
+    }
+    for (var j = 0; j < stepBtns.length; j++) {
+      var sn = Number(stepBtns[j].getAttribute("data-go"));
+      stepBtns[j].classList.toggle("active", sn === n);
+      stepBtns[j].classList.toggle("done", !!done[sn] && sn !== n);
+    }
+    progfill.style.width = (n / TOTAL * 100) + "%";
+    prevBtn.disabled = (n === 1);
+    nextBtn.textContent = (n === TOTAL) ? "SELESAI" : "BERIKUTNYA \u2192";
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  stepsEl.addEventListener("click", function(e){
+    var t = e.target;
+    if (t && t.getAttribute("data-go")) show(Number(t.getAttribute("data-go")));
+  });
+  prevBtn.addEventListener("click", function(){ show(current - 1); });
+  nextBtn.addEventListener("click", function(){
+    done[current] = true;
+    if (current < TOTAL) show(current + 1); else show(current);
+  });
+
+  // QUIZ
+  var quizzes = document.querySelectorAll("[data-quiz]");
+  for (var q = 0; q < quizzes.length; q++) {
+    (function(quiz){
+      var opts = quiz.querySelectorAll(".opt");
+      var fb = quiz.querySelector(".feedback");
+      for (var o = 0; o < opts.length; o++) {
+        opts[o].addEventListener("click", function(){
+          var correct = this.getAttribute("data-correct") === "true";
+          for (var k = 0; k < opts.length; k++) {
+            opts[k].disabled = true;
+            if (opts[k].getAttribute("data-correct") === "true") opts[k].classList.add("correct");
+          }
+          if (!correct) this.classList.add("wrong");
+          fb.className = "feedback show " + (correct ? "good" : "bad");
+          fb.textContent = correct ? "Benar. Lanjutkan." : "Belum tepat - jawaban benar disorot hijau.";
+        });
+      }
+    })(quizzes[q]);
+  }
+
+  // RUNNER (safe-ish JS eval with captured console)
+  var runners = document.querySelectorAll("[data-runner]");
+  for (var r = 0; r < runners.length; r++) {
+    (function(box){
+      var btn = box.querySelector("[data-run]");
+      var ta = box.querySelector(".editor");
+      var out = box.querySelector("[data-output]");
+      btn.addEventListener("click", function(){
+        var logs = [];
+        var fakeConsole = {
+          log: function(){
+            var parts = [];
+            for (var a = 0; a < arguments.length; a++) {
+              var v = arguments[a];
+              parts.push(typeof v === "object" ? JSON.stringify(v) : String(v));
+            }
+            logs.push(parts.join(" "));
+          }
+        };
+        out.innerHTML = "";
+        try {
+          var fn = new Function("console", ta.value);
+          fn(fakeConsole);
+          if (logs.length === 0) logs.push("(tidak ada output console.log)");
+          var html = "";
+          for (var L = 0; L < logs.length; L++) {
+            html += '<div class="ln">' + escapeHtml(logs[L]) + "</div>";
+          }
+          out.innerHTML = html;
+        } catch (err) {
+          out.innerHTML = '<div class="er">ERROR: ' + escapeHtml(String(err.message)) + "</div>";
+        }
+      });
+    })(runners[r]);
+  }
+
+  function escapeHtml(s){
+    return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  }
+
+  // MISSION validator (step 7)
+  var mission = document.querySelector("[data-mission]");
+  if (mission) {
+    var mbtn = mission.querySelector("[data-checkmission]");
+    var mfb = mission.querySelector("[data-missionfb]");
+    var step7Editor = document.querySelector('section[data-step="7"] .editor');
+    mbtn.addEventListener("click", function(){
+      var src = step7Editor ? step7Editor.value : "";
+      var hasPending = src.indexOf("PENDING_APPROVAL") !== -1;
+      var hasAuto = src.indexOf("AUTO_PUBLISH") !== -1;
+      var hasStatus = /status/.test(src);
+      var hasThreshold = src.indexOf("5") !== -1;
+      var ok = hasPending && hasAuto && hasStatus && hasThreshold;
+      mfb.className = "feedback show " + (ok ? "good" : "bad");
+      if (ok) {
+        mfb.textContent = "Misi lolos. Kamu menambahkan gate HITL berbasis jumlah sumber - persis pola approval di produksi.";
+      } else {
+        var miss = [];
+        if (!hasStatus) miss.push("field status");
+        if (!hasPending) miss.push('nilai "PENDING_APPROVAL"');
+        if (!hasAuto) miss.push('nilai "AUTO_PUBLISH"');
+        if (!hasThreshold) miss.push("ambang 5 sumber");
+        mfb.textContent = "Belum lengkap. Masih kurang: " + miss.join(", ") + ". Edit kode di runner Research Agent lalu cek lagi.";
+      }
+    });
+  }
+
+  // AI TUTOR
+  var fab = document.getElementById("tutorFab");
+  var panel = document.getElementById("tutorPanel");
+  var closeBtn = document.getElementById("tutorClose");
+  var ans = document.getElementById("tutorAns");
+  fab.addEventListener("click", function(){ panel.classList.toggle("open"); });
+  closeBtn.addEventListener("click", function(){ panel.classList.remove("open"); });
+  var qbtns = document.querySelectorAll(".tutorbody .qbtn");
+  for (var x = 0; x < qbtns.length; x++) {
+    qbtns[x].addEventListener("click", function(){
+      ans.textContent = this.getAttribute("data-ans");
+      ans.classList.add("show");
+    });
+  }
+
+  show(1);
+})();
+</script>
+</body>
+</html>
