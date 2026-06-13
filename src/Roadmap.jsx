@@ -319,7 +319,7 @@ const modules = [
       { code: "F-03 · Sesi 1", title: "Setup & Core Nodes", file: "f03-sesi1-setup-core-nodes.html", status: "done" },
       { code: "F-03 · Sesi 2", title: "Integrasi Business Tools", file: "f03-sesi2-integrasi-business-tools.html", status: "done" },
       { code: "F-03 · Sesi 3", title: "Advanced n8n", file: "f03-sesi3-advanced-n8n.html", status: "done" },
-      { code: "F-03 · Sesi 4", title: "AI Nodes di n8n", file: null, status: "soon" },
+      { code: "F-03 · Sesi 4", title: "AI Nodes di n8n", file: "f03-sesi4-ai-nodes.html", status: "done" },
     ],
   },
   {
