@@ -329,7 +329,7 @@ const modules = [
     sessions: [
       { code: "F-04 · Sesi 1", title: "LLM API Mastery", file: "f04-sesi1-llm-api.html", status: "done" },
       { code: "F-04 · Sesi 2", title: "Agentic Workflows", file: "f04-sesi2-agentic-workflows.html", status: "done" },
-      { code: "F-04 · Sesi 3", title: "Niche Specialization", file: null, status: "soon" },
+      { code: "F-04 · Sesi 3", title: "Niche Specialization", file: "f04-sesi3-niche-specialization.html", status: "done" },
     ],
   },
   {
