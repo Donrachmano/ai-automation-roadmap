@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>F-04 Sesi 3 - Niche Specialization</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#080c10; --panel:#0d1f2d; --panel2:#0a0f14; --line:#1e3a4a;
+    --txt:#c9d1d9; --txt2:#8b949e; --dim:#6e7681;
+    --acc:#da77f2; --acc-dim:#da77f255; --acc-bg:#da77f211;
+    --ok:#3fb950; --warn:#ffb454; --err:#f85149;
+    --kw:#da77f2; --str:#a5d6ff; --num:#ffb454; --com:#6e7681; --fn:#7ee787;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg); color:var(--txt);
+    font-family:'JetBrains Mono',ui-monospace,'Courier New',monospace;
+    font-size:14px; line-height:1.6; -webkit-text-size-adjust:100%;
+  }
+  a{color:var(--acc);}
+  ::-webkit-scrollbar{width:5px;height:5px;}
+  ::-webkit-scrollbar-track{background:var(--bg);}
+  ::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px;}
+
+  /* ---- header ---- */
+  header{
+    position:sticky; top:0; z-index:50;
+    border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg,#1a0d24 0%,var(--bg) 100%);
+    padding:16px 18px 12px;
+  }
+  .eyebrow{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--acc);
+    box-shadow:0 0 8px var(--acc);animation:pulse 2s infinite;}
+  .eyebrow span{color:var(--acc);font-size:10px;letter-spacing:3px;text-transform:uppercase;}
+  header h1{margin:0;font-size:clamp(15px,4.4vw,21px);font-weight:700;color:#e6edf3;letter-spacing:.5px;}
+  header p{margin:4px 0 0;font-size:11px;color:var(--dim);}
+
+  /* ---- progress ---- */
+  .progwrap{padding:12px 18px 0;}
+  .progbar{height:4px;background:var(--panel);border-radius:3px;overflow:hidden;}
+  .progfill{height:100%;width:12.5%;background:linear-gradient(90deg,var(--acc),#8c4dff);
+    transition:width .35s ease;box-shadow:0 0 10px var(--acc-dim);}
+  .progmeta{display:flex;justify-content:space-between;margin-top:6px;font-size:10px;color:var(--dim);letter-spacing:1px;}
+
+  /* ---- step rail ---- */
+  .rail{display:flex;gap:6px;overflow-x:auto;padding:12px 18px 4px;-webkit-overflow-scrolling:touch;}
+  .rail::-webkit-scrollbar{height:0;}
+  .pill{flex:0 0 auto;padding:6px 11px;border:1px solid var(--line);background:var(--panel2);
+    color:var(--dim);border-radius:5px;font-size:10px;letter-spacing:.5px;cursor:pointer;
+    white-space:nowrap;transition:all .2s;font-family:inherit;}
+  .pill.active{border-color:var(--acc);background:var(--acc-bg);color:var(--acc);box-shadow:0 0 8px var(--acc-dim);}
+  .pill.done{border-color:#2c6b3d;color:var(--ok);}
+  .pill.done::before{content:"\2713 ";}
+
+  /* ---- main ---- */
+  main{padding:18px 18px 120px;max-width:760px;margin:0 auto;}
+  .step{display:none;animation:fade .3s ease;}
+  .step.show{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+  .kicker{font-size:10px;color:var(--acc);letter-spacing:2px;margin-bottom:6px;}
+  h2.title{font-size:19px;color:#e6edf3;margin:0 0 4px;font-weight:700;}
+  .lead{color:var(--txt2);font-size:13px;margin:0 0 18px;}
+
+  h3{font-size:13px;color:#e6edf3;letter-spacing:.5px;margin:22px 0 8px;
+    border-left:3px solid var(--acc);padding-left:9px;}
+  p{margin:0 0 12px;}
+  ul{margin:0 0 12px;padding-left:20px;}
+  li{margin-bottom:6px;}
+  b{color:#e6edf3;}
+  .acc{color:var(--acc);}
+  .ok{color:var(--ok);} .warn{color:var(--warn);} .err{color:var(--err);}
+
+  /* ---- code block ---- */
+  pre{background:#0b1117;border:1px solid var(--line);border-left:3px solid var(--acc);
+    border-radius:7px;padding:14px;overflow-x:auto;font-size:12.5px;line-height:1.55;margin:0 0 14px;}
+  code{font-family:inherit;}
+  .tok-kw{color:var(--kw);} .tok-str{color:var(--str);} .tok-num{color:var(--num);}
+  .tok-com{color:var(--com);font-style:italic;} .tok-fn{color:var(--fn);} .tok-prop{color:#79c0ff;}
+
+  /* ---- boxes ---- */
+  .box{border-radius:7px;padding:13px 14px;margin:0 0 16px;font-size:12.5px;}
+  .n8n{background:#0d2a1a;border:1px solid #2ea04326;border-left:3px solid var(--ok);}
+  .n8n .bh{color:var(--ok);font-size:10px;letter-spacing:1.5px;margin-bottom:6px;}
+  .tip{background:var(--acc-bg);border:1px solid var(--acc-dim);border-left:3px solid var(--acc);}
+  .tip .bh{color:var(--acc);font-size:10px;letter-spacing:1.5px;margin-bottom:6px;}
+  .warnbox{background:#2a1d0a;border:1px solid #d2992226;border-left:3px solid var(--warn);}
+  .warnbox .bh{color:var(--warn);font-size:10px;letter-spacing:1.5px;margin-bottom:6px;}
+
+  /* ---- table-ish grid ---- */
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:0 0 16px;}
+  @media(max-width:560px){.grid3{grid-template-columns:1fr;}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:12px;}
+  .card h4{margin:0 0 6px;font-size:12px;color:var(--acc);letter-spacing:.5px;}
+  .card .price{font-size:16px;color:#e6edf3;font-weight:700;margin:2px 0 8px;}
+  .card ul{font-size:11px;color:var(--txt2);padding-left:16px;margin:0;}
+
+  /* ---- editor ---- */
+  .editor{margin:0 0 16px;}
+  .ed-bar{display:flex;justify-content:space-between;align-items:center;
+    background:var(--panel);border:1px solid var(--line);border-bottom:none;
+    border-radius:7px 7px 0 0;padding:7px 11px;font-size:10px;color:var(--dim);letter-spacing:1px;}
+  .runbtn{background:var(--acc-bg);border:1px solid var(--acc-dim);color:var(--acc);
+    padding:5px 14px;border-radius:5px;font-family:inherit;font-size:11px;cursor:pointer;
+    letter-spacing:1px;transition:all .15s;}
+  .runbtn:hover{background:var(--acc);color:#0b0114;}
+  textarea{width:100%;background:#0b1117;border:1px solid var(--line);color:#e6edf3;
+    font-family:inherit;font-size:12.5px;line-height:1.55;padding:12px;border-radius:0;
+    resize:vertical;min-height:130px;outline:none;border-top:none;}
+  textarea:focus{border-color:var(--acc-dim);}
+  .out{background:#06090c;border:1px solid var(--line);border-top:none;border-radius:0 0 7px 7px;
+    padding:11px 12px;font-size:12px;min-height:34px;white-space:pre-wrap;color:var(--txt2);}
+  .out .ln{display:block;}
+  .out .ok{color:var(--ok);} .out .err{color:var(--err);}
+
+  /* ---- quiz ---- */
+  .quiz{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:14px;margin:0 0 16px;}
+  .quiz .q{font-size:12.5px;color:#e6edf3;margin-bottom:10px;}
+  .quiz .q::before{content:"? ";color:var(--acc);}
+  .opt{display:block;width:100%;text-align:left;background:#0b1117;border:1px solid var(--line);
+    color:var(--txt);padding:9px 11px;border-radius:5px;margin-bottom:7px;cursor:pointer;
+    font-family:inherit;font-size:12px;transition:all .15s;}
+  .opt:hover{border-color:var(--acc-dim);}
+  .opt.correct{border-color:var(--ok);background:#0d2a1a;color:var(--ok);}
+  .opt.wrong{border-color:var(--err);background:#2a0d0d;color:var(--err);}
+  .qfb{font-size:11.5px;margin-top:4px;min-height:16px;}
+
+  /* ---- mission ---- */
+  .mission{border:1px dashed var(--acc-dim);border-radius:8px;padding:14px;margin:0 0 16px;background:var(--acc-bg);}
+  .mission .mh{color:var(--acc);font-size:11px;letter-spacing:1.5px;margin-bottom:8px;}
+  .checklist{list-style:none;padding:0;margin:8px 0 0;font-size:12px;}
+  .checklist li{margin-bottom:5px;color:var(--txt2);}
+  .checklist li.pass{color:var(--ok);}
+  .checklist li::before{content:"\25CB ";color:var(--dim);}
+  .checklist li.pass::before{content:"\2713 ";color:var(--ok);}
+
+  /* ---- nav ---- */
+  .nav{position:fixed;bottom:0;left:0;right:0;display:flex;gap:10px;
+    padding:12px 18px;background:linear-gradient(0deg,var(--bg) 70%,transparent);
+    max-width:760px;margin:0 auto;}
+  .nav button{flex:1;padding:12px;border-radius:7px;font-family:inherit;font-size:12px;
+    letter-spacing:1px;cursor:pointer;transition:all .2s;border:1px solid var(--line);}
+  .prev{background:var(--panel);color:var(--txt);}
+  .prev:disabled{background:var(--panel2);color:#3d444d;cursor:default;}
+  .next{background:var(--acc-bg);border-color:var(--acc-dim);color:var(--acc);}
+  .next:hover{background:var(--acc);color:#0b0114;}
+
+  /* ---- tutor ---- */
+  .tutor-fab{position:fixed;bottom:74px;right:16px;z-index:60;width:48px;height:48px;
+    border-radius:50%;background:var(--acc);color:#0b0114;border:none;font-size:20px;
+    cursor:pointer;box-shadow:0 0 16px var(--acc-dim);font-weight:700;}
+  .tutor{position:fixed;bottom:0;left:0;right:0;z-index:70;background:var(--panel);
+    border-top:1px solid var(--acc-dim);border-radius:14px 14px 0 0;padding:16px 16px 20px;
+    max-width:760px;margin:0 auto;transform:translateY(110%);transition:transform .3s ease;max-height:70vh;overflow-y:auto;}
+  .tutor.open{transform:translateY(0);}
+  .tutor .th{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+  .tutor .th b{color:var(--acc);font-size:12px;letter-spacing:1px;}
+  .tutor .close{background:none;border:none;color:var(--dim);font-size:20px;cursor:pointer;}
+  .tutor .tmsg{background:#0b1117;border:1px solid var(--line);border-radius:7px;padding:11px;font-size:12px;color:var(--txt2);}
+  .tutor .tmsg b{color:var(--acc);}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow"><div class="dot"></div><span>F-04 &middot; AI INTEGRATION &amp; SPECIALIZATION</span></div>
+  <h1>SESI 3 &mdash; Niche Specialization</h1>
+  <p>Minggu 7&ndash;10 &middot; Differentiator &middot; Sesi penutup F-04</p>
+</header>
+
+<div class="progwrap">
+  <div class="progbar"><div class="progfill" id="progfill"></div></div>
+  <div class="progmeta"><span id="stepname">01 / Briefing</span><span id="stepct">STEP 1 / 8</span></div>
+</div>
+
+<div class="rail" id="rail"></div>
+
+<main>
+
+  <!-- STEP 1 -->
+  <section class="step show" data-name="Briefing">
+    <div class="kicker">// STEP 01</div>
+    <h2 class="title">Kenapa Niche = Differentiator</h2>
+    <p class="lead">Sesi 1 &amp; 2 mengajarkan kamu LLM API dan agentic workflow. Sekarang pertanyaannya: untuk siapa? Niche adalah jawaban yang membuat skill itu laku mahal.</p>
+
+    <h3>Generalist vs Specialist</h3>
+    <p>"Saya bisa automation apa saja" terdengar fleksibel, tapi di mata klien itu sinyal lemah &mdash; tidak ada yang langsung kepikiran memanggil kamu untuk masalah spesifik mereka. Bandingkan:</p>
+    <ul>
+      <li><b class="err">Generalist:</b> "AI automation freelancer" &rarr; bersaing harga dengan ribuan orang.</li>
+      <li><b class="ok">Specialist:</b> "Saya bangun lead-scoring + follow-up otomatis untuk agensi real estate" &rarr; klien langsung paham nilainya, harga jadi soal ROI bukan jam kerja.</li>
+    </ul>
+
+    <h3>Tiga Niche Vertikal di Roadmap Ini</h3>
+    <div class="grid3">
+      <div class="card"><h4>CRM</h4><div class="price">Sales Ops</div><ul><li>Lead enrichment</li><li>Lead scoring</li><li>Follow-up otomatis</li><li>Pipeline sync</li></ul></div>
+      <div class="card"><h4>CONTENT</h4><div class="price">Marketing</div><ul><li>Content repurposing</li><li>SEO brief generator</li><li>Social scheduler</li><li>Newsletter automation</li></ul></div>
+      <div class="card"><h4>FINANCE</h4><div class="price">Back Office</div><ul><li>Invoice parsing</li><li>Expense categorize</li><li>Report generation</li><li>Reconciliation</li></ul></div>
+    </div>
+
+    <div class="box n8n">
+      <div class="bh">&#9670; KONTEKS n8n</div>
+      Template niche = aset yang dijual berkali-kali. Satu workflow CRM yang kamu bangun rapi bisa di-clone untuk 10 klien dengan ganti kredensial + parameter. Inilah kenapa specialist menskalakan income tanpa menskalakan jam kerja.
+    </div>
+
+    <div class="tip">
+      <div class="bh">&#9670; INTI SESI</div>
+      Output sesi ini: <b>satu paket solusi lengkap</b> untuk satu industri &mdash; berisi workflow template, struktur harga, case study, dan cara mempresentasikannya. Itu yang nanti masuk portfolio di F-05.
+    </div>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="step" data-name="Pilih Niche">
+    <div class="kicker">// STEP 02</div>
+    <h2 class="title">Memilih Niche Vertikal</h2>
+    <p class="lead">Jangan pilih niche karena "kelihatan keren". Pilih dengan kerangka keputusan yang bisa diukur.</p>
+
+    <h3>4 Kriteria Penilaian</h3>
+    <ul>
+      <li><b>Demand</b> &mdash; apakah banyak bisnis punya masalah ini sekarang?</li>
+      <li><b>Pain jelas</b> &mdash; apakah sakitnya nyata &amp; berulang (bukan sekali setahun)?</li>
+      <li><b>Budget</b> &mdash; apakah niche ini punya uang untuk membayar solusi?</li>
+      <li><b>Domain fit</b> &mdash; apakah kamu cukup paham konteksnya untuk terdengar kredibel?</li>
+    </ul>
+
+    <p>Beri skor 1&ndash;5 tiap kriteria, lalu jumlahkan. Niche dengan total tertinggi adalah taruhan terbaik untuk dimulai. Code Node di bawah meniru cara n8n memproses array &mdash; <code class="acc">$input.all()</code> jadi data, kamu transform dengan <code class="acc">.map()</code> &amp; <code class="acc">.sort()</code>.</p>
+
+    <div class="editor">
+      <div class="ed-bar"><span>n8n Code Node &mdash; niche scorer</span><button class="runbtn" onclick="runCode('ed2','out2')">&#9654; RUN</button></div>
+      <textarea id="ed2" spellcheck="false">// Tiap niche: skor [demand, pain, budget, domain]
+var niches = $input.all().map(function (item) {
+  var n = item.json;
+  var total = n.scores.reduce(function (a, b) { return a + b; }, 0);
+  return { niche: n.niche, total: total };
+});
+
+// Urutkan dari skor tertinggi
+niches.sort(function (a, b) { return b.total - a.total; });
+
+niches.forEach(function (x) {
+  log(x.niche + ": " + x.total + "/20");
+});
+log("PILIH: " + niches[0].niche);</textarea>
+      <div class="out" id="out2"></div>
+    </div>
+
+    <div class="box warnbox">
+      <div class="bh">&#9888; JEBAKAN UMUM</div>
+      Skor "domain fit" jangan dipaksakan. Niche dengan demand tinggi tapi kamu nol paham konteksnya akan ketahuan saat discovery call. Lebih baik niche skor 16 yang kamu kuasai daripada 19 yang asing.
+    </div>
+
+    <div class="quiz" data-correct="1">
+      <div class="q">Niche A skor total 18 tapi domain fit-nya 1. Niche B skor 16 dengan domain fit 4. Mana yang lebih bijak dimulai?</div>
+      <button class="opt" onclick="ans(this)">Niche A &mdash; total lebih tinggi selalu menang</button>
+      <button class="opt" onclick="ans(this)">Niche B &mdash; kredibilitas domain menutup gap kecil di total</button>
+      <button class="opt" onclick="ans(this)">Keduanya sekaligus, biar aman</button>
+      <div class="qfb"></div>
+    </div>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="step" data-name="Workflow Template">
+    <div class="kicker">// STEP 03</div>
+    <h2 class="title">Bangun Workflow Template</h2>
+    <p class="lead">Template bagus = config-driven. Logika tetap, yang berubah cuma parameter. Jadi satu workflow bisa dipakai ulang lintas klien.</p>
+
+    <h3>Prinsip Reusable Template</h3>
+    <ul>
+      <li><b>Parameterisasi</b> &mdash; ambang skor, label, email tujuan disimpan sebagai config, bukan di-hardcode di tengah node.</li>
+      <li><b>Normalisasi input</b> &mdash; data dari form/CRM apa pun dirapikan ke satu bentuk standar dulu.</li>
+      <li><b>Idempoten &amp; aman</b> &mdash; pakai <code class="acc">item?.json</code> dan default value agar tidak meledak saat field kosong.</li>
+    </ul>
+
+    <p>Contoh template niche <b>CRM</b>: normalisasi lead lalu beri skor. Perhatikan optional chaining &amp; default &mdash; pola wajib di n8n karena data klien sering tidak rapi.</p>
+
+    <pre><code><span class="tok-com">// Code Node: normalisasi + scoring lead (CRM niche)</span>
+<span class="tok-kw">var</span> config = { hot: <span class="tok-num">70</span>, warm: <span class="tok-num">40</span> };
+
+<span class="tok-kw">return</span> $input.all().<span class="tok-fn">map</span>(<span class="tok-kw">function</span> (item) {
+  <span class="tok-kw">var</span> lead = item?.json || {};
+  <span class="tok-kw">var</span> email = (lead.email || <span class="tok-str">""</span>).<span class="tok-fn">trim</span>().<span class="tok-fn">toLowerCase</span>();
+  <span class="tok-kw">var</span> score = <span class="tok-num">0</span>;
+  <span class="tok-kw">if</span> (email.<span class="tok-fn">indexOf</span>(<span class="tok-str">"@"</span>) > <span class="tok-num">0</span>) score += <span class="tok-num">30</span>;
+  <span class="tok-kw">if</span> (lead.company) score += <span class="tok-num">25</span>;
+  <span class="tok-kw">if</span> (Number(lead.budget) > <span class="tok-num">1000</span>) score += <span class="tok-num">25</span>;
+  <span class="tok-kw">var</span> tier = score >= config.hot ? <span class="tok-str">"HOT"</span>
+           : score >= config.warm ? <span class="tok-str">"WARM"</span> : <span class="tok-str">"COLD"</span>;
+  <span class="tok-kw">return</span> { json: { email: email, score: score, tier: tier } };
+});</code></pre>
+
+    <div class="box n8n">
+      <div class="bh">&#9670; KONTEKS n8n</div>
+      Setelah Code Node ini, sambung ke node <b>IF</b> (cek <code>tier === "HOT"</code>) &rarr; cabang HOT kirim Slack alert ke sales, cabang lain masuk Google Sheet untuk nurture. Itulah anatomi template yang siap dijual.
+    </div>
+
+    <p>Coba sendiri: ubah ambang <code class="acc">config</code> atau tambah sinyal skor, lalu RUN.</p>
+    <div class="editor">
+      <div class="ed-bar"><span>n8n Code Node &mdash; lead scorer</span><button class="runbtn" onclick="runCode('ed3','out3')">&#9654; RUN</button></div>
+      <textarea id="ed3" spellcheck="false">var config = { hot: 70, warm: 40 };
+
+var out = $input.all().map(function (item) {
+  var lead = item && item.json ? item.json : {};
+  var email = (lead.email || "").trim().toLowerCase();
+  var score = 0;
+  if (email.indexOf("@") > 0) score += 30;
+  if (lead.company) score += 25;
+  if (Number(lead.budget) > 1000) score += 25;
+  var tier = score >= config.hot ? "HOT"
+           : score >= config.warm ? "WARM" : "COLD";
+  return { email: email, score: score, tier: tier };
+});
+
+out.forEach(function (r) { log(r.email + " -> " + r.score + " (" + r.tier + ")"); });</textarea>
+      <div class="out" id="out3"></div>
+    </div>
+  </section>
+
+  <!-- STEP 4 -->
+  <section class="step" data-name="Pricing">
+    <div class="kicker">// STEP 04</div>
+    <h2 class="title">Pricing &amp; Packaging</h2>
+    <p class="lead">Jangan jual jam. Jual hasil. Paket yang dikemas rapi membuat klien memilih "yang mana", bukan "iya atau tidak".</p>
+
+    <h3>Tiga Model Harga</h3>
+    <ul>
+      <li><b>Project-based</b> &mdash; harga tetap per workflow. Cocok untuk klien pertama &amp; scope jelas.</li>
+      <li><b>Retainer</b> &mdash; biaya bulanan untuk maintenance + perubahan. Income paling stabil.</li>
+      <li><b>Productized</b> &mdash; paket standar siap-jual (misal "CRM Starter") &mdash; skalanya paling tinggi.</li>
+    </ul>
+
+    <h3>Tiga Tier (Good / Better / Best)</h3>
+    <div class="grid3">
+      <div class="card"><h4>STARTER</h4><div class="price">$500</div><ul><li>1 workflow inti</li><li>Setup + handover</li><li>7 hari support</li></ul></div>
+      <div class="card" style="border-color:var(--acc-dim);"><h4 class="acc">GROWTH</h4><div class="price">$1.500</div><ul><li>3 workflow</li><li>Error handling</li><li>30 hari support</li><li>1x revisi</li></ul></div>
+      <div class="card"><h4>SCALE</h4><div class="price">$500/bln</div><ul><li>Retainer</li><li>Monitoring</li><li>Perubahan rutin</li><li>Prioritas</li></ul></div>
+    </div>
+
+    <div class="tip">
+      <div class="bh">&#9670; VALUE-BASED THINKING</div>
+      Kalau automation kamu menghemat 20 jam/bulan staf seharga $15/jam, itu $300/bulan nilai &mdash; sebelum menghitung lead yang tertangkap lebih cepat. Harga $1.500 jadi terlihat murah saat dibingkai dari ROI, bukan dari effort kamu.
+    </div>
+
+    <div class="editor">
+      <div class="ed-bar"><span>kalkulator harga value-based</span><button class="runbtn" onclick="runCode('ed4','out4')">&#9654; RUN</button></div>
+      <textarea id="ed4" spellcheck="false">// Hitung harga dari nilai yang dihemat klien
+var hoursSavedPerMonth = 20;
+var hourlyCost = 15;
+var monthlyValue = hoursSavedPerMonth * hourlyCost;
+var annualValue = monthlyValue * 12;
+
+// Harga wajar = 20-30% dari nilai tahunan untuk project
+var fairProject = Math.round(annualValue * 0.25);
+
+log("Nilai/bulan : $" + monthlyValue);
+log("Nilai/tahun : $" + annualValue);
+log("Harga project wajar (~25%): $" + fairProject);</textarea>
+      <div class="out" id="out4"></div>
+    </div>
+
+    <div class="quiz" data-correct="2">
+      <div class="q">Kenapa tier tengah (GROWTH) sengaja dibuat paling menarik?</div>
+      <button class="opt" onclick="ans(this)">Karena paling murah</button>
+      <button class="opt" onclick="ans(this)">Karena satu-satunya pilihan</button>
+      <button class="opt" onclick="ans(this)">Efek anchoring &mdash; klien membandingkan tier &amp; memilih nilai terbaik di tengah</button>
+      <div class="qfb"></div>
+    </div>
+  </section>
+
+  <!-- STEP 5 -->
+  <section class="step" data-name="Case Study">
+    <div class="kicker">// STEP 05</div>
+    <h2 class="title">Dokumentasi Case Study</h2>
+    <p class="lead">Case study adalah bukti. Tanpa angka, itu cuma cerita. Struktur yang menjual: Context &rarr; Problem &rarr; Solution &rarr; Result.</p>
+
+    <h3>Anatomi Case Study</h3>
+    <ul>
+      <li><b>Context</b> &mdash; siapa kliennya &amp; industrinya (1&ndash;2 kalimat).</li>
+      <li><b>Problem</b> &mdash; sakit yang spesifik &amp; terukur ("balas lead butuh 6 jam").</li>
+      <li><b>Solution</b> &mdash; workflow yang kamu bangun, ringkas.</li>
+      <li><b>Result</b> &mdash; angka before/after. Ini bagian yang dibaca duluan.</li>
+    </ul>
+
+    <p>Code Node di bawah mengubah objek case study menjadi ringkasan markdown &mdash; persis pola yang kamu pakai untuk auto-generate dokumentasi portfolio. Regex yang dipakai sederhana &amp; ASCII (aman dari backtracking).</p>
+
+    <div class="editor">
+      <div class="ed-bar"><span>case study -&gt; markdown formatter</span><button class="runbtn" onclick="runCode('ed5','out5')">&#9654; RUN</button></div>
+      <textarea id="ed5" spellcheck="false">var cs = {
+  client: "Agensi Real Estate X",
+  problem: "Balas lead butuh 6 jam, banyak lead dingin",
+  solution: "Lead scoring + Slack alert instan via n8n",
+  before: "6 jam",
+  after: "2 menit"
+};
+
+// slug aman: hanya huruf/angka, spasi jadi strip (regex ASCII sederhana)
+var slug = cs.client.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+
+log("# Case Study: " + cs.client);
+log("**Problem:** " + cs.problem);
+log("**Solution:** " + cs.solution);
+log("**Result:** " + cs.before + " -> " + cs.after + " response time");
+log("slug: " + slug);</textarea>
+      <div class="out" id="out5"></div>
+    </div>
+
+    <div class="box n8n">
+      <div class="bh">&#9670; KONTEKS n8n</div>
+      Pola <code>.replace(/[^a-z0-9]+/g,"-")</code> ini sering dipakai di Code Node untuk membuat ID/filename aman dari nama klien sebelum simpan ke Google Drive atau Notion. Karakter class-nya terbatas &amp; tidak nested &mdash; aman dari catastrophic backtracking.
+    </div>
+
+    <div class="quiz" data-correct="0">
+      <div class="q">Bagian case study mana yang biasanya paling menentukan keputusan calon klien?</div>
+      <button class="opt" onclick="ans(this)">Result &mdash; angka before/after yang konkret</button>
+      <button class="opt" onclick="ans(this)">Context &mdash; nama industri</button>
+      <button class="opt" onclick="ans(this)">Daftar tools yang dipakai</button>
+      <div class="qfb"></div>
+    </div>
+  </section>
+
+  <!-- STEP 6 -->
+  <section class="step" data-name="Portfolio">
+    <div class="kicker">// STEP 06</div>
+    <h2 class="title">Portfolio Presentation</h2>
+    <p class="lead">Klien tidak membaca kode kamu. Mereka butuh melihat hasil dalam 60 detik. Presentasi yang jelas mengubah skill jadi kepercayaan.</p>
+
+    <h3>Tiga Format Wajib</h3>
+    <ul>
+      <li><b>Loom demo (1&ndash;2 menit)</b> &mdash; tunjukkan workflow jalan dari trigger ke output. Visual &gt; deskripsi.</li>
+      <li><b>Workflow-as-code di GitHub</b> &mdash; export JSON n8n + README. Bukti kamu rapi &amp; bisa di-handover.</li>
+      <li><b>One-pager solusi</b> &mdash; problem, solusi, hasil, harga &mdash; dalam satu halaman scannable.</li>
+    </ul>
+
+    <h3>Bingkai dengan STAR</h3>
+    <p>Saat presentasi tiap proyek, ceritakan dengan: <b class="acc">S</b>ituation &rarr; <b class="acc">T</b>ask &rarr; <b class="acc">A</b>ction &rarr; <b class="acc">R</b>esult. Kerangka ini memaksa kamu menutup dengan dampak, bukan dengan daftar fitur.</p>
+
+    <div class="tip">
+      <div class="bh">&#9670; JEMBATAN KE F-05</div>
+      Paket portfolio yang kamu rapikan di sini langsung jadi amunisi F-05 (Market Entry): profil Upwork, proposal, dan discovery call semuanya menarik dari case study + one-pager + demo Loom yang kamu siapkan sekarang.
+    </div>
+
+    <div class="box warnbox">
+      <div class="bh">&#9888; HINDARI</div>
+      Portfolio penuh jargon teknis tanpa konteks bisnis. "Saya pakai HTTP Request node + Merge + Code Node" tidak berarti apa-apa untuk pemilik bisnis. Terjemahkan ke bahasa hasil: "lead masuk &rarr; tim ditugaskan otomatis dalam 2 menit".
+    </div>
+  </section>
+
+  <!-- STEP 7 -->
+  <section class="step" data-name="Mission">
+    <div class="kicker">// STEP 07 &middot; PRACTICE MISSION</div>
+    <h2 class="title">Paket Solusi Lengkap</h2>
+    <p class="lead">Project sesi ini: rakit satu objek <code class="acc">solutionPackage</code> lengkap untuk satu industri spesifik. Validator akan cek strukturnya.</p>
+
+    <div class="mission">
+      <div class="mh">&#9670; SPESIFIKASI OBJEK</div>
+      Objek <code>solutionPackage</code> harus punya:
+      <ul class="checklist" id="check7">
+        <li data-k="niche"><code>niche</code> &mdash; string industri spesifik</li>
+        <li data-k="workflows"><code>workflows</code> &mdash; array berisi minimal 2 nama workflow</li>
+        <li data-k="pricing"><code>pricing</code> &mdash; objek dengan minimal 3 tier</li>
+        <li data-k="caseStudy"><code>caseStudy</code> &mdash; objek dengan field <code>before</code> &amp; <code>after</code></li>
+        <li data-k="portfolio"><code>portfolio</code> &mdash; array berisi minimal 1 format demo</li>
+      </ul>
+    </div>
+
+    <div class="editor">
+      <div class="ed-bar"><span>rakit solutionPackage lalu RUN untuk validasi</span><button class="runbtn" onclick="runMission()">&#9654; VALIDATE</button></div>
+      <textarea id="ed7" spellcheck="false">// Lengkapi/ubah paket untuk industri pilihanmu
+var solutionPackage = {
+  niche: "Agensi Real Estate",
+  workflows: [
+    "Lead scoring + Slack alert",
+    "Follow-up email otomatis"
+  ],
+  pricing: {
+    starter: 500,
+    growth: 1500,
+    scale: 500
+  },
+  caseStudy: {
+    client: "Agensi X",
+    before: "6 jam response",
+    after: "2 menit response"
+  },
+  portfolio: [
+    "Loom demo 90 detik",
+    "GitHub workflow JSON + README"
+  ]
+};
+
+// Jangan hapus baris ini:
+return solutionPackage;</textarea>
+      <div class="out" id="out7"></div>
+    </div>
+  </section>
+
+  <!-- STEP 8 -->
+  <section class="step" data-name="Recap">
+    <div class="kicker">// STEP 08 &middot; CHECKPOINT</div>
+    <h2 class="title">Recap &amp; Penutup F-04</h2>
+    <p class="lead">Selamat &mdash; ini sesi terakhir F-04. Kamu sekarang punya differentiator yang jelas di pasar remote.</p>
+
+    <h3>Yang Kamu Kuasai di Sesi Ini</h3>
+    <ul>
+      <li>Memilih niche vertikal dengan kerangka skor terukur (demand, pain, budget, domain).</li>
+      <li>Membangun workflow template config-driven yang reusable lintas klien.</li>
+      <li>Mengemas harga dalam 3 tier + berpikir value-based, bukan jual jam.</li>
+      <li>Mendokumentasikan case study dengan struktur Context&rarr;Problem&rarr;Solution&rarr;Result + angka.</li>
+      <li>Menyiapkan portfolio: Loom demo, workflow-as-code, one-pager.</li>
+    </ul>
+
+    <h3>Peta F-04 (Selesai)</h3>
+    <ul>
+      <li><b class="ok">&#10003; Sesi 1</b> &mdash; LLM API Mastery</li>
+      <li><b class="ok">&#10003; Sesi 2</b> &mdash; Agentic Workflows</li>
+      <li><b class="ok">&#10003; Sesi 3</b> &mdash; Niche Specialization (sekarang)</li>
+    </ul>
+
+    <div class="box n8n">
+      <div class="bh">&#9670; CHECKPOINT MENTOR</div>
+      Sebelum lanjut ke <b>F-05 (Market Entry &amp; Income)</b>, pastikan kamu sudah punya satu <code>solutionPackage</code> nyata untuk satu industri &mdash; lengkap dengan minimal 2 workflow, 3 tier harga, 1 case study, dan format demo. Itu fondasi portfolio yang akan dikonversi jadi income di fase berikutnya.
+    </div>
+
+    <div class="tip">
+      <div class="bh">&#9670; MILESTONE F-04</div>
+      Punya unique selling point yang jelas di pasar remote. &#10003;
+    </div>
+  </section>
+
+</main>
+
+<div class="nav">
+  <button class="prev" id="prevBtn" onclick="go(-1)">&larr; PREV</button>
+  <button class="next" id="nextBtn" onclick="go(1)">NEXT &rarr;</button>
+</div>
+
+<button class="tutor-fab" onclick="toggleTutor()" aria-label="AI Tutor">&#9650;</button>
+<div class="tutor" id="tutor">
+  <div class="th"><b>&#9670; AI TUTOR &mdash; F-04 S3</b><button class="close" onclick="toggleTutor()">&times;</button></div>
+  <div class="tmsg" id="tutorMsg"></div>
+</div>
+
+<script>
+"use strict";
+
+/* ---------- step navigation ---------- */
+var steps = document.querySelectorAll(".step");
+var TOTAL = steps.length;
+var cur = 0;
+
+var tutorHints = [
+  "<b>Briefing.</b> Inti: generalist bersaing harga, specialist bersaing nilai. Tugasmu sesi ini menghasilkan satu paket solusi untuk satu industri.",
+  "<b>Pilih Niche.</b> Skor 4 kriteria (demand, pain, budget, domain) 1-5. Jangan abaikan domain fit -- niche yang kamu paham lebih mudah dijual walau skornya sedikit lebih rendah.",
+  "<b>Workflow Template.</b> Kunci: config-driven + item?.json + default value. Logika tetap, parameter berubah. Itu yang bikin satu workflow laku berkali-kali.",
+  "<b>Pricing.</b> Bingkai dari ROI klien, bukan jam kerjamu. Tier tengah (GROWTH) sengaja jadi sweet spot lewat anchoring.",
+  "<b>Case Study.</b> Result dengan angka before/after dibaca duluan. Tanpa angka, case study cuma cerita.",
+  "<b>Portfolio.</b> Loom demo + workflow-as-code + one-pager. Terjemahkan jargon teknis ke bahasa hasil bisnis.",
+  "<b>Mission.</b> Rakit solutionPackage: niche, workflows (>=2), pricing (>=3 tier), caseStudy (before+after), portfolio (>=1). Klik VALIDATE.",
+  "<b>Recap.</b> F-04 selesai. Pastikan punya 1 paket nyata sebelum masuk F-05 Market Entry & Income."
+];
+
+function buildRail(){
+  var rail = document.getElementById("rail");
+  for (var i = 0; i < TOTAL; i++){
+    var b = document.createElement("button");
+    b.className = "pill" + (i === 0 ? " active" : "");
+    b.textContent = (i+1) + ". " + steps[i].getAttribute("data-name");
+    (function(idx){ b.onclick = function(){ jump(idx); }; })(i);
+    rail.appendChild(b);
+  }
+}
+
+function render(){
+  for (var i = 0; i < TOTAL; i++){
+    steps[i].classList.toggle("show", i === cur);
+  }
+  var pills = document.querySelectorAll(".pill");
+  for (var j = 0; j < pills.length; j++){
+    pills[j].classList.toggle("active", j === cur);
+    if (j < cur) pills[j].classList.add("done");
+  }
+  var pct = ((cur+1) / TOTAL) * 100;
+  document.getElementById("progfill").style.width = pct + "%";
+  document.getElementById("stepname").textContent =
+    (cur+1 < 10 ? "0" : "") + (cur+1) + " / " + steps[cur].getAttribute("data-name");
+  document.getElementById("stepct").textContent = "STEP " + (cur+1) + " / " + TOTAL;
+  document.getElementById("prevBtn").disabled = (cur === 0);
+  document.getElementById("nextBtn").textContent = (cur === TOTAL-1) ? "SELESAI \u2713" : "NEXT \u2192";
+  document.getElementById("tutorMsg").innerHTML = tutorHints[cur];
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function go(d){
+  var n = cur + d;
+  if (n < 0 || n >= TOTAL) return;
+  cur = n; render();
+}
+function jump(i){ cur = i; render(); }
+
+/* ---------- code runner (sandbox) ---------- */
+function makeInput(){
+  // mock $input.all() dengan beberapa item sample
+  var data = [
+    { json: { niche: "CRM", scores: [5,4,5,4], email: "ali@acme.io", company: "Acme", budget: 2000 } },
+    { json: { niche: "Content", scores: [5,3,4,3], email: "rina@blog.id", company: "", budget: 500 } },
+    { json: { niche: "Finance", scores: [4,5,5,2], email: "fin@corp.co", company: "Corp", budget: 5000 } }
+  ];
+  return { all: function(){ return data; } };
+}
+
+function runCode(inId, outId){
+  var src = document.getElementById(inId).value;
+  var out = document.getElementById(outId);
+  var lines = [];
+  var log = function(){
+    var parts = [];
+    for (var k = 0; k < arguments.length; k++){
+      var a = arguments[k];
+      parts.push(typeof a === "object" ? JSON.stringify(a) : String(a));
+    }
+    lines.push(parts.join(" "));
+  };
+  out.innerHTML = "";
+  try {
+    var $input = makeInput();
+    var fn = new Function("$input", "log", "Math", "Number", "String", "JSON", src);
+    fn($input, log, Math, Number, String, JSON);
+    if (lines.length === 0) lines.push("(tidak ada output -- pakai log(...) untuk menampilkan hasil)");
+    for (var i = 0; i < lines.length; i++){
+      var span = document.createElement("span");
+      span.className = "ln ok";
+      span.textContent = "\u203A " + lines[i];
+      out.appendChild(span);
+    }
+  } catch (e){
+    var err = document.createElement("span");
+    err.className = "ln err";
+    err.textContent = "\u2717 ERROR: " + e.message;
+    out.appendChild(err);
+  }
+}
+
+/* ---------- mission validator ---------- */
+function runMission(){
+  var src = document.getElementById("ed7").value;
+  var out = document.getElementById("out7");
+  out.innerHTML = "";
+  var checks = document.querySelectorAll("#check7 li");
+  var pkg;
+  try {
+    var fn = new Function(src + "\nreturn typeof solutionPackage !== 'undefined' ? solutionPackage : null;");
+    pkg = fn();
+  } catch (e){
+    var er = document.createElement("span");
+    er.className = "ln err";
+    er.textContent = "\u2717 ERROR: " + e.message;
+    out.appendChild(er);
+    return;
+  }
+  if (!pkg || typeof pkg !== "object"){
+    var e2 = document.createElement("span");
+    e2.className = "ln err";
+    e2.textContent = "\u2717 solutionPackage tidak ditemukan / bukan objek.";
+    out.appendChild(e2);
+    return;
+  }
+
+  var rules = {
+    niche: typeof pkg.niche === "string" && pkg.niche.length > 0,
+    workflows: Array.isArray(pkg.workflows) && pkg.workflows.length >= 2,
+    pricing: pkg.pricing && typeof pkg.pricing === "object" && Object.keys(pkg.pricing).length >= 3,
+    caseStudy: pkg.caseStudy && typeof pkg.caseStudy === "object" &&
+               "before" in pkg.caseStudy && "after" in pkg.caseStudy,
+    portfolio: Array.isArray(pkg.portfolio) && pkg.portfolio.length >= 1
+  };
+
+  var passed = 0;
+  for (var i = 0; i < checks.length; i++){
+    var key = checks[i].getAttribute("data-k");
+    if (rules[key]){ checks[i].classList.add("pass"); passed++; }
+    else { checks[i].classList.remove("pass"); }
+  }
+
+  var res = document.createElement("span");
+  if (passed === checks.length){
+    res.className = "ln ok";
+    res.textContent = "\u2713 LULUS! Paket lengkap (" + passed + "/" + checks.length + "). Siap masuk portfolio F-05.";
+  } else {
+    res.className = "ln err";
+    res.textContent = "\u2717 " + passed + "/" + checks.length + " syarat terpenuhi. Lengkapi yang masih kosong.";
+  }
+  out.appendChild(res);
+}
+
+/* ---------- quiz ---------- */
+function ans(btn){
+  var quiz = btn.closest(".quiz");
+  if (quiz.getAttribute("data-locked") === "1") return;
+  var correct = parseInt(quiz.getAttribute("data-correct"), 10);
+  var opts = quiz.querySelectorAll(".opt");
+  var idx = Array.prototype.indexOf.call(opts, btn);
+  var fb = quiz.querySelector(".qfb");
+  if (idx === correct){
+    btn.classList.add("correct");
+    fb.className = "qfb ok";
+    fb.textContent = "\u2713 Tepat.";
+  } else {
+    btn.classList.add("wrong");
+    opts[correct].classList.add("correct");
+    fb.className = "qfb err";
+    fb.textContent = "\u2717 Kurang pas \u2014 jawaban yang benar disorot hijau.";
+  }
+  quiz.setAttribute("data-locked", "1");
+}
+
+/* ---------- tutor ---------- */
+function toggleTutor(){
+  document.getElementById("tutor").classList.toggle("open");
+}
+
+/* ---------- init ---------- */
+buildRail();
+render();
+</script>
+</body>
+</html>
