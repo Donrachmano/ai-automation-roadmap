@@ -339,7 +339,7 @@ const modules = [
     sessions: [
       { code: "F-05 · Sesi 1", title: "Portfolio & Personal Brand", file: "f05-sesi1-portfolio-personal-brand.html", status: "done" },
       { code: "F-05 · Sesi 2", title: "Client Acquisition", file: "f05-sesi2-client-acquisition.html", status: "done" },
-      { code: "F-05 · Sesi 3", title: "Scaling & SaaS Prep", file: null, status: "soon" },
+      { code: "F-05 · Sesi 3", title: "Scaling & SaaS Prep", file: "f05-sesi3-scaling-saas-prep.html", status: "done" },
     ],
   },
 ];
