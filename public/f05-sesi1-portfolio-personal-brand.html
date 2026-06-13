@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>F-05 Sesi 1 - Portfolio &amp; Personal Brand</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#080c10; --bg2:#0a0f14; --bg3:#0d1f2d;
+      --bd:#1e3a4a; --ac:#ff8c42; --ac2:rgba(255,140,66,.12);
+      --tx:#c9d1d9; --tx2:#8b949e; --tx3:#6e7681;
+      --gn:#3fb950; --cy:#00e5ff; --n8:#69db7c; --rd:#f85149;
+      --font:'JetBrains Mono','Courier New',monospace;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{background:var(--bg);color:var(--tx);font-family:var(--font);font-size:13px;line-height:1.6;min-height:100vh;}
+    ::-webkit-scrollbar{width:4px;} ::-webkit-scrollbar-track{background:var(--bg);} ::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px;}
+
+    /* HEADER */
+    .hdr{background:linear-gradient(180deg,#0d1f2d 0%,var(--bg) 100%);border-bottom:1px solid var(--bd);padding:14px 20px 10px;position:sticky;top:0;z-index:50;}
+    .hdr-eye{display:flex;align-items:center;gap:8px;margin-bottom:3px;}
+    .dot{width:7px;height:7px;border-radius:50%;background:var(--ac);box-shadow:0 0 8px var(--ac);animation:pulse 2s infinite;}
+    @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+    .hdr-badge{font-size:9px;color:var(--ac);letter-spacing:3px;text-transform:uppercase;}
+    .hdr-title{font-size:clamp(14px,4vw,19px);font-weight:700;color:#e6edf3;}
+    .hdr-sub{font-size:10px;color:var(--tx3);margin-top:2px;}
+
+    /* PROGRESS */
+    .prog{padding:10px 20px 0;background:var(--bg2);border-bottom:1px solid var(--bd);}
+    .prog-lbl{font-size:9px;color:var(--tx3);letter-spacing:2px;margin-bottom:6px;}
+    .dots-row{display:flex;gap:4px;margin-bottom:8px;}
+    .sdot{flex:1;height:3px;border-radius:2px;background:var(--bd);transition:background .3s;cursor:pointer;}
+    .sdot.dn{background:rgba(255,140,66,.5);} .sdot.ac{background:var(--ac);}
+    .si{display:flex;align-items:center;gap:8px;padding-bottom:8px;}
+    .sn{font-size:10px;color:var(--ac);font-weight:700;}
+    .snm{font-size:10px;color:var(--tx2);letter-spacing:1px;text-transform:uppercase;}
+
+    /* LAYOUT */
+    .main{padding:18px 18px 90px;}
+    .step{display:none;} .step.active{display:block;}
+
+    /* TYPE */
+    h2{font-size:17px;font-weight:700;color:#e6edf3;margin-bottom:8px;}
+    h3{font-size:11px;font-weight:700;color:var(--ac);letter-spacing:1.5px;margin-bottom:6px;text-transform:uppercase;}
+    p{font-size:12px;color:var(--tx2);line-height:1.7;margin-bottom:10px;}
+    .lbl{font-size:9px;color:var(--tx3);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;display:block;}
+    .hl{color:var(--ac);font-weight:600;} .hl-g{color:var(--gn);} .hl-c{color:var(--cy);}
+    hr{border:none;border-top:1px solid var(--bd);margin:14px 0;}
+
+    /* CARDS */
+    .card{background:var(--bg3);border:1px solid var(--bd);border-radius:8px;padding:14px;margin-bottom:12px;}
+    .card-ac{border-color:rgba(255,140,66,.4);background:rgba(255,140,66,.04);}
+
+    /* LIST */
+    .lst{list-style:none;}
+    .lst li{display:flex;gap:8px;font-size:12px;color:var(--tx);margin-bottom:6px;line-height:1.5;}
+    .lst li::before{content:'>';color:var(--ac);flex-shrink:0;font-weight:700;}
+
+    /* CODE BLOCK */
+    .cb{background:#040608;border:1px solid var(--bd);border-left:3px solid var(--ac);border-radius:4px;padding:12px;font-size:11px;color:#e6edf3;line-height:1.9;margin-bottom:12px;white-space:pre-wrap;overflow-x:auto;font-family:var(--font);}
+
+    /* TOOL BOX */
+    .tool-box{background:#040710;border:1px solid var(--ac);border-radius:8px;padding:14px;margin-bottom:14px;}
+    .tool-title{font-size:10px;color:var(--ac);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;}
+
+    /* FORM */
+    .ig{margin-bottom:9px;}
+    .ig label{font-size:10px;color:var(--tx3);letter-spacing:1px;display:block;margin-bottom:4px;}
+    input[type=text],textarea,select{width:100%;background:var(--bg3);border:1px solid var(--bd);border-radius:4px;color:var(--tx);font-family:var(--font);font-size:12px;padding:8px 10px;outline:none;transition:border-color .2s;}
+    input[type=text]:focus,textarea:focus,select:focus{border-color:var(--ac);}
+    textarea{resize:vertical;min-height:70px;}
+    select{cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236e7681'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;}
+
+    /* BUTTONS */
+    .btn{padding:8px 16px;border-radius:4px;border:none;cursor:pointer;font-family:var(--font);font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;transition:all .2s;}
+    .btn-p{background:var(--ac);color:#000;} .btn-p:hover{background:#ff9f5a;}
+    .btn-g{background:transparent;border:1px solid var(--ac);color:var(--ac);} .btn-g:hover{background:rgba(255,140,66,.1);}
+    .btn-sm{padding:5px 10px;font-size:10px;}
+
+    /* OUTPUT */
+    .out-box{background:var(--bg);border:1px solid var(--gn);border-radius:4px;padding:12px;font-size:11px;color:#e6edf3;line-height:1.8;margin-top:10px;white-space:pre-wrap;font-family:var(--font);}
+
+    /* CHECKLIST */
+    .ci{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--bd);cursor:pointer;user-select:none;}
+    .ci:last-child{border-bottom:none;}
+    .cb2{width:16px;height:16px;border:1px solid var(--tx3);border-radius:3px;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:1px;transition:all .2s;font-size:10px;font-weight:700;}
+    .cb2.chk{background:var(--ac);border-color:var(--ac);color:#000;}
+    .cl{font-size:12px;color:var(--tx);flex:1;line-height:1.5;}
+    .cl.dn{color:var(--tx3);text-decoration:line-through;}
+
+    /* PROGRESS BAR */
+    .pb-w{background:var(--bd);border-radius:2px;height:4px;overflow:hidden;margin-top:6px;}
+    .pb-f{height:100%;background:var(--ac);border-radius:2px;transition:width .4s;}
+    .pb-l{font-size:10px;color:var(--tx3);margin-top:4px;}
+
+    /* QUIZ */
+    .quiz-box{background:rgba(63,185,80,.05);border:1px solid rgba(63,185,80,.2);border-left:3px solid var(--gn);border-radius:6px;padding:14px;margin-top:16px;}
+    .ql{font-size:9px;color:var(--gn);letter-spacing:2px;margin-bottom:12px;}
+    .qqw{margin-bottom:14px;}
+    .qqw:last-child{margin-bottom:0;}
+    .qq{font-size:12px;color:#e6edf3;margin-bottom:8px;font-weight:600;}
+    .qo{display:block;width:100%;padding:7px 10px;border:1px solid var(--bd);border-radius:4px;background:var(--bg2);color:var(--tx2);font-family:var(--font);font-size:11px;text-align:left;cursor:pointer;margin-bottom:4px;transition:all .2s;}
+    .qo:hover:not([disabled]){border-color:var(--ac);color:var(--tx);}
+    .qo.correct{border-color:var(--gn);background:rgba(63,185,80,.1);color:#e6edf3;}
+    .qo.wrong{border-color:var(--rd);background:rgba(248,81,73,.1);}
+    .qo:disabled{cursor:default;}
+    .qfb{font-size:11px;padding:6px 8px;border-radius:4px;margin-top:4px;display:none;}
+    .qfb.ok{background:rgba(63,185,80,.1);color:var(--gn);border:1px solid rgba(63,185,80,.2);}
+    .qfb.no{background:rgba(248,81,73,.1);color:var(--rd);border:1px solid rgba(248,81,73,.2);}
+
+    /* N8N BOX */
+    .n8n{background:rgba(105,219,124,.05);border:1px solid rgba(105,219,124,.2);border-left:3px solid var(--n8);border-radius:6px;padding:12px;margin-bottom:12px;}
+    .n8n-l{font-size:9px;color:var(--n8);letter-spacing:2px;margin-bottom:5px;}
+    .n8n-t{font-size:11px;color:var(--tx);line-height:1.6;}
+
+    /* TIP BOX */
+    .tip{background:rgba(255,140,66,.05);border:1px solid rgba(255,140,66,.2);border-radius:6px;padding:12px;margin-bottom:12px;}
+    .tip-l{font-size:9px;color:var(--ac);letter-spacing:2px;margin-bottom:5px;}
+    .tip-t{font-size:11px;color:var(--tx2);line-height:1.6;}
+
+    /* ACCORDION HEAD */
+    .ah{display:flex;justify-content:space-between;align-items:center;padding:11px 13px;background:var(--bg2);border:1px solid var(--bd);border-radius:6px;cursor:pointer;transition:all .2s;margin-bottom:4px;}
+    .ah.open{border-color:var(--ac);background:rgba(255,140,66,.05);border-radius:6px 6px 0 0;margin-bottom:0;}
+
+    /* SCORE RING */
+    .sr{display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg3);border:1px solid var(--bd);border-radius:6px;margin-bottom:10px;}
+
+    /* GRID */
+    .g2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+    @media(max-width:400px){.g2{grid-template-columns:1fr;}}
+
+    /* NAV */
+    .nav-bar{position:fixed;bottom:0;left:0;right:0;background:var(--bg2);border-top:1px solid var(--bd);padding:10px 18px;display:flex;gap:10px;z-index:40;}
+    .nav-btn{flex:1;padding:10px;border-radius:4px;border:1px solid var(--bd);background:var(--bg3);color:var(--tx);font-family:var(--font);font-size:11px;cursor:pointer;letter-spacing:1px;transition:all .2s;}
+    .nav-btn.pr{background:rgba(255,140,66,.15);border-color:var(--ac);color:var(--ac);}
+    .nav-btn:disabled{opacity:.3;cursor:default;}
+
+    /* AI TUTOR */
+    .fab{position:fixed;bottom:66px;right:14px;width:42px;height:42px;border-radius:50%;background:var(--ac);color:#000;border:none;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 0 16px rgba(255,140,66,.5);z-index:60;font-family:var(--font);transition:transform .2s;}
+    .fab:hover{transform:scale(1.1);}
+    .tp{position:fixed;bottom:118px;right:10px;width:calc(100% - 20px);max-width:380px;background:var(--bg2);border:1px solid var(--ac);border-radius:10px;overflow:hidden;z-index:55;display:none;flex-direction:column;box-shadow:0 0 24px rgba(255,140,66,.2);}
+    .tp.open{display:flex;}
+    .th{padding:9px 13px;background:rgba(255,140,66,.08);border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;}
+    .th-t{font-size:10px;color:var(--ac);letter-spacing:2px;}
+    .tc{background:none;border:none;color:var(--tx3);cursor:pointer;font-size:16px;font-family:var(--font);}
+    .tm{flex:1;max-height:240px;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:7px;}
+    .msg{padding:8px 10px;border-radius:6px;font-size:11px;line-height:1.6;max-width:92%;}
+    .mu{background:rgba(255,140,66,.12);border:1px solid rgba(255,140,66,.25);color:#e6edf3;align-self:flex-end;}
+    .ma{background:var(--bg3);border:1px solid var(--bd);color:var(--tx);align-self:flex-start;}
+    .tir{display:flex;gap:6px;padding:8px 10px;border-top:1px solid var(--bd);}
+    .ti{flex:1;background:var(--bg3);border:1px solid var(--bd);border-radius:4px;color:var(--tx);font-family:var(--font);font-size:11px;padding:6px 9px;outline:none;}
+    .ti:focus{border-color:var(--ac);}
+    .ts{background:var(--ac);border:none;color:#000;padding:6px 12px;border-radius:4px;cursor:pointer;font-family:var(--font);font-size:11px;font-weight:700;}
+    .qbs{display:flex;gap:5px;flex-wrap:wrap;padding:6px 10px 0;}
+    .qb{background:rgba(255,140,66,.1);border:1px solid rgba(255,140,66,.2);color:var(--ac);padding:4px 8px;border-radius:12px;font-size:10px;cursor:pointer;font-family:var(--font);}
+    .qb:hover{background:rgba(255,140,66,.2);}
+
+    /* HL VARIANT */
+    .hlv{background:var(--bg3);border:1px solid var(--bd);border-radius:4px;padding:10px;margin-bottom:7px;}
+    .hlv-text{font-size:12px;color:#e6edf3;line-height:1.5;margin-bottom:6px;}
+    .hlv-foot{display:flex;justify-content:space-between;align-items:center;}
+
+    /* MISC */
+    .num3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+    .num-card{background:var(--bg2);border:1px solid var(--bd);border-radius:6px;padding:10px;text-align:center;}
+    .nc-sub{font-size:11px;color:var(--tx3);margin-bottom:4px;}
+    .nc-val{font-size:16px;font-weight:700;color:var(--ac);}
+    .nc-unit{font-size:10px;color:var(--tx3);}
+    .nc-desc{font-size:10px;color:var(--tx2);margin-top:4px;}
+    .comp-row{display:flex;gap:10px;align-items:flex-start;padding:8px;background:var(--bg2);border-radius:4px;border-left:3px solid var(--ac);margin-bottom:6px;}
+    .comp-num{color:var(--ac);font-weight:700;font-size:13px;flex-shrink:0;width:20px;}
+    .comp-ttl{font-size:12px;font-weight:600;color:#e6edf3;}
+    .comp-sub{font-size:11px;color:var(--tx2);}
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- HEADER -->
+  <div class="hdr">
+    <div class="hdr-eye">
+      <div class="dot"></div>
+      <span class="hdr-badge">F-05 &bull; SESI 1 &bull; MARKET ENTRY &amp; INCOME</span>
+    </div>
+    <div class="hdr-title">Portfolio &amp; Personal Brand</div>
+    <div class="hdr-sub">Packaging Skills untuk Remote Income &rarr; $2K+/bulan</div>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="prog">
+    <div class="prog-lbl">&loz; PROGRESS SESI</div>
+    <div class="dots-row" id="stepDots"></div>
+    <div class="si">
+      <span class="sn" id="sNum">01/08</span>
+      <span class="snm" id="sName">INTRO</span>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <!-- ===== STEP 0: INTRO ===== -->
+    <div class="step active" id="step-0">
+      <span class="lbl">&loz; F-05 SESI 1</span>
+      <h2>Portfolio = Kredibilitas di Market Remote</h2>
+      <p>F-01 s/d F-04 = <span class="hl">skill building</span>. F-05 = <span class="hl">packaging &amp; selling</span>. Sekarang semua yang sudah dipelajari perlu dikemas menjadi aset yang bisa dilihat, dinilai, dan dibeli klien internasional.</p>
+
+      <div class="card card-ac">
+        <h3>Kenapa Portfolio &gt; CV?</h3>
+        <ul class="lst">
+          <li>Klien remote membuat keputusan dalam <span class="hl">10-30 detik</span> melihat profilmu</li>
+          <li>CV adalah klaim. Portfolio adalah <span class="hl">bukti yang bisa diverifikasi</span></li>
+          <li>Workflow n8n bisa di-import ulang oleh siapapun &mdash; tidak bisa dipalsukan</li>
+          <li>Portfolio yang kuat = <span class="hl">inbound leads pasif</span> dari GitHub, LinkedIn, Upwork</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>5 Komponen Portfolio AI Automation Expert</h3>
+        <div style="margin-top:4px">
+          <div class="comp-row"><div class="comp-num">01</div><div><div class="comp-ttl">GitHub Portfolio</div><div class="comp-sub">Workflow JSON + README terdokumentasi &mdash; verifiable proof</div></div></div>
+          <div class="comp-row"><div class="comp-num">02</div><div><div class="comp-ttl">Loom Demo Video</div><div class="comp-sub">Video 2-3 menit per proyek: hook + demo langsung + result</div></div></div>
+          <div class="comp-row"><div class="comp-num">03</div><div><div class="comp-ttl">LinkedIn Profile (EN)</div><div class="comp-sub">Dioptimasi untuk discoverability di market global</div></div></div>
+          <div class="comp-row"><div class="comp-num">04</div><div><div class="comp-ttl">Upwork Profile</div><div class="comp-sub">Niche positioning jelas untuk platform monetisasi utama</div></div></div>
+          <div class="comp-row"><div class="comp-num">05</div><div><div class="comp-ttl">Case Study Tertulis</div><div class="comp-sub">Narasi Problem &rarr; Solution &rarr; Result dengan metrik nyata</div></div></div>
+        </div>
+      </div>
+
+      <div class="n8n">
+        <div class="n8n-l">&loz; F-03 &amp; F-04 CONNECTION</div>
+        <div class="n8n-t">Semua workflow yang sudah kamu buat di F-03 (Lead Gen, CRM) dan F-04 (AI Customer Support, Research Agent) <strong>langsung bisa jadi portfolio piece pertama</strong>. Bahan baku sudah ada &mdash; sekarang tinggal dokumentasi.</div>
+      </div>
+
+      <div class="tip">
+        <div class="tip-l">&loz; MINDSET SHIFT</div>
+        <div class="tip-t">"Skill tanpa visibility = skill yang tidak menghasilkan uang." F-05 adalah fase mengubah 4 fase sebelumnya menjadi <strong>aset yang terlihat, terverifikasi, dan menghasilkan income</strong>.</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="ql">&loz; QUIZ CHECK &mdash; STEP 1</div>
+        <div class="qqw" data-qid="q0-0">
+          <div class="qq">1. Apa yang paling efektif membuktikan kemampuan ke klien remote?</div>
+          <button class="qo" onclick="pickQ(this,'q0-0')">A) Sertifikat dari kursus online</button>
+          <button class="qo" data-c="1" onclick="pickQ(this,'q0-0')">B) Portfolio dengan workflow berjalan, video demo, dan metrik</button>
+          <button class="qo" onclick="pickQ(this,'q0-0')">C) CV yang panjang dan detail</button>
+          <button class="qo" onclick="pickQ(this,'q0-0')">D) Jumlah followers di media sosial</button>
+          <div class="qfb" id="fb-q0-0"></div>
+        </div>
+        <div class="qqw" data-qid="q0-1">
+          <div class="qq">2. Berapa portfolio piece minimum yang ideal sebelum aktif melamar di Upwork?</div>
+          <button class="qo" onclick="pickQ(this,'q0-1')">A) 1 piece sudah cukup untuk memulai</button>
+          <button class="qo" data-c="1" onclick="pickQ(this,'q0-1')">B) 3-5 piece yang terdokumentasi lengkap</button>
+          <button class="qo" onclick="pickQ(this,'q0-1')">C) 10+ piece agar terlihat sangat berpengalaman</button>
+          <button class="qo" onclick="pickQ(this,'q0-1')">D) Portfolio tidak penting, yang penting proposal bagus</button>
+          <div class="qfb" id="fb-q0-1"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== STEP 1: GITHUB ===== -->
+    <div class="step" id="step-1">
+      <span class="lbl">&loz; KOMPONEN 1</span>
+      <h2>GitHub Portfolio: Workflow as Code</h2>
+      <p>GitHub adalah <span class="hl">resume teknikal yang bisa diverifikasi</span>. Klien tech-savvy (startup, SaaS, tech company) selalu cek GitHub sebelum memutuskan hire.</p>
+
+      <div class="card">
+        <h3>Cara Export Workflow n8n</h3>
+        <ul class="lst">
+          <li>Buka workflow di n8n dashboard</li>
+          <li>Klik ikon <span class="hl">tiga titik "..."</span> di kanan atas &rarr; pilih <span class="hl">"Download"</span></li>
+          <li>File <span class="hl">.json</span> akan terdownload &mdash; inilah yang di-commit ke GitHub</li>
+          <li>Siapapun dengan n8n bisa import file ini: portfolio jadi <span class="hl">fully verifiable</span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Struktur Repo Profesional</h3>
+        <div class="cb">n8n-lead-gen-crm-automation/
+├── README.md          &lt;-- wajah repo, wajib ada
+├── workflow.json      &lt;-- export dari n8n
+├── screenshots/
+│   ├── workflow-overview.png
+│   └── output-example.png
+└── docs/
+    └── setup-guide.md (opsional)</div>
+        <div class="tip" style="margin-bottom:0">
+          <div class="tip-l">&loz; NAMING CONVENTION</div>
+          <div class="tip-t">Gunakan <strong>kebab-case deskriptif</strong>: <span style="color:var(--ac)">n8n-lead-gen-crm-automation</span>, bukan <span style="color:var(--rd)">repo123</span> atau <span style="color:var(--rd)">WORKFLOW_FINAL</span>. Pin 6 repo terbaik di profil GitHub &mdash; AI workflow di posisi pertama.</div>
+        </div>
+      </div>
+
+      <!-- README GENERATOR -->
+      <div class="tool-box">
+        <div class="tool-title">&loz; README GENERATOR</div>
+        <div class="ig"><label>NAMA WORKFLOW</label><input type="text" id="rm-name" placeholder="Lead Generation CRM Automation"></div>
+        <div class="ig"><label>DESKRIPSI SINGKAT</label><input type="text" id="rm-desc" placeholder="Automates lead capture, enrichment, and follow-up via email &amp; Slack"></div>
+        <div class="ig"><label>TOOLS YANG DIGUNAKAN (pisah koma)</label><input type="text" id="rm-tools" placeholder="n8n, Google Sheets, Gmail, Slack, Airtable"></div>
+        <div class="ig"><label>HASIL YANG DICAPAI</label><input type="text" id="rm-result" placeholder="Reduces manual work from 3 hours to 10 minutes daily"></div>
+        <div class="ig"><label>LINK LOOM VIDEO (opsional)</label><input type="text" id="rm-loom" placeholder="https://loom.com/share/..."></div>
+        <button class="btn btn-p" onclick="genReadme()" style="margin-bottom:10px">GENERATE README</button>
+        <div id="rm-out" style="display:none">
+          <div class="out-box" id="rm-txt"></div>
+          <button class="btn btn-g btn-sm" onclick="copyEl('rm-txt')" style="margin-top:8px">COPY README</button>
+        </div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="ql">&loz; QUIZ CHECK &mdash; STEP 2</div>
+        <div class="qqw" data-qid="q1-0">
+          <div class="qq">1. Format file export workflow n8n yang di-commit ke GitHub?</div>
+          <button class="qo" onclick="pickQ(this,'q1-0')">A) .py (Python script)</button>
+          <button class="qo" data-c="1" onclick="pickQ(this,'q1-0')">B) .json (workflow JSON)</button>
+          <button class="qo" onclick="pickQ(this,'q1-0')">C) .yaml (YAML config)</button>
+          <button class="qo" onclick="pickQ(this,'q1-0')">D) .pdf (screenshot)</button>
+          <div class="qfb" id="fb-q1-0"></div>
+        </div>
+        <div class="qqw" data-qid="q1-1">
+          <div class="qq">2. Berapa maksimum repo yang bisa di-pin di profil GitHub?</div>
+          <button class="qo" onclick="pickQ(this,'q1-1')">A) 3 repo</button>
+          <button class="qo" onclick="pickQ(this,'q1-1')">B) 4 repo</button>
+          <button class="qo" data-c="1" onclick="pickQ(this,'q1-1')">C) 6 repo</button>
+          <button class="qo" onclick="pickQ(this,'q1-1')">D) Tidak ada batas</button>
+          <div class="qfb" id="fb-q1-1"></div>
+        </div>
+        <div class="qqw" data-qid="q1-2">
+          <div class="qq">3. Naming convention repo GitHub yang paling profesional?</div>
+          <button class="qo" onclick="pickQ(this,'q1-2')">A) repo123 atau myRepo</button>
+          <button class="qo" data-c="1" onclick="pickQ(this,'q1-2')">B) n8n-lead-generation-crm-automation</button>
+          <button class="qo" onclick="pickQ(this,'q1-2')">C) WORKFLOW_FINAL_V2</button>
+          <button class="qo" onclick="pickQ(this,'q1-2')">D) Workflow(Copy)(1)</button>
+          <div class="qfb" id="fb-q1-2"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== STEP 2: LOOM ===== -->
+    <div class="step" id="step-2">
+      <span class="lbl">&loz; KOMPONEN 2</span>
+      <h2>Loom: Show, Don&apos;t Tell</h2>
+      <p>Video demo adalah <span class="hl">trust builder terkuat</span> dalam portfolio AI Automation Expert. Klien melihat workflow berjalan live &mdash; tidak ada cara lebih meyakinkan.</p>
+
+      <div class="card card-ac">
+        <h3>Kenapa Video Beats Screenshot &amp; Text?</h3>
+        <ul class="lst">
+          <li>Text &amp; klaim: siapapun bisa menulis, tidak bisa diverifikasi</li>
+          <li>Screenshot: statis, tidak menunjukkan proses atau real execution</li>
+          <li>Video demo LIVE: workflow berjalan di depan mata &mdash; <span class="hl">tidak bisa dipalsukan</span></li>
+          <li>Profile dengan video demo dapat <span class="hl">4-8x lebih banyak</span> response dari klien</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Struktur Video 3 Menit yang Terbukti</h3>
+        <div class="cb">0:00-0:20  | HOOK (langsung ke nilai, jangan intro diri dulu)
+  "This workflow saves [X hours/week] by automating [pain point]."
+
+0:20-0:45  | PROBLEM
+  Tunjukkan proses manual yang menyakitkan.
+  Screenshot email chain, spreadsheet manual, berapa lama prosesnya.
+
+0:45-2:00  | DEMO LIVE
+  Jalankan workflow langsung di n8n. Walk through setiap node.
+  "Node ini ngapain, kenapa diperlukan" &mdash; jelaskan singkat.
+
+2:00-2:30  | RESULT
+  Tunjukkan output: email terkirim, row di Sheet, notif Slack.
+  Sebutkan metrik: "dari 3 jam menjadi 10 menit per hari."
+
+2:30-2:50  | CTA
+  "Interested? Check the link in my profile or DM me."</div>
+      </div>
+
+      <div class="card">
+        <h3>Tips Teknis</h3>
+        <ul class="lst">
+          <li>Resolusi minimal <span class="hl">1080p</span> (set di Loom settings)</li>
+          <li>Audio: earphones dengan mic, rekam di ruangan sepi</li>
+          <li>Aktifkan <span class="hl">cursor highlight</span> di Loom settings (buat gerakan kursor terlihat jelas)</li>
+          <li>Face cam di sudut kanan bawah: <span class="hl">wajib nyala</span> &mdash; membangun trust</li>
+          <li>Judul video SEO: <span class="hl">"n8n Lead Gen CRM | Saves 15h/Week | Full Demo"</span></li>
+        </ul>
+      </div>
+
+      <!-- VIDEO SCRIPT BUILDER -->
+      <div class="tool-box">
+        <div class="tool-title">&loz; VIDEO SCRIPT BUILDER</div>
+        <div class="g2">
+          <div class="ig"><label>WAKTU YANG DIHEMAT</label><input type="text" id="vs-time" placeholder="15 hours per week"></div>
+          <div class="ig"><label>PROSES YANG DIOTOMASI</label><input type="text" id="vs-proc" placeholder="lead capture dan follow-up"></div>
+        </div>
+        <div class="ig"><label>PAIN POINT SEBELUMNYA</label><input type="text" id="vs-pain" placeholder="manual copy-paste dari form ke CRM, 3 jam per hari"></div>
+        <div class="ig"><label>TOOLS UTAMA DALAM WORKFLOW</label><input type="text" id="vs-tools" placeholder="n8n, Google Sheets, Gmail, Slack"></div>
+        <div class="ig"><label>HASIL UTAMA (dengan angka)</label><input type="text" id="vs-res" placeholder="80% pengurangan manual work, 0 errors"></div>
+        <button class="btn btn-p" onclick="buildScript()" style="margin-bottom:10px">GENERATE SCRIPT</button>
+        <div id="vs-out" style="display:none">
+          <div class="out-box" id="vs-txt"></div>
+          <button class="btn btn-g btn-sm" onclick="copyEl('vs-txt')" style="margin-top:8px">COPY SCRIPT</button>
+        </div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="ql">&loz; QUIZ CHECK &mdash; STEP 3</div>
+        <div class="qqw" data-qid="q2-0">
+          <div class="qq">1. Durasi optimal video demo portfolio di Loom?</div>
+          <button class="qo" onclick="pickQ(this,'q2-0')">A) 30 detik (singkat padat)</button>
+          <button class="qo" data-c="1" onclick="pickQ(this,'q2-0')">B) 2-3 menit (cover semua bagian)</button>
+          <button class="qo" onclick="pickQ(this,'q2-0')">C) 10-15 menit (semakin detail semakin baik)</button>
+          <button class="qo" onclick="pickQ(this,'q2-0')">D) 30+ menit (comprehensive walkthrough)</button>
+          <div class="qfb" id="fb-q2-0"></div>
+        </div>
+        <div class="qqw" data-qid="q2-1">
+          <div class="qq">2. Apa yang HARUS ada di 20 detik pertama untuk menarik klien?</div>
+          <button class="qo" onclick="pickQ(this,'q2-1')">A) Perkenalan nama dan asal kota</button>
+          <button class="qo" onclick="pickQ(this,'q2-1')">B) Daftar lengkap semua tools yang digunakan</button>
+          <button class="qo" data-c="1" onclick="pickQ(this,'q2-1')">C) Hook: masalah yang dipecahkan + hasil yang dicapai</button>
+          <button class="qo" onclick="pickQ(this,'q2-1')">D) Disclaimer dan copyright notice</button>
+          <div class="qfb" id="fb-q2-1"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== STEP 3: LINKEDIN ===== -->
+    <div class="step" id="step-3">
+      <span class="lbl">&loz; KOMPONEN 3</span>
+      <h2>LinkedIn: Positioning di Market Global</h2>
+      <p>LinkedIn punya <span class="hl">900+ juta profesional</span>. Klien internasional mencari vendor di sini setiap hari. Profile yang dioptimasi = <span class="hl">inbound leads pasif</span> tanpa harus aktif apply.</p>
+
+      <div class="card">
+        <h3>Photo &amp; Banner</h3>
+        <ul class="lst">
+          <li><span class="hl">Foto:</span> wajah mengisi 60-70% frame, latar netral, pencahayaan bagus, ekspresi profesional-approachable. HP bagus + dekat jendela = sudah cukup.</li>
+          <li><span class="hl">Banner:</span> buat di Canva (1584x396px). Isi: nama + tagline + tools utama (logo n8n, OpenAI). Minimal, clean, readable di mobile.</li>
+        </ul>
+      </div>
+
+      <div class="card card-ac">
+        <h3>Headline Formula &mdash; 220 Karakter</h3>
+        <p style="margin-bottom:8px"><span class="hl">[Role] | [Niche] | [Key Result/Benefit]</span></p>
+        <div class="cb">Contoh strong headline:
+
+"AI Automation Specialist | E-Commerce & SaaS | Building n8n Workflows
+ That Save 20+ Hours/Week"
+
+"n8n Workflow Expert | Lead Generation & CRM | Reducing Manual Work
+ by 80% for Growing Businesses"
+
+"Business Process Automation | Marketing Agencies | AI-Powered n8n
+ Workflows + OpenAI Integration"</div>
+      </div>
+
+      <div class="card">
+        <h3>About Section &amp; Featured</h3>
+        <div class="cb">--- HOOK (baris 1-2, atasi pain klien langsung) ---
+Struggling with repetitive manual tasks eating your team's time?
+I build n8n automation workflows that eliminate manual work entirely.
+
+--- EXPERTISE (3-4 kalimat) ---
+I specialize in [niche] automation using n8n, REST APIs, and AI integrations.
+Tools: n8n, OpenAI, Claude, Google Sheets, Gmail, Slack, Airtable.
+
+--- PROOF (2 kalimat) ---
+My workflows have reduced processing time by 80%, eliminated data entry
+errors, and helped teams scale without additional headcount.
+
+--- CTA ---
+Open to consulting projects. Let's talk about automating your
+biggest bottleneck. → DM or connect.</div>
+        <div class="tip" style="margin-bottom:0;margin-top:10px">
+          <div class="tip-l">&loz; FEATURED SECTION</div>
+          <div class="tip-t">Pin <strong>2-3 item terbaik</strong>: 1 Loom video, 1 GitHub link, 1 case study. Featured adalah hal pertama yang dilihat klien setelah headline &mdash; manfaatkan maksimal.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Skills &amp; Activity</h3>
+        <p style="margin-bottom:6px">Skills yang perlu ditambahkan: <span class="hl">n8n, REST API, AI Automation, Workflow Design, API Integration, OpenAI API, Anthropic Claude, JavaScript, JSON, Webhook, Google Sheets, Airtable</span></p>
+        <p style="margin-bottom:0">Activity: post <span class="hl">1-2x per minggu</span> &mdash; automation win, tutorial singkat, case study snippet. Hook kuat di baris pertama (LinkedIn memotong setelah 3 baris).</p>
+      </div>
+
+      <!-- LINKEDIN HEADLINE BUILDER -->
+      <div class="tool-box">
+        <div class="tool-title">&loz; LINKEDIN HEADLINE BUILDER</div>
+        <div class="ig">
+          <label>PILIH ROLE UTAMA</label>
+          <select id="li-role">
+            <option value="AI Automation Specialist">AI Automation Specialist</option>
+            <option value="n8n Workflow Expert">n8n Workflow Expert</option>
+            <option value="AI Integration Engineer">AI Integration Engineer</option>
+            <option value="Business Process Automation Expert">Business Process Automation Expert</option>
+            <option value="Workflow Automation Consultant">Workflow Automation Consultant</option>
+          </select>
+        </div>
+        <div class="ig"><label>NICHE / INDUSTRI TARGET</label><input type="text" id="li-niche" placeholder="E-Commerce, SaaS, Real Estate, Marketing Agencies..."></div>
+        <div class="ig"><label>KEY RESULT / BENEFIT</label><input type="text" id="li-result" placeholder="Saving 20h/Week, Reducing Errors 80%, Scaling Without Hiring..."></div>
+        <button class="btn btn-p" onclick="buildHeadline()" style="margin-bottom:10px">GENERATE HEADLINE</button>
+        <div id="li-out" style="display:none"><div id="li-var"></div></div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="ql">&loz; QUIZ CHECK &mdash; STEP 4</div>
+        <div class="qqw" data-qid="q3-0">
+          <div class="qq">1. Headline LinkedIn mana yang paling efektif untuk AI Automation Expert?</div>
+          <button class="qo" onclick="pickQ(this,'q3-0')">A) "Freelancer berpengalaman mencari kerja"</button>
+          <button class="qo" data-c="1" onclick="pickQ(this,'q3-0')">B) "AI Automation Specialist | E-Commerce | Saving 20h/Week for Clients"</button>
+          <button class="qo" onclick="pickQ(this,'q3-0')">C) "Software Engineer dengan banyak keahlian"</button>
+          <button class="qo" onclick="pickQ(this,'q3-0')">D) "Open to opportunities - DM me anytime"</button>
+          <div class="qfb" id="fb-q3-0"></div>
+        </div>
+        <div class="qqw" data-qid="q3-1">
+          <div class="qq">2. Fungsi utama "Featured" section di LinkedIn untuk portfolio?</div>
+          <button class="qo" onclick="pickQ(this,'q3-1')">A) Menampilkan semua sertifikat pendidikan formal</button>
+          <button class="qo" data-c="1" onclick="pickQ(this,'q3-1')">B) Pin case study, Loom video, dan GitHub terbaik agar mudah dilihat klien</button>
+          <button class="qo" onclick="pickQ(this,'q3-1')">C) Menampilkan semua post yang pernah dibuat</button>
+          <button class="qo" onclick="pickQ(this,'q3-1')">D) Mendaftar semua koneksi LinkedIn</button>
+          <div class="qfb" id="fb-q3-1"></div>
+        </div>
+        <div class="qqw" data-qid="q3-2">
+          <div class="qq">3. Frekuensi posting konten LinkedIn yang ideal untuk membangun personal brand?</div>
+          <button class="qo" onclick="pickQ(this,'q3-2')">A) Sekali sehari tanpa gagal</button>
+          <button class="qo" data-c="1" onclick="pickQ(this,'q3-2')">B) 1-2x per minggu secara konsisten</button>
+          <button class="qo" onclick="pickQ(this,'q3-2')">C) Hanya posting saat punya klien baru</button>
+          <button class="qo" onclick="pickQ(this,'q3-2')">D) Tidak perlu posting, cukup profile yang bagus</button>
+          <div class="qfb" id="fb-q3-2"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== STEP 4: UPWORK ===== -->
+    <div class="step" id="step-4">
+      <span class="lbl">&loz; KOMPONEN 4</span>
+      <h2>Upwork: Niche Positioning Strategy</h2>
+      <p>Upwork adalah platform freelance terbesar di dunia. Dengan positioning yang tepat, ini bisa menjadi <span class="hl">mesin penghasil income pertama</span> dari klien internasional.</p>
+
+      <div class="card card-ac">
+        <h3>Kenapa Niche Beats Generalis?</h3>
+        <ul class="lst">
+          <li>Algoritma Upwork <span class="hl">memprioritaskan profil spesifik</span> di search results</li>
+          <li>Klien mencari spesialis: "n8n expert" bukan "programmer yang bisa segalanya"</li>
+          <li>Spesialis bisa charge <span class="hl">2-3x lebih mahal</span> dari generalis</li>
+          <li>Lebih mudah membangun reputasi dan JSS (Job Success Score) di satu area</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Title Formula</h3>
+        <div class="cb">[Specific Tool] + [Use Case / Niche] + [Outcome]
+
+"n8n Automation Expert | CRM & Lead Generation | Save 20+ Hours/Week"
+"AI Workflow Builder | E-Commerce Automation | n8n & OpenAI Specialist"
+"Business Process Automation | n8n | Reducing Manual Work by 80%"</div>
+      </div>
+
+      <div class="card">
+        <h3>Overview Structure</h3>
+        <div class="cb">--- HOOK (2 kalimat) ---
+Struggling with repetitive manual tasks eating your team's time?
+I build n8n workflows that eliminate manual work and scale your ops.
+
+--- EXPERTISE (3-4 kalimat) ---
+I specialize in [niche] automation, connecting your tools using n8n,
+REST APIs, and AI integrations (OpenAI, Claude). Lead gen, CRM, email
+automation, data pipelines, or AI-powered support workflows.
+
+--- PROOF (2 kalimat) ---
+My workflows reduce processing time by 80%, eliminate data entry errors,
+and let teams handle 10x volume without additional headcount.
+
+--- OFFER ---
+I deliver: workflow design, build, testing, documentation, 30-day support.
+Typical timeline: 3-7 business days.
+
+--- CTA ---
+Ready to automate your biggest bottleneck? Let's talk.</div>
+      </div>
+
+      <div class="card">
+        <h3>Hourly Rate Strategy</h3>
+        <div class="num3">
+          <div class="num-card"><div class="nc-sub">STARTER</div><div class="nc-val">$25-40</div><div class="nc-unit">/hr</div><div class="nc-desc">0-4 reviews<br>Prioritas: dapatkan review</div></div>
+          <div class="num-card"><div class="nc-sub">GROWING</div><div class="nc-val">$50-80</div><div class="nc-unit">/hr</div><div class="nc-desc">5-9 reviews<br>Naik setelah 5 review</div></div>
+          <div class="num-card"><div class="nc-sub">EXPERT</div><div class="nc-val">$80-120</div><div class="nc-unit">/hr</div><div class="nc-desc">10+ reviews<br>Selektif pilih proyek</div></div>
+        </div>
+      </div>
+
+      <!-- UPWORK VALIDATOR -->
+      <div class="tool-box">
+        <div class="tool-title">&loz; UPWORK PROFILE VALIDATOR</div>
+        <p style="font-size:11px;color:var(--tx2);margin-bottom:12px">Centang item yang sudah selesai untuk melihat kesiapan profilmu.</p>
+        <div id="uw-list"></div>
+        <div class="sr" style="margin-top:12px">
+          <div>
+            <div style="display:flex;align-items:baseline;gap:4px">
+              <span style="font-size:28px;font-weight:700;color:var(--ac)" id="uw-num">0</span>
+              <span style="font-size:12px;color:var(--tx3)">/ 12</span>
+            </div>
+            <div style="font-size:11px;color:var(--tx2)" id="uw-desc">Centang item yang sudah selesai</div>
+          </div>
+          <div class="pb-w" style="flex:1;margin:0"><div class="pb-f" id="uw-pb" style="width:0%"></div></div>
+        </div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="ql">&loz; QUIZ CHECK &mdash; STEP 5</div>
+        <div class="qqw" data-qid="q4-0">
+          <div class="qq">1. Kenapa niche positioning lebih efektif dari generalis di Upwork?</div>
+          <button class="qo" onclick="pickQ(this,'q4-0')">A) Klien Upwork tidak percaya pada generalis</button>
+          <button class="qo" data-c="1" onclick="pickQ(this,'q4-0')">B) Algoritma Upwork memprioritaskan profil spesifik di search results</button>
+          <button class="qo" onclick="pickQ(this,'q4-0')">C) Generalis tidak diizinkan mendaftar ke Upwork</button>
+          <button class="qo" onclick="pickQ(this,'q4-0')">D) Niche lebih mudah karena kompetisi lebih sedikit</button>
+          <div class="qfb" id="fb-q4-0"></div>
+        </div>
+        <div class="qqw" data-qid="q4-1">
+          <div class="qq">2. Overview Upwork yang efektif dimulai dengan?</div>
+          <button class="qo" onclick="pickQ(this,'q4-1')">A) Daftar lengkap semua skills yang dimiliki</button>
+          <button class="qo" data-c="1" onclick="pickQ(this,'q4-1')">B) Hook 2 kalimat yang menyentuh pain point klien langsung</button>
+          <button class="qo" onclick="pickQ(this,'q4-1')">C) Hourly rate yang ditawarkan</button>
+          <button class="qo" onclick="pickQ(this,'q4-1')">D) Link ke GitHub portfolio</button>
+          <div class="qfb" id="fb-q4-1"></div>
+        </div>
+        <div class="qqw" data-qid="q4-2">
+          <div class="qq">3. Hourly rate yang tepat untuk pemula (0-4 reviews) di Upwork?</div>
+          <button class="qo" onclick="pickQ(this,'q4-2')">A) $100+/hr langsung dari awal</button>
+          <button class="qo" data-c="1" onclick="pickQ(this,'q4-2')">B) $25-40/hr untuk mendapatkan review pertama</button>
+          <button class="qo" onclick="pickQ(this,'q4-2')">C) Gratis untuk 10 klien pertama</button>
+          <button class="qo" onclick="pickQ(this,'q4-2')">D) $150+/hr untuk menunjukkan premium positioning</button>
+          <div class="qfb" id="fb-q4-2"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== STEP 5: CASE STUDY ===== -->
+    <div class="step" id="step-5">
+      <span class="lbl">&loz; KOMPONEN 5</span>
+      <h2>Case Study: Problem &rarr; Solution &rarr; Result</h2>
+      <p>Case study adalah <span class="hl">narasi lengkap kemampuanmu</span>. Menunjukkan cara berpikir, pendekatan problem-solving, dan yang terpenting: <span class="hl">hasil yang bisa diukur</span>.</p>
+
+      <div class="card card-ac">
+        <h3>3 Bagian yang Tidak Bisa Dilewat</h3>
+        <ul class="lst">
+          <li><span class="hl">PROBLEM:</span> Spesifik tentang pain (industri, ukuran tim, jam yang terbuang, berapa error per hari)</li>
+          <li><span class="hl">SOLUTION:</span> Proses dan tools yang kamu gunakan &mdash; bukan hanya output tapi <em>bagaimana</em> kamu approach-nya</li>
+          <li><span class="hl">RESULT:</span> Selalu dengan angka: %, jam, $, atau quantity. Tanpa angka = tidak meyakinkan</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Tips per Bagian</h3>
+        <div class="cb">PROBLEM &mdash; jadikan spesifik:
+  "A mid-size e-commerce company..."       &lt;-- industri
+  "...processing 200+ leads per week..."   &lt;-- scale
+  "...manually copying data between 4 tools..." &lt;-- pain
+  "...taking 3 hours per day per person"   &lt;-- cost
+
+SOLUTION &mdash; jelaskan proses, bukan hanya tool:
+  "I analyzed their workflow and identified 3 bottlenecks..."
+  "Using n8n with Google Sheets, Gmail, Slack..."
+  "The workflow triggers when a form is submitted..."
+  "Including error handling and fallback notifications..."
+
+RESULT &mdash; SELALU quantify:
+  "From 3 hours to 10 minutes daily"       &lt;-- time saving
+  "80% reduction in processing time"       &lt;-- percentage
+  "Zero errors vs. 15-20 errors/week"      &lt;-- quality
+  "Running 4 months with zero downtime"    &lt;-- reliability</div>
+      </div>
+
+      <div class="tip">
+        <div class="tip-l">&loz; WHERE TO PUBLISH</div>
+        <div class="tip-t">LinkedIn post (carousel) + GitHub README + Upwork portfolio + personal website. <strong>Satu case study = konten untuk 4 platform berbeda.</strong></div>
+      </div>
+
+      <!-- CASE STUDY FORMATTER -->
+      <div class="tool-box">
+        <div class="tool-title">&loz; CASE STUDY FORMATTER</div>
+        <div class="g2">
+          <div class="ig"><label>JENIS PROYEK</label><input type="text" id="cs-proj" placeholder="Lead Generation Automation"></div>
+          <div class="ig"><label>INDUSTRI KLIEN</label><input type="text" id="cs-ind" placeholder="E-Commerce / SaaS"></div>
+        </div>
+        <div class="ig"><label>PROBLEM (pain point spesifik)</label><textarea id="cs-prob" placeholder="A mid-size e-commerce company was manually copying 200+ leads per week, taking 3 hours per day and causing frequent errors..."></textarea></div>
+        <div class="ig"><label>SOLUTION (proses + tools)</label><textarea id="cs-sol" placeholder="I built an n8n workflow that automatically captures form submissions, enriches data, pushes to Google Sheets, and sends instant Slack notifications..."></textarea></div>
+        <div class="ig"><label>RESULT (dengan angka/metrik)</label><textarea id="cs-res" placeholder="Reduced manual work from 3 hours to 10 minutes daily. Zero data entry errors since implementation (previously 15-20 errors/week)..."></textarea></div>
+        <div class="g2">
+          <div class="ig"><label>KEY METRIC 1</label><input type="text" id="cs-m1" placeholder="85% time reduction"></div>
+          <div class="ig"><label>KEY METRIC 2</label><input type="text" id="cs-m2" placeholder="100% error elimination"></div>
+        </div>
+        <button class="btn btn-p" onclick="fmtCaseStudy()" style="margin-bottom:10px">FORMAT CASE STUDY</button>
+        <div id="cs-out" style="display:none">
+          <div class="out-box" id="cs-txt"></div>
+          <button class="btn btn-g btn-sm" onclick="copyEl('cs-txt')" style="margin-top:8px">COPY CASE STUDY</button>
+        </div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="ql">&loz; QUIZ CHECK &mdash; STEP 6</div>
+        <div class="qqw" data-qid="q5-0">
+          <div class="qq">1. Bagian "Result" dalam case study harus selalu mengandung?</div>
+          <button class="qo" onclick="pickQ(this,'q5-0')">A) Minimal 500 kata deskriptif</button>
+          <button class="qo" data-c="1" onclick="pickQ(this,'q5-0')">B) Angka dan metrik spesifik (%, jam, $, quantity)</button>
+          <button class="qo" onclick="pickQ(this,'q5-0')">C) Bahasa teknis kompleks agar terlihat profesional</button>
+          <button class="qo" onclick="pickQ(this,'q5-0')">D) Nama klien secara spesifik (selalu)</button>
+          <div class="qfb" id="fb-q5-0"></div>
+        </div>
+        <div class="qqw" data-qid="q5-1">
+          <div class="qq">2. Strategi publikasi case study yang paling optimal?</div>
+          <button class="qo" onclick="pickQ(this,'q5-1')">A) Hanya di website pribadi</button>
+          <button class="qo" onclick="pickQ(this,'q5-1')">B) Hanya di GitHub saja</button>
+          <button class="qo" data-c="1" onclick="pickQ(this,'q5-1')">C) Multi-platform: LinkedIn + GitHub + Upwork (satu konten, banyak platform)</button>
+          <button class="qo" onclick="pickQ(this,'q5-1')">D) Tidak perlu dipublikasikan, simpan untuk diri sendiri</button>
+          <div class="qfb" id="fb-q5-1"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== STEP 6: PORTFOLIO PIECES ===== -->
+    <div class="step" id="step-6">
+      <span class="lbl">&loz; PORTFOLIO BUILDER</span>
+      <h2>5 Portfolio Piece yang Wajib Dimiliki</h2>
+      <p>Kelima piece ini dirancang untuk mencakup <span class="hl">berbagai use case yang sering dicari klien</span> &mdash; dari basic automation hingga AI integration &mdash; sekaligus menunjukkan range kemampuanmu.</p>
+
+      <div class="n8n" style="margin-bottom:14px">
+        <div class="n8n-l">&loz; GOOD NEWS: KAMU SUDAH PUNYA BAHAN BAKU</div>
+        <div class="n8n-t">Workflow Lead Gen + CRM (F-03), AI Customer Support &amp; Research Agent (F-04) langsung bisa jadi dasar untuk piece 1, 4, dan 5. <strong>Tinggal tambahkan dokumentasi (GitHub + Loom + case study).</strong></div>
+      </div>
+
+      <span class="lbl">&loz; PORTFOLIO TRACKER &mdash; KLIK ITEM UNTUK TOGGLE</span>
+      <div id="port-tracker"></div>
+
+      <div class="sr" style="margin-top:14px">
+        <div>
+          <div style="font-size:11px;color:var(--tx3);margin-bottom:2px">OVERALL PROGRESS</div>
+          <div style="font-size:13px;color:var(--ac);font-weight:700" id="ov-pct">0 / 25 items</div>
+        </div>
+        <div class="pb-w" style="flex:1;margin:0"><div class="pb-f" id="ov-pb" style="width:0%"></div></div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="ql">&loz; QUIZ CHECK &mdash; STEP 7</div>
+        <div class="qqw" data-qid="q6-0">
+          <div class="qq">1. Portfolio piece mana yang paling menunjukkan kemampuan AI integration?</div>
+          <button class="qo" onclick="pickQ(this,'q6-0')">A) Lead Generation Automation (piece 1)</button>
+          <button class="qo" data-c="1" onclick="pickQ(this,'q6-0')">B) AI Customer Support atau Multi-step AI Research Agent (piece 4 atau 5)</button>
+          <button class="qo" onclick="pickQ(this,'q6-0')">C) Data Pipeline sederhana (piece 3)</button>
+          <button class="qo" onclick="pickQ(this,'q6-0')">D) Semua piece menunjukkan level kemampuan yang sama</button>
+          <div class="qfb" id="fb-q6-0"></div>
+        </div>
+        <div class="qqw" data-qid="q6-1">
+          <div class="qq">2. Setiap portfolio piece punya 5 sub-checklist. Apa yang TIDAK termasuk?</div>
+          <button class="qo" onclick="pickQ(this,'q6-1')">A) Workflow n8n dibangun &amp; ditest</button>
+          <button class="qo" onclick="pickQ(this,'q6-1')">B) Loom video 2-3 menit direkam</button>
+          <button class="qo" data-c="1" onclick="pickQ(this,'q6-1')">C) Mendapatkan pembayaran dari klien nyata</button>
+          <button class="qo" onclick="pickQ(this,'q6-1')">D) Case study tertulis (problem-solution-result)</button>
+          <div class="qfb" id="fb-q6-1"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== STEP 7: PRACTICE MISSION ===== -->
+    <div class="step" id="step-7">
+      <span class="lbl">&loz; PRACTICE MISSION</span>
+      <h2>Mission: Build Your First Portfolio Piece</h2>
+      <p>Teori selesai. Sekarang waktunya <span class="hl">eksekusi</span>. Mission minggu ini: pilih 1 workflow dari F-03 atau F-04, lengkapi semua komponen dokumentasinya dalam 7 hari.</p>
+
+      <div class="card card-ac">
+        <h3>Langkah Pertama: Pilih Workflow</h3>
+        <p>Pilih workflow yang paling kamu banggakan dari F-03 atau F-04. Lead Gen CRM, AI Customer Support, atau Research Agent semuanya bagus. Yang penting kamu bisa menjelaskan: <span class="hl">problem yang dipecahkan</span> + <span class="hl">hasilnya dengan angka</span>.</p>
+      </div>
+
+      <span class="lbl">&loz; WEEKLY DELIVERABLES &mdash; TARGET SELESAI DALAM 7 HARI</span>
+      <div id="mission-list"></div>
+      <div class="pb-w" style="margin:8px 0 4px"><div class="pb-f" id="ms-pb" style="width:0%"></div></div>
+      <div class="pb-l" id="ms-pct">0 / 8 tasks selesai</div>
+
+      <div class="card" style="margin-top:14px">
+        <h3>Timeline 7 Hari</h3>
+        <div class="cb">Hari 1-2: Export workflow, buat GitHub repo, tulis README
+         (Gunakan README Generator di Step 2)
+
+Hari 3-4: Rekam dan upload Loom video 2-3 menit
+         (Gunakan Video Script Builder di Step 3)
+
+Hari 5:   Tulis case study lengkap min. 200 kata
+         (Gunakan Case Study Formatter di Step 6)
+
+Hari 6:   Update LinkedIn Featured + Upwork portfolio
+
+Hari 7:   Review, share di LinkedIn, collect feedback</div>
+      </div>
+
+      <div class="n8n">
+        <div class="n8n-l">&loz; SETELAH PIECE PERTAMA SELESAI</div>
+        <div class="n8n-t">Lanjut ke piece kedua. Setelah 3 piece lengkap, mulai aktif apply di Upwork. Rate awal $25-40/hr. <strong>Review pertama adalah aset terpenting</strong> &mdash; deliver value di atas rate untuk 5 proyek pertama.</div>
+      </div>
+
+      <div class="tip">
+        <div class="tip-l">&loz; PRO TIP</div>
+        <div class="tip-t"><strong>1 piece terdokumentasi dengan baik</strong> (GitHub + Loom + case study) lebih valuable dari 10 workflow tanpa dokumentasi. Quality over quantity untuk 5 piece pertama.</div>
+      </div>
+
+      <div class="card">
+        <h3>Quick Questions untuk AI Tutor</h3>
+        <p>Gunakan tombol oranye di kanan bawah untuk tanya langsung:</p>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="qb" onclick="askQ('Cara membuat README yang menarik untuk workflow n8n?')">README tips</button>
+          <button class="qb" onclick="askQ('Gimana cara dapat klien pertama di Upwork?')">Klien pertama</button>
+          <button class="qb" onclick="askQ('Tips rekam Loom video yang bagus?')">Loom video</button>
+          <button class="qb" onclick="askQ('Bagaimana cara pricing automation project?')">Pricing</button>
+          <button class="qb" onclick="askQ('Niche apa yang paling banyak dicari di Upwork untuk automation?')">Best niche</button>
+        </div>
+      </div>
+
+      <div id="comp-banner" style="display:none;background:rgba(63,185,80,.1);border:1px solid var(--gn);border-radius:8px;padding:16px;text-align:center;margin-top:14px">
+        <div style="font-size:20px;margin-bottom:8px">&#127881;</div>
+        <div style="font-size:13px;font-weight:700;color:var(--gn);margin-bottom:6px">SESI 1 SELESAI!</div>
+        <div style="font-size:11px;color:var(--tx2)">Portfolio piece pertama dalam progress. Lanjut ke Sesi 2: Client Acquisition Strategy.</div>
+      </div>
+    </div>
+
+  </div><!-- end main -->
+
+  <!-- NAV -->
+  <div class="nav-bar">
+    <button class="nav-btn" id="btnPrev" onclick="navStep(-1)" disabled>&#8592; SEBELUMNYA</button>
+    <button class="nav-btn pr" id="btnNext" onclick="navStep(1)">BERIKUTNYA &#8594;</button>
+  </div>
+
+  <!-- AI TUTOR FAB -->
+  <button class="fab" onclick="toggleTutor()" title="AI Tutor">AI</button>
+
+  <!-- AI TUTOR PANEL -->
+  <div class="tp" id="tutorPanel">
+    <div class="th">
+      <span class="th-t">&#9654; AI TUTOR &mdash; PORTFOLIO ADVISOR</span>
+      <button class="tc" onclick="toggleTutor()">&#215;</button>
+    </div>
+    <div class="qbs">
+      <button class="qb" onclick="askQ('Cara buat README yang bagus?')">README</button>
+      <button class="qb" onclick="askQ('Tips LinkedIn headline?')">LinkedIn</button>
+      <button class="qb" onclick="askQ('Cara dapat klien pertama Upwork?')">Upwork</button>
+      <button class="qb" onclick="askQ('Gimana cara pricing project?')">Pricing</button>
+    </div>
+    <div class="tm" id="tutorMsg"></div>
+    <div class="tir">
+      <input class="ti" id="tutorIn" type="text" placeholder="Tanya tentang portfolio &amp; income..." onkeydown="if(event.key==='Enter')sendQ()">
+      <button class="ts" onclick="sendQ()">&#8594;</button>
+    </div>
+  </div>
+
+</div><!-- end app -->
+
+<script>
+  /* ============ STATE ============ */
+  var cur = 0, TOTAL = 8;
+  var NAMES = [
+    'INTRO: PORTFOLIO = KREDIBILITAS',
+    'KOMPONEN 1: GITHUB PORTFOLIO',
+    'KOMPONEN 2: LOOM DEMO VIDEO',
+    'KOMPONEN 3: LINKEDIN OPTIMIZATION',
+    'KOMPONEN 4: UPWORK PROFILE',
+    'KOMPONEN 5: CASE STUDY FORMATTER',
+    'PORTFOLIO PIECES TRACKER',
+    'PRACTICE MISSION'
+  ];
+
+  /* ============ QUIZ EXPLANATIONS ============ */
+  var QX = {
+    'q0-0':'Portfolio dengan workflow berjalan + video demo + metrik adalah bukti konkrit yang tidak bisa dipalsukan. Klien remote tidak bisa interview tatap muka.',
+    'q0-1':'3-5 piece terdokumentasi lengkap cukup untuk menunjukkan range kemampuan tanpa terlihat terlalu tipis atau terlalu tersebar.',
+    'q1-0':'n8n menyimpan workflow sebagai JSON. File ini yang bisa di-import siapapun yang punya n8n, menjadikan portfolio sepenuhnya verifiable.',
+    'q1-1':'GitHub membatasi 6 pinned repo per profil. Pilih 6 yang paling impressive dan relevan dengan niche target.',
+    'q1-2':'kebab-case deskriptif adalah standar nama repo yang professional, mudah dibaca, dan SEO-friendly di GitHub search.',
+    'q2-0':'2-3 menit adalah sweet spot: cukup untuk cover hook + problem + demo live + result + CTA tanpa membuat klien kehilangan perhatian.',
+    'q2-1':'Hook yang kuat di 20 detik pertama menentukan apakah klien akan terus menonton. Langsung ke nilai yang diberikan, jangan intro diri dulu.',
+    'q3-0':'Formula [Role] | [Niche] | [Result] langsung mengkomunikasikan siapa kamu, untuk siapa, dan apa manfaat spesifiknya dalam satu kalimat.',
+    'q3-1':'Featured adalah prime real estate LinkedIn. Letakkan bukti terbaik di sini karena ini yang pertama dilihat setelah headline dan foto profil.',
+    'q3-2':'1-2x per minggu adalah frekuensi optimal: konsisten tanpa membuang waktu terlalu banyak, dan membangun kredibilitas jangka panjang.',
+    'q4-0':'Algoritma Upwork memang memprioritaskan profil spesifik di search results. Klien juga lebih percaya spesialis daripada generalis.',
+    'q4-1':'Hook yang menyentuh pain point klien di kalimat pertama membuat mereka langsung merasa "ini untuk saya" dan terus membaca.',
+    'q4-2':'Review adalah mata uang Upwork. Mulai kompetitif untuk dapat 5 review pertama, lalu naikkan rate secara bertahap.',
+    'q5-0':'Angka mengubah case study dari cerita menjadi bukti. "85% time reduction" jauh lebih meyakinkan dari "significantly faster".',
+    'q5-1':'Satu case study bisa jadi konten untuk 4+ platform. Multi-platform maksimalkan jangkauan tanpa harus membuat konten baru.',
+    'q6-0':'AI workflow (customer support, research agent) menunjukkan kemampuan AI integration yang menjadi differentiator utama di market saat ini.',
+    'q6-1':'Portfolio piece checklist fokus pada dokumentasi: build, GitHub, README, Loom, case study. Pembayaran bukan bagian dari dokumentasi portfolio.'
+  };
+
+  /* ============ UPWORK ITEMS ============ */
+  var UW_ITEMS = [
+    'Foto profil professional (wajah jelas, latar netral)',
+    'Title/judul yang niche-spesifik (gunakan formula yang benar)',
+    'Overview terstruktur: hook + expertise + proof + CTA',
+    'Hourly rate sudah diset sesuai level saat ini',
+    'Minimal 10 skills yang relevan terdaftar',
+    'Minimal 1 portfolio item/project sample diupload',
+    'ID verification sudah selesai',
+    'Availability & jam kerja per minggu sudah diset',
+    'Video perkenalan direkam (sangat direkomendasikan)',
+    'Profile completeness sudah 100%',
+    'Setidaknya 1 skill test/certification diselesaikan',
+    'Tagline/sub-headline di header sudah diisi'
+  ];
+  var uwState = new Array(12).fill(false);
+
+  /* ============ PORTFOLIO DATA ============ */
+  var PP = [
+    { title:'Lead Generation + CRM Automation', tag:'F-03', problem:'Manual lead tracking & data entry membuang 3+ jam/hari', stack:'n8n + Google Sheets + Gmail + Slack', result:'Auto-capture, enrich, notify tim, trigger follow-up email otomatis' },
+    { title:'Content Publishing Automation', tag:'AI+n8n', problem:'Manual posting ke multiple platform, sering terlupakan dan tidak konsisten', stack:'n8n + OpenAI/Claude + Social Media APIs + Sheets', result:'Generate konten, schedule, auto-publish ke multi-platform' },
+    { title:'Data Pipeline / Automated Reporting', tag:'F-03', problem:'Laporan harian/mingguan dibuat manual dari berbagai sumber data', stack:'n8n + Data Source APIs + Google Sheets + Email', result:'Auto-collect, process, kirim laporan terjadwal ke stakeholder' },
+    { title:'AI-Powered Customer Support Workflow', tag:'F-04', problem:'Tim support kewalahan dengan pertanyaan repetitif dari pelanggan', stack:'n8n + OpenAI/Claude + Slack + Knowledge Base', result:'AI jawab query umum otomatis, eskalasi ke human jika diperlukan' },
+    { title:'Multi-step AI Research Agent', tag:'F-04', problem:'Research manual butuh jam per topik, hasilnya tidak konsisten', stack:'n8n AI Agent + Web Search + OpenAI/Claude + Notion', result:'Input topik, agent riset multi-sumber, output laporan terstruktur' }
+  ];
+  var portState = [
+    [false,false,false,false,false],
+    [false,false,false,false,false],
+    [false,false,false,false,false],
+    [false,false,false,false,false],
+    [false,false,false,false,false]
+  ];
+  var PC = ['Workflow n8n dibangun & ditest','Export JSON ke GitHub repo','README.md ditulis lengkap','Loom video 2-3 menit direkam','Case study tertulis (problem-solution-result)'];
+
+  /* ============ MISSION DATA ============ */
+  var MI = [
+    'Export workflow dari n8n sebagai file JSON',
+    'Buat GitHub repo baru dengan nama kebab-case deskriptif',
+    'Commit workflow.json + screenshot ke repo',
+    'Tulis README.md lengkap (gunakan README Generator di Step 2)',
+    'Rekam Loom video 2-3 menit (hook + demo live + result)',
+    'Tulis case study minimal 200 kata (gunakan Formatter di Step 6)',
+    'Update LinkedIn Featured dengan link Loom dan/atau GitHub',
+    'Tambahkan ke Upwork portfolio (jika sudah ada akun)'
+  ];
+  var msState = new Array(8).fill(false);
+
+  /* ============ TUTOR KB ============ */
+  var KB = [
+    {kw:['readme','template','dokumentasi repo'],ans:'README yang baik berisi: (1) Nama & overview singkat, (2) What It Does dalam bullet points, (3) Tools & Nodes yang digunakan, (4) Prerequisites & cara menggunakan, (5) Screenshot/output, (6) Link Loom demo. Gunakan README Generator di Step 2!'},
+    {kw:['linkedin','headline','judul profil','tagline'],ans:'Formula headline terbaik: [Role] | [Niche] | [Key Result]. Contoh: "AI Automation Specialist | E-Commerce | Saving 20h/Week". Maks 220 karakter. Gunakan LinkedIn Headline Builder di Step 4!'},
+    {kw:['loom','video','demo','rekam','record'],ans:'Struktur Loom 2-3 menit: HOOK (0-20 det): waktu dihemat + apa yang diotomasi. PROBLEM (20-45 det): tunjukkan proses manual. DEMO (45-120 det): workflow live. RESULT (120-150 det): output. CTA (150-180 det). Aktifkan face cam dan cursor highlight!'},
+    {kw:['rate','harga','tarif','bayaran','charge','pricing'],ans:'Rate Upwork: Starter (0-4 reviews) = $25-40/hr. Growing (5-9 reviews) = $50-80/hr. Expert (10+) = $80-120/hr. Fixed price: simple workflow $100-300, medium $300-800, AI workflow $800-2000+. Naikkan rate setelah tiap 5 review positif.'},
+    {kw:['upwork','overview','bio','profile'],ans:'Overview Upwork: (1) Hook 2 kalimat atasi pain point, (2) Expertise 3-4 kalimat + tools, (3) Proof 2 kalimat dengan angka, (4) Offer: apa yang kamu deliver + timeline, (5) CTA. Total ideal 200-300 kata. Gunakan template di Step 5!'},
+    {kw:['case study','metrik','angka','result'],ans:'Result di case study HARUS pakai angka. Buruk: "menghemat banyak waktu". Bagus: "Dari 3 jam ke 10 menit per hari (85% lebih cepat), 0 error vs sebelumnya 15-20/minggu". Gunakan Case Study Formatter di Step 6!'},
+    {kw:['klien pertama','first client','dapat proyek','proposal'],ans:'Untuk klien pertama: (1) Apply rate sedikit lebih rendah ($25-35/hr), (2) Fokus proyek kecil yang ada portfolio piece-nya, (3) Personalisasi setiap proposal - baca job posting teliti dan reference masalah spesifik klien, (4) Tanya 1 pertanyaan smart. Review pertama paling berharga!'},
+    {kw:['niche','spesialisasi','industri target'],ans:'Cara pilih niche: (1) Industri yang kamu pahami atau tertarik, (2) Cek demand di Upwork (search automation + industri), (3) Mulai 1-2 niche, expand nanti. Top niches: E-Commerce, SaaS, Real Estate, Marketing Agency, Healthcare admin.'},
+    {kw:['portfolio','piece','proyek','workflow'],ans:'5 portfolio pieces yang direkomendasikan: (1) Lead Gen + CRM, (2) Content Publishing, (3) Data Pipeline / Reporting, (4) AI Customer Support, (5) Multi-step AI Research Agent. Pieces 1, 4, 5 bisa langsung dari F-03 dan F-04!'},
+    {kw:['github','repo','struktur','folder','pin'],ans:'Struktur repo: README.md + workflow.json di root, folder /screenshots, folder /docs. Naming: kebab-case deskriptif. Pin 6 repo terbaik di profil (AI workflow paling depan). Semua pinned repo wajib punya README lengkap!'},
+    {kw:['bahasa','inggris','english','grammar'],ans:'LinkedIn dan Upwork harus full Bahasa Inggris. Gunakan Grammarly untuk grammar check. Clarity > complexity. Simple, direct, benefit-focused. Claude/ChatGPT bisa bantu draft pertama, tapi edit dan personalisasi sendiri setelahnya.'},
+    {kw:['foto','photo','gambar','profile picture'],ans:'Foto profil: wajah isi 60-70% frame, latar netral/blur, pencahayaan bagus (dekat jendela siang). Ekspresi professional-approachable. HP kamera bagus sudah cukup, tidak perlu fotografer studio.'},
+    {kw:['export','json','download workflow'],ans:'Cara export n8n: buka workflow, klik menu "..." di kanan atas, pilih "Download". File JSON terdownload. Commit file ini ke GitHub repo. Siapapun dengan n8n bisa import file ini - portfoliomu jadi fully verifiable!'},
+    {kw:['featured','pin linkedin'],ans:'Featured LinkedIn: pin 1 Loom video terbaik + 1 GitHub link + 1 case study post. Ini yang pertama dilihat setelah headline. Update berkala dengan konten terbaru yang paling mengesankan.'},
+    {kw:['posting','konten','content','activity'],ans:'Konten LinkedIn: (1) Automation win - "Workflow ini hemat X jam/minggu", (2) Tutorial singkat, (3) Case study snippet, (4) Tool tips. Post 1-2x/minggu konsisten. Hook kuat di baris pertama - LinkedIn potong setelah 3 baris.'},
+    {kw:['proposal','melamar','apply'],ans:'Proposal yang convert: Sebut masalah spesifik klien di awal (baca job posting teliti!). Jangan template copy-paste. Jelaskan approach dan process. Tunjukkan workflow serupa yang pernah dibuat. Tanya 1 pertanyaan smart. Ideal 150-250 kata.'},
+    {kw:['berapa lama','timeline','kapan dapat uang'],ans:'Timeline realistis: Minggu 1-2: dokumentasi piece pertama. Minggu 3-4: setup profiles + piece ke-2. Minggu 5-6: piece ke-3, mulai apply Upwork. Bulan 2-3: dapat 3-5 review. Bulan 4-6: rate naik + LinkedIn generate inbound. Bulan 6: $500-1000+/bulan realistis.'},
+    {kw:['canva','banner','design banner'],ans:'Banner LinkedIn di Canva: 1584x396px. Cari template "LinkedIn Banner", pilih minimal dan professional. Isi: nama + tagline + tools utama (logo n8n, OpenAI) + satu benefit/result. Readable di mobile adalah prioritas utama.'}
+  ];
+
+  /* ============ INIT ============ */
+  window.onload = function() {
+    renderDots();
+    buildUpworkList();
+    buildPortTracker();
+    buildMissionList();
+    addMsg('a','Halo! Saya AI Tutor untuk sesi Portfolio & Personal Brand. Tanya apapun: GitHub portfolio, LinkedIn optimization, Upwork strategy, case study, atau cara dapat klien pertama!');
+  };
+
+  /* ============ NAVIGATION ============ */
+  function renderDots() {
+    var c = document.getElementById('stepDots');
+    c.innerHTML = '';
+    for (var i = 0; i < TOTAL; i++) {
+      var d = document.createElement('div');
+      d.className = 'sdot' + (i < cur ? ' dn' : '') + (i === cur ? ' ac' : '');
+      (function(idx) { d.onclick = function() { goStep(idx); }; })(i);
+      c.appendChild(d);
+    }
+    document.getElementById('sNum').textContent = pad(cur+1) + '/' + pad(TOTAL);
+    document.getElementById('sName').textContent = NAMES[cur];
+    document.getElementById('btnPrev').disabled = (cur === 0);
+    document.getElementById('btnNext').textContent = cur === TOTAL-1 ? 'SELESAI \u2713' : 'BERIKUTNYA \u2192';
+  }
+  function pad(n) { return n < 10 ? '0'+n : ''+n; }
+  function navStep(d) { var nx = cur+d; if (nx<0||nx>=TOTAL) return; goStep(nx); }
+  function goStep(idx) {
+    document.getElementById('step-'+cur).classList.remove('active');
+    cur = idx;
+    document.getElementById('step-'+cur).classList.add('active');
+    renderDots();
+    window.scrollTo(0,0);
+  }
+
+  /* ============ QUIZ ============ */
+  function pickQ(btn, qId) {
+    var c = document.querySelector('[data-qid="'+qId+'"]');
+    if (!c || c.dataset.ans) return;
+    c.dataset.ans = '1';
+    var ok = btn.dataset.c === '1';
+    c.querySelectorAll('.qo').forEach(function(b) {
+      b.disabled = true;
+      if (b.dataset.c === '1') b.classList.add('correct');
+    });
+    if (!ok) btn.classList.add('wrong');
+    var fb = document.getElementById('fb-'+qId);
+    if (fb) {
+      fb.style.display = 'block';
+      fb.className = 'qfb ' + (ok ? 'ok' : 'no');
+      fb.textContent = (ok ? 'Benar! ' : 'Belum tepat. ') + (QX[qId] || '');
+    }
+  }
+
+  /* ============ README GENERATOR ============ */
+  function genReadme() {
+    var name = document.getElementById('rm-name').value.trim() || 'My n8n Workflow';
+    var desc = document.getElementById('rm-desc').value.trim() || 'Automates repetitive business processes.';
+    var tools = document.getElementById('rm-tools').value.trim() || 'n8n';
+    var result = document.getElementById('rm-result').value.trim() || 'Saves hours of manual work daily.';
+    var loom = document.getElementById('rm-loom').value.trim();
+    var loomLine = loom ? '\n\n## Demo\nFull workflow demo: ' + loom : '\n\n## Demo\n> Add your Loom video link here';
+    var toolList = tools.split(',');
+    var toolLines = '';
+    for (var i = 0; i < toolList.length; i++) toolLines += '- ' + toolList[i].trim() + '\n';
+    var md = '# ' + name + '\n\n'
+      + '## Overview\n' + desc + '\n\n'
+      + '## What It Does\n'
+      + '- ' + desc + '\n'
+      + '- Result: ' + result + '\n'
+      + '- Runs automatically 24/7 without manual intervention\n\n'
+      + '## Tools & Nodes Used\n' + toolLines
+      + '\n## Prerequisites\n'
+      + '- n8n instance (cloud or self-hosted)\n'
+      + '- API credentials for services listed above\n\n'
+      + '## How to Use\n'
+      + '1. Clone this repo\n'
+      + '2. Import `workflow.json` into your n8n instance\n'
+      + '3. Configure credentials for each service\n'
+      + '4. Activate the workflow\n'
+      + '5. Test with a sample trigger\n\n'
+      + '## Output / Result\n'
+      + result
+      + loomLine + '\n\n'
+      + '## License\nMIT\n';
+    document.getElementById('rm-txt').textContent = md;
+    document.getElementById('rm-out').style.display = 'block';
+  }
+
+  /* ============ VIDEO SCRIPT BUILDER ============ */
+  function buildScript() {
+    var time = document.getElementById('vs-time').value.trim() || 'X hours per week';
+    var proc = document.getElementById('vs-proc').value.trim() || 'repetitive manual tasks';
+    var pain = document.getElementById('vs-pain').value.trim() || 'manual data entry taking hours per day';
+    var tools = document.getElementById('vs-tools').value.trim() || 'n8n';
+    var res = document.getElementById('vs-res').value.trim() || 'significant time and error reduction';
+    var s = '[0:00 - 0:20]  HOOK\n'
+      + '"This workflow saves ' + time + ' by automating ' + proc + '."\n'
+      + 'No self-intro. Start with the value directly.\n\n'
+      + '[0:20 - 0:45]  PROBLEM\n'
+      + '"Before this, the team was dealing with: ' + pain + '."\n'
+      + 'Show the manual process: screenshot of spreadsheet, email chain, etc.\n\n'
+      + '[0:45 - 2:00]  LIVE DEMO\n'
+      + 'Switch to n8n. Run the workflow LIVE.\n'
+      + 'Tools: ' + tools + '\n'
+      + '"This is the workflow. Walk through each node briefly."\n'
+      + 'Explain what each key node does and why it matters.\n\n'
+      + '[2:00 - 2:30]  RESULT\n'
+      + '"Here\'s the output..." (show email sent, row in Sheet, Slack notif)\n'
+      + 'Key result: ' + res + '\n'
+      + '"This runs automatically, 24/7, without anyone touching it."\n\n'
+      + '[2:30 - 2:50]  CTA\n'
+      + '"Want to automate something similar? Check the link in my profile or DM me."';
+    document.getElementById('vs-txt').textContent = s;
+    document.getElementById('vs-out').style.display = 'block';
+  }
+
+  /* ============ LINKEDIN HEADLINE BUILDER ============ */
+  var savedHL = [];
+  function buildHeadline() {
+    var role = document.getElementById('li-role').value;
+    var niche = document.getElementById('li-niche').value.trim();
+    var res = document.getElementById('li-result').value.trim();
+    if (!niche || !res) { alert('Isi field Niche dan Key Result terlebih dahulu.'); return; }
+    savedHL = [
+      role + ' | ' + niche + ' | ' + res,
+      role + ' for ' + niche + ' Businesses | ' + res,
+      'Helping ' + niche + ' Companies ' + res + ' with AI Automation & n8n'
+    ];
+    var c = document.getElementById('li-var');
+    var out = document.getElementById('li-out');
+    c.innerHTML = '<div style="font-size:10px;color:var(--tx3);letter-spacing:1px;margin-bottom:8px">3 HEADLINE VARIANTS - PILIH YANG PALING COCOK:</div>';
+    for (var i = 0; i < savedHL.length; i++) {
+      var v = savedHL[i];
+      var len = v.length;
+      var lc = len > 200 ? '#f85149' : len > 180 ? '#f0883e' : '#3fb950';
+      var d = document.createElement('div');
+      d.className = 'hlv';
+      var txt = document.createElement('div');
+      txt.className = 'hlv-text';
+      txt.textContent = v;
+      var ft = document.createElement('div');
+      ft.className = 'hlv-foot';
+      var ls = document.createElement('span');
+      ls.style.cssText = 'font-size:10px;color:'+lc;
+      ls.textContent = len + '/220 karakter';
+      var cb = document.createElement('button');
+      cb.className = 'btn btn-g btn-sm';
+      cb.textContent = 'COPY';
+      (function(idx) { cb.onclick = function() { copyStr(savedHL[idx]); }; })(i);
+      ft.appendChild(ls); ft.appendChild(cb);
+      d.appendChild(txt); d.appendChild(ft);
+      c.appendChild(d);
+    }
+    out.style.display = 'block';
+  }
+
+  /* ============ UPWORK VALIDATOR ============ */
+  function buildUpworkList() {
+    var c = document.getElementById('uw-list');
+    if (!c) return;
+    var h = '';
+    for (var i = 0; i < UW_ITEMS.length; i++) {
+      h += '<div class="ci" onclick="toggleUW('+i+')" id="uwi-'+i+'">';
+      h += '<div class="cb2" id="uwb-'+i+'"></div>';
+      h += '<div class="cl" id="uwl-'+i+'">'+UW_ITEMS[i]+'</div>';
+      h += '</div>';
+    }
+    c.innerHTML = h;
+  }
+  function toggleUW(i) {
+    uwState[i] = !uwState[i];
+    var box = document.getElementById('uwb-'+i);
+    var lbl = document.getElementById('uwl-'+i);
+    if (uwState[i]) { box.classList.add('chk'); box.textContent = 'v'; lbl.classList.add('dn'); }
+    else { box.classList.remove('chk'); box.textContent = ''; lbl.classList.remove('dn'); }
+    updateUWScore();
+  }
+  function updateUWScore() {
+    var done = uwState.filter(Boolean).length;
+    document.getElementById('uw-num').textContent = done;
+    document.getElementById('uw-pb').style.width = Math.round((done/12)*100)+'%';
+    var d;
+    if (done < 5) d = 'Perlu banyak perbaikan - lengkapi komponen utama dulu';
+    else if (done < 8) d = 'Cukup baik, masih ada celah yang perlu diisi';
+    else if (done < 11) d = 'Hampir sempurna! Sedikit lagi untuk profil optimal';
+    else d = 'Profile siap! Waktunya aktif melamar proyek.';
+    document.getElementById('uw-desc').textContent = d;
+  }
+
+  /* ============ CASE STUDY FORMATTER ============ */
+  function fmtCaseStudy() {
+    var proj = document.getElementById('cs-proj').value.trim() || 'Automation Project';
+    var ind = document.getElementById('cs-ind').value.trim() || 'Business';
+    var prob = document.getElementById('cs-prob').value.trim();
+    var sol = document.getElementById('cs-sol').value.trim();
+    var res = document.getElementById('cs-res').value.trim();
+    var m1 = document.getElementById('cs-m1').value.trim();
+    var m2 = document.getElementById('cs-m2').value.trim();
+    if (!prob || !sol || !res) { alert('Isi field Problem, Solution, dan Result terlebih dahulu.'); return; }
+    var metrics = '';
+    if (m1 && m2) metrics = '\n\nKEY METRICS:\n- ' + m1 + '\n- ' + m2;
+    else if (m1) metrics = '\n\nKEY METRIC: ' + m1;
+    var cs = '=== CASE STUDY ===\n'
+      + proj + ' | ' + ind + ' Industry\n'
+      + '================================\n\n'
+      + 'THE PROBLEM\n-----------\n' + prob + '\n\n'
+      + 'THE SOLUTION\n------------\n' + sol + '\n\n'
+      + 'THE RESULT\n----------\n' + res
+      + metrics + '\n\n'
+      + '================================\n'
+      + 'Built with: n8n Automation\n'
+      + 'Type: ' + proj;
+    document.getElementById('cs-txt').textContent = cs;
+    document.getElementById('cs-out').style.display = 'block';
+  }
+
+  /* ============ PORTFOLIO TRACKER ============ */
+  function buildPortTracker() {
+    var c = document.getElementById('port-tracker');
+    if (!c) return;
+    var h = '';
+    for (var i = 0; i < PP.length; i++) {
+      var p = PP[i];
+      h += '<div style="margin-bottom:6px">';
+      h += '<div class="ah" id="pah-'+i+'" onclick="togglePort('+i+')">';
+      h += '<div style="flex:1"><div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">';
+      h += '<span style="color:var(--ac);font-size:11px;font-weight:700">0'+(i+1)+'</span>';
+      h += '<span style="font-size:12px;color:#e6edf3;font-weight:600">'+p.title+'</span>';
+      h += '<span style="font-size:9px;background:rgba(255,140,66,.15);color:var(--ac);border:1px solid rgba(255,140,66,.3);padding:1px 7px;border-radius:10px">'+p.tag+'</span>';
+      h += '</div><div style="font-size:10px;color:var(--tx3)">'+p.stack+'</div></div>';
+      h += '<div style="display:flex;align-items:center;gap:8px;flex-shrink:0">';
+      h += '<span style="font-size:10px;color:var(--tx3)" id="pbg-'+i+'">0/5</span>';
+      h += '<span style="color:var(--ac);font-size:16px" id="par-'+i+'">+</span></div></div>';
+      h += '<div id="pbd-'+i+'" style="display:none;background:var(--bg3);border:1px solid var(--ac);border-top:none;border-radius:0 0 6px 6px;padding:13px;margin-bottom:0">';
+      h += '<div style="font-size:11px;color:var(--tx2);margin-bottom:6px"><span style="color:var(--ac)">Problem: </span>'+p.problem+'</div>';
+      h += '<div style="font-size:11px;color:var(--tx2);margin-bottom:10px"><span style="color:var(--ac)">Result: </span>'+p.result+'</div>';
+      h += '<div style="font-size:9px;color:var(--tx3);letter-spacing:1px;margin-bottom:6px">DOKUMENTASI CHECKLIST:</div>';
+      for (var j = 0; j < PC.length; j++) {
+        h += '<div class="ci" onclick="togglePC('+i+','+j+')">';
+        h += '<div class="cb2" id="pcb-'+i+'-'+j+'"></div>';
+        h += '<div class="cl" id="pcl-'+i+'-'+j+'">'+PC[j]+'</div></div>';
+      }
+      h += '<div class="pb-w" style="margin-top:8px"><div class="pb-f" id="ppb-'+i+'" style="width:0%"></div></div>';
+      h += '<div class="pb-l"><span id="ppc-'+i+'">0/5</span> items selesai</div>';
+      h += '</div></div>';
+    }
+    c.innerHTML = h;
+  }
+  function togglePort(i) {
+    var head = document.getElementById('pah-'+i);
+    var body = document.getElementById('pbd-'+i);
+    var arr = document.getElementById('par-'+i);
+    var open = body.style.display === 'block';
+    if (open) { body.style.display='none'; head.classList.remove('open'); arr.textContent='+'; }
+    else { body.style.display='block'; head.classList.add('open'); arr.textContent='-'; }
+  }
+  function togglePC(pi, ci) {
+    portState[pi][ci] = !portState[pi][ci];
+    var box = document.getElementById('pcb-'+pi+'-'+ci);
+    var lbl = document.getElementById('pcl-'+pi+'-'+ci);
+    if (portState[pi][ci]) { box.classList.add('chk'); box.textContent='v'; lbl.classList.add('dn'); }
+    else { box.classList.remove('chk'); box.textContent=''; lbl.classList.remove('dn'); }
+    updatePortP(pi);
+    updateOverall();
+  }
+  function updatePortP(pi) {
+    var done = portState[pi].filter(Boolean).length;
+    document.getElementById('ppb-'+pi).style.width = Math.round((done/5)*100)+'%';
+    document.getElementById('ppc-'+pi).textContent = done+'/5';
+    document.getElementById('pbg-'+pi).textContent = done+'/5';
+  }
+  function updateOverall() {
+    var tot = 0;
+    for (var i = 0; i < 5; i++) tot += portState[i].filter(Boolean).length;
+    var pct = Math.round((tot/25)*100);
+    document.getElementById('ov-pb').style.width = pct+'%';
+    document.getElementById('ov-pct').textContent = tot + ' / 25 items';
+  }
+
+  /* ============ MISSION LIST ============ */
+  function buildMissionList() {
+    var c = document.getElementById('mission-list');
+    if (!c) return;
+    var h = '';
+    for (var i = 0; i < MI.length; i++) {
+      h += '<div class="ci" onclick="toggleMS('+i+')">';
+      h += '<div class="cb2" id="msb-'+i+'"></div>';
+      h += '<div class="cl" id="msl-'+i+'">'+MI[i]+'</div></div>';
+    }
+    c.innerHTML = h;
+  }
+  function toggleMS(i) {
+    msState[i] = !msState[i];
+    var box = document.getElementById('msb-'+i);
+    var lbl = document.getElementById('msl-'+i);
+    if (msState[i]) { box.classList.add('chk'); box.textContent='v'; lbl.classList.add('dn'); }
+    else { box.classList.remove('chk'); box.textContent=''; lbl.classList.remove('dn'); }
+    var done = msState.filter(Boolean).length;
+    var pct = Math.round((done/8)*100);
+    document.getElementById('ms-pb').style.width = pct+'%';
+    document.getElementById('ms-pct').textContent = done + ' / 8 tasks selesai';
+    if (done === 8) document.getElementById('comp-banner').style.display = 'block';
+  }
+
+  /* ============ COPY HELPERS ============ */
+  function copyStr(s) {
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(s).catch(function() { fallbackCopy(s); });
+    } else { fallbackCopy(s); }
+  }
+  function fallbackCopy(s) {
+    var el = document.createElement('textarea');
+    el.value = s; el.style.position = 'fixed'; el.style.opacity = '0';
+    document.body.appendChild(el); el.select();
+    try { document.execCommand('copy'); } catch(e) {}
+    document.body.removeChild(el);
+  }
+  function copyEl(id) { copyStr(document.getElementById(id).textContent); }
+
+  /* ============ AI TUTOR ============ */
+  function toggleTutor() { document.getElementById('tutorPanel').classList.toggle('open'); }
+  function sendQ() {
+    var inp = document.getElementById('tutorIn');
+    var q = inp.value.trim();
+    if (!q) return;
+    inp.value = '';
+    addMsg('u', q);
+    setTimeout(function() { addMsg('a', matchKB(q)); }, 500);
+  }
+  function askQ(q) {
+    document.getElementById('tutorPanel').classList.add('open');
+    addMsg('u', q);
+    setTimeout(function() { addMsg('a', matchKB(q)); }, 500);
+  }
+  function addMsg(type, text) {
+    var c = document.getElementById('tutorMsg');
+    var d = document.createElement('div');
+    d.className = 'msg ' + (type === 'u' ? 'mu' : 'ma');
+    d.textContent = text;
+    c.appendChild(d);
+    c.scrollTop = c.scrollHeight;
+  }
+  function matchKB(q) {
+    var ql = q.toLowerCase();
+    var best = null, bestS = 0;
+    for (var i = 0; i < KB.length; i++) {
+      var s = 0;
+      for (var j = 0; j < KB[i].kw.length; j++) {
+        if (ql.indexOf(KB[i].kw[j]) !== -1) s++;
+      }
+      if (s > bestS) { bestS = s; best = KB[i]; }
+    }
+    if (best && bestS > 0) return best.ans;
+    return 'Pertanyaan bagus! Untuk sesi ini, fokus pada 5 komponen utama: GitHub repo, Loom video, LinkedIn profile, Upwork profile, dan case study. Coba tanya lebih spesifik tentang salah satunya, atau gunakan quick buttons di atas!';
+  }
+</script>
+</body>
+</html>
