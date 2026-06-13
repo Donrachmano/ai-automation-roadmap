@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>F-05 Sesi 2 - Client Acquisition</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#080c10;
+    --panel:#0d1f2d;
+    --panel2:#0a0f14;
+    --line:#1e3a4a;
+    --txt:#c9d1d9;
+    --txt2:#8b949e;
+    --muted:#6e7681;
+    --head:#e6edf3;
+    --accent:#ff8c42;
+    --accent-dim:#ff8c4222;
+    --accent-line:#ff8c4244;
+    --green:#3fb950;
+    --red:#f85149;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);
+    color:var(--txt);
+    font-family:'JetBrains Mono',monospace;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::-webkit-scrollbar{width:5px;height:5px}
+  ::-webkit-scrollbar-track{background:var(--bg)}
+  ::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px}
+
+  /* HEADER */
+  header{
+    border-bottom:1px solid var(--line);
+    padding:18px 20px 14px;
+    background:linear-gradient(180deg,#1a120a 0%,var(--bg) 100%);
+    position:sticky;top:0;z-index:100;
+    backdrop-filter:blur(6px);
+  }
+  .eyebrow{display:flex;align-items:center;gap:9px;margin-bottom:5px}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);
+    box-shadow:0 0 8px var(--accent);animation:pulse 2s infinite}
+  .eyebrow span{color:var(--accent);font-size:10px;letter-spacing:3px;text-transform:uppercase}
+  header h1{font-size:clamp(15px,4.2vw,21px);color:var(--head);letter-spacing:1px;font-weight:800}
+  header p{font-size:10.5px;color:var(--muted);margin-top:3px}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+  /* PROGRESS */
+  .progwrap{padding:10px 20px;border-bottom:1px solid var(--line);background:var(--panel2)}
+  .progbar{height:5px;background:#10171e;border-radius:3px;overflow:hidden}
+  .progfill{height:100%;width:12.5%;background:linear-gradient(90deg,#ff8c42,#ffb37a);
+    border-radius:3px;transition:width .4s ease;box-shadow:0 0 10px var(--accent)}
+  .progmeta{display:flex;justify-content:space-between;margin-top:6px;font-size:9.5px;color:var(--muted);letter-spacing:1px}
+
+  /* STEP NAV */
+  .stepnav{display:flex;gap:6px;overflow-x:auto;padding:12px 20px;border-bottom:1px solid var(--line);
+    background:var(--panel2);scrollbar-width:none}
+  .stepnav::-webkit-scrollbar{display:none}
+  .stepbtn{flex-shrink:0;width:30px;height:30px;border-radius:6px;border:1px solid var(--line);
+    background:var(--panel);color:var(--muted);font-family:inherit;font-size:11px;font-weight:700;
+    cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center}
+  .stepbtn:hover{border-color:var(--accent-line)}
+  .stepbtn.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);
+    box-shadow:0 0 10px var(--accent-line)}
+  .stepbtn.done{border-color:var(--green);color:var(--green)}
+
+  main{max-width:880px;margin:0 auto;padding:22px 18px 80px}
+  .step{display:none;animation:fade .4s ease}
+  .step.show{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  .kicker{font-size:9.5px;color:var(--accent);letter-spacing:2.5px;margin-bottom:8px;text-transform:uppercase}
+  h2.title{font-size:clamp(17px,5vw,24px);color:var(--head);letter-spacing:.5px;margin-bottom:6px;font-weight:800}
+  .lead{font-size:12px;color:var(--txt2);margin-bottom:20px;line-height:1.7}
+
+  h3{font-size:13.5px;color:var(--head);margin:22px 0 10px;letter-spacing:.5px;font-weight:700;
+    display:flex;align-items:center;gap:8px}
+  h3:before{content:"";width:3px;height:14px;background:var(--accent);border-radius:2px}
+  p{font-size:12px;color:var(--txt);margin-bottom:12px;line-height:1.7}
+  ul{margin:0 0 14px;padding-left:0;list-style:none}
+  li{font-size:12px;color:var(--txt);margin-bottom:7px;line-height:1.6;display:flex;gap:8px}
+  li:before{content:"\203A";color:var(--accent);flex-shrink:0}
+  strong{color:var(--head);font-weight:700}
+  em{color:var(--accent);font-style:normal}
+  code.inline{background:var(--panel);border:1px solid var(--line);border-radius:4px;
+    padding:1px 6px;font-size:11px;color:#ffb37a}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:15px;margin-bottom:14px}
+  .card.accent{border-color:var(--accent-line);background:var(--accent-dim)}
+
+  .note{border-left:3px solid var(--accent);background:#1a120a;border:1px solid var(--accent-line);
+    border-left:3px solid var(--accent);border-radius:6px;padding:13px 14px;margin:14px 0}
+  .note .nlabel{font-size:9.5px;color:var(--accent);letter-spacing:2px;margin-bottom:6px}
+  .note p{margin:0;font-size:11.5px;color:var(--txt)}
+
+  .n8n{border:1px solid #69db7c33;background:#0d2a1a;border-left:3px solid var(--green);
+    border-radius:6px;padding:13px 14px;margin:14px 0}
+  .n8n .nlabel{font-size:9.5px;color:var(--green);letter-spacing:2px;margin-bottom:6px}
+  .n8n p{margin:0;font-size:11.5px;color:#b5e6c4}
+
+  /* CODE BLOCK */
+  pre{background:#05080b;border:1px solid var(--line);border-radius:8px;padding:14px;overflow-x:auto;
+    margin:12px 0;font-size:11.5px;line-height:1.65}
+  pre code{font-family:inherit;white-space:pre}
+  .c-key{color:#ff7b72}.c-str{color:#a5d6ff}.c-com{color:#6e7681;font-style:italic}
+  .c-fn{color:#d2a8ff}.c-num{color:#79c0ff}.c-lbl{color:#ffb37a}.c-tag{color:#7ee787}
+
+  /* TOOL PANELS */
+  .tool{background:var(--panel2);border:1px solid var(--accent-line);border-radius:10px;
+    padding:16px;margin:16px 0}
+  .tool-head{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+  .tool-head .ic{font-size:15px}
+  .tool-head .tt{font-size:12.5px;color:var(--accent);letter-spacing:1px;font-weight:700}
+  .tool-sub{font-size:10.5px;color:var(--muted);margin-bottom:14px}
+  label.fl{display:block;font-size:10px;color:var(--txt2);letter-spacing:1px;margin:10px 0 5px;text-transform:uppercase}
+  input,select,textarea{width:100%;background:#05080b;border:1px solid var(--line);border-radius:6px;
+    color:var(--txt);font-family:inherit;font-size:12px;padding:9px 11px;transition:border .2s}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent)}
+  textarea{resize:vertical;min-height:64px;line-height:1.5}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media(max-width:520px){.row2{grid-template-columns:1fr}}
+
+  button.run{margin-top:14px;width:100%;background:var(--accent-dim);border:1px solid var(--accent);
+    color:var(--accent);font-family:inherit;font-size:12px;font-weight:700;letter-spacing:1px;
+    padding:11px;border-radius:7px;cursor:pointer;transition:all .2s}
+  button.run:hover{background:#ff8c4233;box-shadow:0 0 14px var(--accent-line)}
+  button.run:active{transform:scale(.99)}
+  button.ghost{background:var(--panel);border:1px solid var(--line);color:var(--txt2)}
+  button.ghost:hover{border-color:var(--accent-line);background:var(--panel)}
+
+  .output{margin-top:14px;background:#05080b;border:1px dashed var(--accent-line);border-radius:8px;
+    padding:14px;font-size:11.5px;color:var(--txt);white-space:pre-wrap;line-height:1.65;display:none}
+  .output.show{display:block;animation:fade .35s}
+  .output .ohead{font-size:9.5px;color:var(--accent);letter-spacing:2px;margin-bottom:10px;
+    display:flex;justify-content:space-between;align-items:center}
+  .copybtn{background:none;border:1px solid var(--line);color:var(--muted);font-family:inherit;
+    font-size:9px;padding:3px 8px;border-radius:4px;cursor:pointer;letter-spacing:1px}
+  .copybtn:hover{color:var(--accent);border-color:var(--accent-line)}
+
+  /* DISCOVERY CALL */
+  .dc-section{border:1px solid var(--line);border-radius:8px;margin-bottom:10px;overflow:hidden}
+  .dc-head{display:flex;align-items:center;justify-content:space-between;padding:11px 13px;
+    background:var(--panel);cursor:pointer}
+  .dc-head.active{background:var(--accent-dim)}
+  .dc-head .dt{font-size:11.5px;color:var(--head);font-weight:700}
+  .dc-head .dt small{display:block;color:var(--muted);font-size:9px;letter-spacing:1px;margin-top:2px;font-weight:400}
+  .dc-timer{font-size:13px;color:var(--accent);font-weight:700;font-variant-numeric:tabular-nums}
+  .dc-body{display:none;padding:12px 13px;background:var(--panel2);border-top:1px solid var(--line)}
+  .dc-body.show{display:block}
+  .dc-body li{font-size:11px;margin-bottom:8px}
+  .dc-controls{display:flex;gap:8px;margin-top:12px}
+  .dc-controls button{flex:1;padding:9px;font-size:10.5px;border-radius:6px;font-family:inherit;
+    cursor:pointer;letter-spacing:1px;font-weight:700;border:1px solid var(--line);background:var(--panel);color:var(--txt2)}
+  .dc-controls button.primary{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
+  .dc-total{text-align:center;font-size:10px;color:var(--muted);margin-top:10px;letter-spacing:1px}
+
+  /* PRICING */
+  .price-out{margin-top:16px;text-align:center;background:#05080b;border:1px solid var(--accent-line);
+    border-radius:10px;padding:18px;display:none}
+  .price-out.show{display:block;animation:fade .35s}
+  .price-out .plabel{font-size:9.5px;color:var(--muted);letter-spacing:2px;margin-bottom:6px}
+  .price-out .pval{font-size:clamp(22px,7vw,32px);color:var(--accent);font-weight:800;letter-spacing:.5px}
+  .price-out .pmodel{font-size:10.5px;color:var(--txt2);margin-top:6px}
+  .price-out .pbreak{margin-top:14px;text-align:left;border-top:1px solid var(--line);padding-top:12px}
+  .price-out .pbreak div{display:flex;justify-content:space-between;font-size:10.5px;color:var(--txt2);margin-bottom:5px}
+  .price-out .pbreak div span:last-child{color:var(--head)}
+
+  /* CHECKLIST */
+  .check-item{display:flex;align-items:flex-start;gap:10px;padding:9px 11px;border:1px solid var(--line);
+    border-radius:6px;margin-bottom:7px;cursor:pointer;transition:all .2s;background:var(--panel)}
+  .check-item:hover{border-color:var(--accent-line)}
+  .check-item.checked{background:var(--accent-dim);border-color:var(--accent-line)}
+  .check-box{width:17px;height:17px;border:1.5px solid var(--muted);border-radius:4px;flex-shrink:0;
+    margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--accent)}
+  .check-item.checked .check-box{border-color:var(--accent);background:var(--accent-dim)}
+  .check-txt{font-size:11px;color:var(--txt);line-height:1.45}
+  .check-txt b{color:var(--head)}
+  .crit{font-size:8.5px;color:var(--red);letter-spacing:1px;margin-left:6px}
+  .check-verdict{margin-top:14px;padding:13px;border-radius:8px;text-align:center;font-size:11.5px;display:none}
+  .check-verdict.show{display:block;animation:fade .35s}
+  .check-verdict.ok{background:#0d2a1a;border:1px solid var(--green);color:#b5e6c4}
+  .check-verdict.warn{background:#2a1a0d;border:1px solid var(--accent);color:#ffd0a8}
+
+  /* QUIZ */
+  .quiz{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:15px;margin:16px 0}
+  .quiz .q{font-size:12px;color:var(--head);margin-bottom:11px;font-weight:600}
+  .qopt{display:block;width:100%;text-align:left;background:var(--panel2);border:1px solid var(--line);
+    border-radius:6px;padding:10px 12px;margin-bottom:7px;color:var(--txt);font-family:inherit;
+    font-size:11.5px;cursor:pointer;transition:all .15s}
+  .qopt:hover{border-color:var(--accent-line)}
+  .qopt.correct{background:#0d2a1a;border-color:var(--green);color:#b5e6c4}
+  .qopt.wrong{background:#2a0d0d;border-color:var(--red);color:#f8b4b0}
+  .qfb{font-size:10.5px;margin-top:8px;padding:9px;border-radius:6px;display:none}
+  .qfb.show{display:block}
+  .qfb.good{background:#0d2a1a;color:#b5e6c4;border:1px solid #69db7c33}
+  .qfb.bad{background:#2a0d0d;color:#f8b4b0;border:1px solid #f8514933}
+
+  /* MISSION */
+  .mission{border:1px solid var(--accent-line);background:var(--accent-dim);border-radius:10px;padding:16px;margin:16px 0}
+  .mission .mlabel{font-size:9.5px;color:var(--accent);letter-spacing:2px;margin-bottom:8px}
+  .mtask{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+  .mtask:last-child{border-bottom:none}
+  .mtask .mnum{font-size:11px;color:var(--accent);font-weight:700;flex-shrink:0}
+  .mtask .mtxt{font-size:11px;color:var(--txt)}
+
+  /* AI TUTOR */
+  .tutor{position:fixed;bottom:18px;right:18px;z-index:200}
+  .tutor-btn{width:50px;height:50px;border-radius:50%;background:var(--accent-dim);
+    border:1.5px solid var(--accent);color:var(--accent);font-size:20px;cursor:pointer;
+    box-shadow:0 0 18px var(--accent-line);transition:transform .2s}
+  .tutor-btn:hover{transform:scale(1.08)}
+  .tutor-panel{position:absolute;bottom:60px;right:0;width:min(340px,86vw);background:var(--panel);
+    border:1px solid var(--accent-line);border-radius:12px;padding:0;display:none;
+    box-shadow:0 12px 40px rgba(0,0,0,.6);overflow:hidden}
+  .tutor-panel.show{display:block;animation:fade .25s}
+  .tutor-top{background:var(--accent-dim);padding:11px 14px;border-bottom:1px solid var(--accent-line);
+    display:flex;align-items:center;gap:8px}
+  .tutor-top .tt{font-size:11px;color:var(--accent);font-weight:700;letter-spacing:1px}
+  .tutor-body{padding:12px;max-height:46vh;overflow-y:auto}
+  .tprompt{display:block;width:100%;text-align:left;background:var(--panel2);border:1px solid var(--line);
+    border-radius:6px;padding:9px 11px;margin-bottom:7px;color:var(--txt2);font-family:inherit;
+    font-size:10.5px;cursor:pointer}
+  .tprompt:hover{border-color:var(--accent-line);color:var(--txt)}
+  .tans{font-size:11px;color:var(--txt);line-height:1.6;padding:11px;background:var(--panel2);
+    border:1px solid var(--line);border-radius:6px;margin-top:4px;display:none}
+  .tans.show{display:block}
+
+  /* NAV */
+  .pagenav{display:flex;justify-content:space-between;gap:10px;margin-top:30px}
+  .pagenav button{flex:1;padding:12px;border-radius:8px;font-family:inherit;font-size:11px;
+    letter-spacing:1px;cursor:pointer;font-weight:700;transition:all .2s}
+  .pagenav .prev{background:var(--panel);border:1px solid var(--line);color:var(--txt2)}
+  .pagenav .prev:disabled{opacity:.35;cursor:default}
+  .pagenav .next{background:var(--accent-dim);border:1px solid var(--accent);color:var(--accent)}
+  .pagenav .next:hover{box-shadow:0 0 14px var(--accent-line)}
+
+  .done-screen{text-align:center;padding:30px 16px}
+  .done-screen .big{font-size:42px;margin-bottom:10px}
+  .done-screen h2{font-size:20px;color:var(--accent);margin-bottom:10px;letter-spacing:1px}
+  .badge{display:inline-block;margin-top:16px;padding:8px 16px;border:1px solid var(--accent);
+    border-radius:20px;color:var(--accent);font-size:11px;letter-spacing:2px;background:var(--accent-dim)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow"><div class="dot"></div><span>AI Automation Bootcamp</span></div>
+  <h1>F-05 / SESI 2 &mdash; CLIENT ACQUISITION</h1>
+  <p>Market Entry &amp; Income &middot; Bulan 12&ndash;14 &middot; Dari portfolio ke 3 klien pertama</p>
+</header>
+
+<div class="progwrap">
+  <div class="progbar"><div class="progfill" id="progfill"></div></div>
+  <div class="progmeta"><span id="progtxt">STEP 1 / 8</span><span id="progpct">12%</span></div>
+</div>
+
+<div class="stepnav" id="stepnav"></div>
+
+<main>
+
+<!-- STEP 1 -->
+<section class="step show" data-step="0">
+  <div class="kicker">Briefing Sesi</div>
+  <h2 class="title">Mesin Akuisisi Klien</h2>
+  <p class="lead">Portfolio sudah jadi (Sesi 1). Sekarang masalahnya bukan "bisa atau tidak", tapi "klien mana yang mau bayar". Sesi ini mengubah skill jadi pipeline: dari outreach &rarr; call &rarr; proposal &rarr; kontrak &rarr; deal.</p>
+
+  <h3>Funnel akuisisi yang akan kamu bangun</h3>
+  <div class="card">
+    <pre><code><span class="c-com"># Setiap tahap punya 1 tujuan tunggal</span>
+
+  <span class="c-lbl">[1] OUTREACH</span>      Upwork proposal + LinkedIn cold message
+                  Tujuan: dapat balasan / discovery call
+        <span class="c-key">|</span>
+        <span class="c-key">v</span>
+  <span class="c-lbl">[2] DISCOVERY</span>     Call 20-30 menit, gali pain &amp; budget
+                  Tujuan: paham masalah, kualifikasi klien
+        <span class="c-key">|</span>
+        <span class="c-key">v</span>
+  <span class="c-lbl">[3] SCOPING</span>       Tentukan deliverable + harga
+                  Tujuan: proposal harga yang masuk akal
+        <span class="c-key">|</span>
+        <span class="c-key">v</span>
+  <span class="c-lbl">[4] CONTRACT</span>      Kontrak + deposit + mulai kerja
+                  Tujuan: lindungi diri, deal resmi</code></pre>
+  </div>
+
+  <p>Di sesi ini kamu dapat <strong>5 tool praktis</strong> untuk tiap tahap funnel. Bukan teori &mdash; setiap tool menghasilkan output yang bisa langsung kamu pakai untuk klien nyata.</p>
+
+  <div class="note">
+    <div class="nlabel">&#9670; MINDSET</div>
+    <p>3 klien pertama boleh <em>pro bono atau diskon besar</em>. Tujuannya bukan uang &mdash; tapi <strong>testimoni, case study, dan rasa percaya diri</strong> saat scoping. Uang datang dari klien ke-4 dan seterusnya.</p>
+  </div>
+
+  <div class="quiz" data-quiz="q1">
+    <div class="q">Apa tujuan utama discovery call?</div>
+    <button class="qopt" data-correct="false">Langsung tutup deal di telepon</button>
+    <button class="qopt" data-correct="true">Menggali pain point &amp; budget untuk kualifikasi klien</button>
+    <button class="qopt" data-correct="false">Menjelaskan semua fitur n8n yang kamu kuasai</button>
+    <div class="qfb"></div>
+  </div>
+</section>
+
+<!-- STEP 2: UPWORK -->
+<section class="step" data-step="1">
+  <div class="kicker">Tahap 1 &middot; Outreach</div>
+  <h2 class="title">Upwork Proposal Strategy</h2>
+  <p class="lead">Klien baca 10-30 detik pertama. Proposal generik ("I am expert with 5 years...") langsung dibuang. Yang menang: bicara soal <em>masalah mereka</em> di kalimat pertama, bukan soal kamu.</p>
+
+  <h3>Anatomi proposal yang dibalas</h3>
+  <ul>
+    <li><strong>Hook</strong> &mdash; sentuh masalah/hasil spesifik dari job post, bukan "Dear Sir"</li>
+    <li><strong>Restate problem</strong> &mdash; buktikan kamu baca dan paham brief-nya</li>
+    <li><strong>Approach singkat</strong> &mdash; 2-3 langkah cara kamu menyelesaikan (n8n + integrasi)</li>
+    <li><strong>Proof</strong> &mdash; 1 contoh relevan / portfolio link, bukan daftar panjang</li>
+    <li><strong>CTA + 1 pertanyaan</strong> &mdash; ajak diskusi, pancing balasan</li>
+  </ul>
+
+  <div class="note">
+    <div class="nlabel">&#9670; ATURAN</div>
+    <p>Maksimal 120-150 kata. Tutup dengan <strong>satu pertanyaan spesifik</strong> &mdash; otak manusia susah mengabaikan pertanyaan langsung. Itu menaikkan reply rate.</p>
+  </div>
+
+  <!-- TOOL: PROPOSAL BUILDER -->
+  <div class="tool">
+    <div class="tool-head"><span class="ic">&#9998;</span><span class="tt">UPWORK PROPOSAL BUILDER</span></div>
+    <div class="tool-sub">Isi data job &rarr; generate draft proposal siap edit</div>
+
+    <label class="fl">Judul / inti job post</label>
+    <input id="up_job" placeholder="cth: Automate lead capture from website form to CRM">
+
+    <div class="row2">
+      <div>
+        <label class="fl">Niche kamu</label>
+        <select id="up_niche">
+          <option value="CRM &amp; Sales automation">CRM &amp; Sales</option>
+          <option value="Content &amp; Marketing automation">Content &amp; Marketing</option>
+          <option value="Finance &amp; Ops automation">Finance &amp; Ops</option>
+          <option value="General workflow automation">General</option>
+        </select>
+      </div>
+      <div>
+        <label class="fl">Tool inti</label>
+        <input id="up_tool" value="n8n" placeholder="n8n">
+      </div>
+    </div>
+
+    <label class="fl">Pain point klien (1 kalimat)</label>
+    <input id="up_pain" placeholder="cth: lead masuk lambat ke CRM, banyak yang hilang manual">
+
+    <label class="fl">Bukti / pengalaman relevan (singkat)</label>
+    <input id="up_proof" placeholder="cth: pernah bangun workflow Form -> Sheet -> Email auto">
+
+    <button class="run" onclick="buildProposal()">&gt; GENERATE PROPOSAL</button>
+
+    <div class="output" id="up_out">
+      <div class="ohead"><span>PROPOSAL.txt</span><button class="copybtn" onclick="copyOut('up_out_body')">COPY</button></div>
+      <span id="up_out_body"></span>
+    </div>
+  </div>
+
+  <div class="quiz" data-quiz="q2">
+    <div class="q">Kalimat pembuka proposal yang paling kuat?</div>
+    <button class="qopt" data-correct="false">"Hi, I have 5 years experience in automation."</button>
+    <button class="qopt" data-correct="true">"Lead yang masuk lewat form sering hilang karena input manual &mdash; ini bisa otomatis penuh."</button>
+    <button class="qopt" data-correct="false">"Please consider me for this job, I work hard."</button>
+    <div class="qfb"></div>
+  </div>
+</section>
+
+<!-- STEP 3: LINKEDIN -->
+<section class="step" data-step="2">
+  <div class="kicker">Tahap 1 &middot; Outreach</div>
+  <h2 class="title">Cold Outreach via LinkedIn</h2>
+  <p class="lead">Upwork = klien sedang cari. LinkedIn = kamu cari klien sebelum mereka sadar butuh. Kuncinya: <em>personal, singkat, dan menawarkan nilai sebelum minta apa pun</em>.</p>
+
+  <h3>Urutan 3 pesan</h3>
+  <ul>
+    <li><strong>Connection note</strong> (&lt;300 char) &mdash; sebutkan trigger spesifik tentang mereka, jangan pitch</li>
+    <li><strong>Follow-up 1</strong> (setelah connect) &mdash; beri insight/observasi yang berguna, soft offer</li>
+    <li><strong>Follow-up 2</strong> (3-4 hari) &mdash; tawarkan call singkat / contoh konkret, lalu berhenti</li>
+  </ul>
+
+  <div class="note">
+    <div class="nlabel">&#9670; ATURAN EMAS</div>
+    <p>Jangan jualan di pesan pertama. Connection note yang langsung pitch = ditolak. Bangun konteks dulu, baru tawarkan di follow-up.</p>
+  </div>
+
+  <!-- TOOL: LINKEDIN GENERATOR -->
+  <div class="tool">
+    <div class="tool-head"><span class="ic">&#128279;</span><span class="tt">LINKEDIN OUTREACH GENERATOR</span></div>
+    <div class="tool-sub">Generate 3-pesan sequence yang dipersonalisasi</div>
+
+    <div class="row2">
+      <div>
+        <label class="fl">Role target</label>
+        <input id="li_role" placeholder="cth: Founder / Ops Manager">
+      </div>
+      <div>
+        <label class="fl">Industri</label>
+        <input id="li_ind" placeholder="cth: e-commerce / agency">
+      </div>
+    </div>
+
+    <label class="fl">Trigger / observasi tentang mereka</label>
+    <input id="li_trig" placeholder="cth: baru posting soal tim sales kewalahan">
+
+    <label class="fl">Nilai yang kamu tawarkan (1 kalimat)</label>
+    <input id="li_offer" placeholder="cth: otomasi follow-up lead supaya tidak ada yang bocor">
+
+    <button class="run" onclick="buildLinkedIn()">&gt; GENERATE SEQUENCE</button>
+
+    <div class="output" id="li_out">
+      <div class="ohead"><span>OUTREACH_SEQUENCE.txt</span><button class="copybtn" onclick="copyOut('li_out_body')">COPY</button></div>
+      <span id="li_out_body"></span>
+    </div>
+  </div>
+
+  <div class="quiz" data-quiz="q3">
+    <div class="q">Connection note yang benar isinya...</div>
+    <button class="qopt" data-correct="true">Trigger personal tentang mereka, tanpa pitch jualan</button>
+    <button class="qopt" data-correct="false">Penawaran harga paket otomasi lengkap</button>
+    <button class="qopt" data-correct="false">CV dan daftar semua skill kamu</button>
+    <div class="qfb"></div>
+  </div>
+</section>
+
+<!-- STEP 4: DISCOVERY CALL -->
+<section class="step" data-step="3">
+  <div class="kicker">Tahap 2 &middot; Discovery</div>
+  <h2 class="title">Discovery Call Framework</h2>
+  <p class="lead">Call 20-30 menit. Kamu <em>mendengar 70%, bicara 30%</em>. Tujuan: paham masalah, dampak finansial, dan budget &mdash; bukan presentasi. Pakai script ini, jalankan timer per section biar tidak melebar.</p>
+
+  <!-- TOOL: DISCOVERY SCRIPT + TIMER -->
+  <div class="tool">
+    <div class="tool-head"><span class="ic">&#127908;</span><span class="tt">DISCOVERY CALL SCRIPT</span></div>
+    <div class="tool-sub">Tap section untuk buka pertanyaan &amp; jalankan timer</div>
+    <div id="dc_sections"></div>
+    <div class="dc-controls">
+      <button id="dc_play" class="primary" onclick="dcToggle()">&#9658; START</button>
+      <button onclick="dcNext()">NEXT SECTION &rarr;</button>
+      <button class="ghost" onclick="dcReset()">RESET</button>
+    </div>
+    <div class="dc-total" id="dc_total">Total target: 20:00 &middot; Section aktif: Rapport</div>
+  </div>
+
+  <div class="n8n">
+    <div class="nlabel">&#9670; KONTEKS n8n</div>
+    <p>Saat klien cerita proses manual mereka, diam-diam petakan ke node: trigger apa (Webhook/Schedule?), data dari mana (Sheets/Form?), aksi akhir (Email/Slack?). Ini membantumu scoping akurat di tahap berikutnya.</p>
+  </div>
+
+  <div class="quiz" data-quiz="q4">
+    <div class="q">Rasio bicara ideal kamu saat discovery call?</div>
+    <button class="qopt" data-correct="false">Kamu bicara 70%, klien 30%</button>
+    <button class="qopt" data-correct="true">Klien bicara 70%, kamu 30%</button>
+    <button class="qopt" data-correct="false">50/50, gantian terus</button>
+    <div class="qfb"></div>
+  </div>
+</section>
+
+<!-- STEP 5: SCOPING & PRICING -->
+<section class="step" data-step="4">
+  <div class="kicker">Tahap 3 &middot; Scoping</div>
+  <h2 class="title">Scoping &amp; Pricing Project</h2>
+  <p class="lead">Salah harga = rugi atau kehilangan klien. Hindari jebakan jam-jaman di awal &mdash; <em>harga per project (value-based)</em> lebih sehat. Pakai kalkulator ini untuk dapat rentang yang masuk akal.</p>
+
+  <h3>Faktor yang menaikkan harga</h3>
+  <ul>
+    <li><strong>Kompleksitas</strong> workflow (logic, error handling, sub-workflow)</li>
+    <li><strong>Jumlah integrasi</strong> (tiap tool = waktu setup + testing)</li>
+    <li><strong>Komponen AI</strong> (LLM node, prompt eng, biaya token)</li>
+    <li><strong>Urgensi &amp; ukuran klien</strong> (startup vs perusahaan)</li>
+  </ul>
+
+  <!-- TOOL: PRICING CALCULATOR -->
+  <div class="tool">
+    <div class="tool-head"><span class="ic">&#129518;</span><span class="tt">SCOPING &amp; PRICING CALCULATOR</span></div>
+    <div class="tool-sub">Estimasi rentang harga project (USD)</div>
+
+    <div class="row2">
+      <div>
+        <label class="fl">Jumlah workflow</label>
+        <input id="pr_wf" type="number" value="1" min="1" max="20">
+      </div>
+      <div>
+        <label class="fl">Kompleksitas</label>
+        <select id="pr_cx">
+          <option value="simple">Simple (linear, sedikit node)</option>
+          <option value="medium" selected>Medium (logic + transform)</option>
+          <option value="complex">Complex (sub-wf, error handling)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row2">
+      <div>
+        <label class="fl">Jumlah integrasi</label>
+        <input id="pr_int" type="number" value="2" min="0" max="15">
+      </div>
+      <div>
+        <label class="fl">Komponen AI?</label>
+        <select id="pr_ai"><option value="no">Tidak</option><option value="yes">Ya (LLM node)</option></select>
+      </div>
+    </div>
+
+    <div class="row2">
+      <div>
+        <label class="fl">Ukuran klien</label>
+        <select id="pr_size">
+          <option value="0.7">Solo / pro bono</option>
+          <option value="1" selected>Small business</option>
+          <option value="1.5">Mid / company</option>
+        </select>
+      </div>
+      <div>
+        <label class="fl">Model harga</label>
+        <select id="pr_model"><option value="project">Per project</option><option value="retainer">Retainer / bulan</option></select>
+      </div>
+    </div>
+
+    <button class="run" onclick="calcPrice()">&gt; HITUNG ESTIMASI</button>
+
+    <div class="price-out" id="pr_out">
+      <div class="plabel">RENTANG HARGA REKOMENDASI</div>
+      <div class="pval" id="pr_val">$0 &ndash; $0</div>
+      <div class="pmodel" id="pr_modeltxt"></div>
+      <div class="pbreak" id="pr_break"></div>
+    </div>
+  </div>
+
+  <div class="note">
+    <div class="nlabel">&#9670; UNTUK 3 KLIEN PERTAMA</div>
+    <p>Pilih <em>Solo / pro bono</em> atau diskon 50-70%. Tetap kirim invoice dengan harga "asli" yang dicoret, supaya klien tahu nilai sebenarnya &mdash; ini memperkuat testimoni kamu nanti.</p>
+  </div>
+
+  <div class="quiz" data-quiz="q5">
+    <div class="q">Kenapa per-project lebih disarankan daripada per-jam di awal?</div>
+    <button class="qopt" data-correct="true">Harga terikat ke nilai/hasil, bukan ke kelambatanmu sebagai pemula</button>
+    <button class="qopt" data-correct="false">Karena per-jam selalu ilegal di Upwork</button>
+    <button class="qopt" data-correct="false">Karena klien suka membayar lebih mahal</button>
+    <div class="qfb"></div>
+  </div>
+</section>
+
+<!-- STEP 6: CONTRACT -->
+<section class="step" data-step="5">
+  <div class="kicker">Tahap 4 &middot; Contract</div>
+  <h2 class="title">Contract &amp; Deliverable Standar</h2>
+  <p class="lead">Tanpa kontrak = scope creep, telat bayar, revisi tak berujung. Kontrak tidak harus rumit &mdash; cukup jelas. Centang checklist ini sebelum mulai project apa pun.</p>
+
+  <!-- TOOL: CONTRACT CHECKLIST -->
+  <div class="tool">
+    <div class="tool-head"><span class="ic">&#128203;</span><span class="tt">CONTRACT READINESS CHECKLIST</span></div>
+    <div class="tool-sub">Centang yang sudah ada di kontrak &middot; item <span style="color:var(--red)">[KRITIS]</span> wajib</div>
+    <div id="ck_list"></div>
+    <button class="run" onclick="validateContract()">&gt; VALIDASI KESIAPAN</button>
+    <div class="check-verdict" id="ck_verdict"></div>
+  </div>
+
+  <div class="note">
+    <div class="nlabel">&#9670; DEPOSIT</div>
+    <p>Selalu minta <strong>deposit 30-50% di muka</strong> sebelum kerja, bahkan untuk klien diskon. Ini menyaring klien serius dan melindungi waktumu.</p>
+  </div>
+
+  <div class="quiz" data-quiz="q6">
+    <div class="q">Klausa apa yang mencegah "scope creep"?</div>
+    <button class="qopt" data-correct="false">Klausa kerahasiaan (NDA)</button>
+    <button class="qopt" data-correct="true">Definisi scope + daftar out-of-scope yang jelas</button>
+    <button class="qopt" data-correct="false">Klausa font logo perusahaan</button>
+    <div class="qfb"></div>
+  </div>
+</section>
+
+<!-- STEP 7: MISSION -->
+<section class="step" data-step="6">
+  <div class="kicker">Project Praktik</div>
+  <h2 class="title">Misi: 3 Klien Pertama</h2>
+  <p class="lead">Target sesi sesuai roadmap: dapatkan <em>3 klien pertama</em> (boleh pro bono / diskon untuk dapat review). Jalankan funnel penuh yang baru kamu pelajari.</p>
+
+  <div class="mission">
+    <div class="mlabel">&#9670; CHECKLIST MISI</div>
+    <div class="mtask"><span class="mnum">01</span><span class="mtxt">Kirim <strong>10 Upwork proposal</strong> pakai Proposal Builder (niche-mu)</span></div>
+    <div class="mtask"><span class="mnum">02</span><span class="mtxt">Kirim <strong>15 LinkedIn connection note</strong> + follow-up sequence</span></div>
+    <div class="mtask"><span class="mnum">03</span><span class="mtxt">Jalankan minimal <strong>3 discovery call</strong> pakai script + timer</span></div>
+    <div class="mtask"><span class="mnum">04</span><span class="mtxt">Buat <strong>3 proposal harga</strong> dari Pricing Calculator</span></div>
+    <div class="mtask"><span class="mnum">05</span><span class="mtxt">Tutup <strong>3 deal</strong> dengan kontrak lengkap (checklist lolos)</span></div>
+    <div class="mtask"><span class="mnum">06</span><span class="mtxt">Minta <strong>testimoni + izin case study</strong> dari tiap klien</span></div>
+  </div>
+
+  <div class="n8n">
+    <div class="nlabel">&#9670; SAMBUNGAN KE F-04</div>
+    <p>Tiap deal yang masuk, deliver pakai skill F-03/F-04: workflow n8n + AI node. Dokumentasikan sebagai case study untuk Sesi 3 (Scaling &amp; SaaS Prep).</p>
+  </div>
+
+  <div class="note">
+    <div class="nlabel">&#9670; TARGET REALISTIS</div>
+    <p>Rasio kasar: ~25 outreach &rarr; ~5 balasan &rarr; ~3 call &rarr; ~3 deal (karena diskon/pro bono lebih mudah closing). Konsistensi &gt; kesempurnaan.</p>
+  </div>
+</section>
+
+<!-- STEP 8: DONE -->
+<section class="step" data-step="7">
+  <div class="done-screen">
+    <div class="big">&#127919;</div>
+    <h2>SESI 2 SELESAI</h2>
+    <p>Kamu sekarang punya pipeline akuisisi penuh: Upwork &rarr; LinkedIn &rarr; Discovery &rarr; Pricing &rarr; Contract. Tinggal eksekusi misi 3 klien pertama.</p>
+
+    <div class="card" style="text-align:left;margin-top:20px">
+      <h3>Yang sudah kamu kuasai</h3>
+      <ul>
+        <li>Proposal Upwork yang fokus ke masalah klien, bukan ke diri sendiri</li>
+        <li>Cold outreach LinkedIn 3-pesan tanpa terkesan jualan</li>
+        <li>Discovery call framework dengan timer per section</li>
+        <li>Scoping &amp; pricing value-based, bukan jam-jaman</li>
+        <li>Kontrak standar dengan deposit &amp; out-of-scope clause</li>
+      </ul>
+    </div>
+
+    <div class="card accent" style="text-align:left">
+      <div class="kicker">&rarr; SESI BERIKUTNYA</div>
+      <p style="margin:0"><strong>F-05 Sesi 3: Scaling &amp; SaaS Prep</strong> &mdash; retainer model, productized service, dokumentasi tim, dan identifikasi pain point untuk MVP SaaS-mu.</p>
+    </div>
+
+    <div class="badge">&#9670; F-05.2 &middot; CLIENT ACQUISITION &middot; CLEARED</div>
+  </div>
+</section>
+
+  <div class="pagenav">
+    <button class="prev" id="btnPrev" onclick="go(-1)" disabled>&larr; SEBELUMNYA</button>
+    <button class="next" id="btnNext" onclick="go(1)">LANJUT &rarr;</button>
+  </div>
+
+</main>
+
+<!-- AI TUTOR -->
+<div class="tutor">
+  <div class="tutor-panel" id="tutorPanel">
+    <div class="tutor-top"><span class="ic">&#129302;</span><span class="tt">AI TUTOR &middot; Client Acquisition</span></div>
+    <div class="tutor-body">
+      <button class="tprompt" onclick="tutorAns(0)">Bagaimana cara dapat balasan proposal Upwork?</button>
+      <button class="tprompt" onclick="tutorAns(1)">Apa yang salah kalau cold outreach diabaikan?</button>
+      <button class="tprompt" onclick="tutorAns(2)">Berapa harga wajar untuk pemula?</button>
+      <button class="tprompt" onclick="tutorAns(3)">Klien minta revisi tak terbatas, gimana?</button>
+      <div class="tans" id="tutorAns"></div>
+    </div>
+  </div>
+  <button class="tutor-btn" onclick="toggleTutor()">&#129302;</button>
+</div>
+
+<script>
+"use strict";
+
+/* ====== STATE ====== */
+var TOTAL = 8;
+var cur = 0;
+var done = {};
+
+/* ====== STEP NAV BUILD ====== */
+(function(){
+  var nav = document.getElementById("stepnav");
+  for (var i = 0; i < TOTAL; i++){
+    var b = document.createElement("button");
+    b.className = "stepbtn" + (i === 0 ? " active" : "");
+    b.textContent = (i + 1);
+    b.setAttribute("data-i", i);
+    b.onclick = (function(idx){ return function(){ jump(idx); }; })(i);
+    nav.appendChild(b);
+  }
+})();
+
+function render(){
+  var steps = document.querySelectorAll(".step");
+  for (var i = 0; i < steps.length; i++){
+    if (i === cur) steps[i].classList.add("show");
+    else steps[i].classList.remove("show");
+  }
+  var btns = document.querySelectorAll(".stepbtn");
+  for (var j = 0; j < btns.length; j++){
+    btns[j].classList.remove("active");
+    if (j === cur) btns[j].classList.add("active");
+    if (done[j]) btns[j].classList.add("done");
+  }
+  var pct = Math.round(((cur + 1) / TOTAL) * 100);
+  document.getElementById("progfill").style.width = pct + "%";
+  document.getElementById("progtxt").textContent = "STEP " + (cur + 1) + " / " + TOTAL;
+  document.getElementById("progpct").textContent = pct + "%";
+  document.getElementById("btnPrev").disabled = (cur === 0);
+  var nx = document.getElementById("btnNext");
+  nx.textContent = (cur === TOTAL - 1) ? "SELESAI \u2713" : "LANJUT \u2192";
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+function go(d){
+  done[cur] = true;
+  var n = cur + d;
+  if (n < 0) n = 0;
+  if (n > TOTAL - 1) n = TOTAL - 1;
+  cur = n;
+  render();
+}
+function jump(i){ done[cur] = true; cur = i; render(); }
+
+/* ====== QUIZ ====== */
+document.querySelectorAll(".quiz").forEach(function(q){
+  var opts = q.querySelectorAll(".qopt");
+  var fb = q.querySelector(".qfb");
+  opts.forEach(function(o){
+    o.onclick = function(){
+      if (q.getAttribute("data-answered")) return;
+      q.setAttribute("data-answered", "1");
+      var correct = o.getAttribute("data-correct") === "true";
+      opts.forEach(function(x){
+        if (x.getAttribute("data-correct") === "true") x.classList.add("correct");
+      });
+      if (!correct) o.classList.add("wrong");
+      fb.className = "qfb show " + (correct ? "good" : "bad");
+      fb.textContent = correct
+        ? "\u2713 Benar. Itu prinsip inti akuisisi klien."
+        : "\u2717 Belum tepat. Jawaban yang benar disorot hijau \u2014 perhatikan alasannya.";
+    };
+  });
+});
+
+/* ====== TOOL 1: UPWORK PROPOSAL ====== */
+function clean(s){ return (s || "").replace(/\s+/g, " ").trim(); }
+function buildProposal(){
+  var job = clean(document.getElementById("up_job").value) || "this automation project";
+  var niche = clean(document.getElementById("up_niche").value);
+  var tool = clean(document.getElementById("up_tool").value) || "n8n";
+  var pain = clean(document.getElementById("up_pain").value) || "manual work that wastes time and loses data";
+  var proof = clean(document.getElementById("up_proof").value) || "built similar end-to-end automation workflows";
+
+  var p = "";
+  p += "Hi there,\n\n";
+  p += "I read your post on \"" + job + "\" \u2014 the part where " + pain + " is exactly the kind of problem I fix.\n\n";
+  p += "Here is how I would approach it:\n";
+  p += "1. Map your current flow and trigger points\n";
+  p += "2. Build the automation in " + tool + " (" + niche + ")\n";
+  p += "3. Add error handling + a quick test run so nothing breaks silently\n\n";
+  p += "Relevant: I " + proof + ", so this is familiar ground for me.\n\n";
+  p += "Quick question to scope it right: where does the data start today \u2014 a form, a sheet, or somewhere else?\n\n";
+  p += "Happy to jump on a short call.\n\u2014 [Nama kamu]";
+
+  document.getElementById("up_out_body").textContent = p;
+  document.getElementById("up_out").classList.add("show");
+}
+
+/* ====== TOOL 2: LINKEDIN ====== */
+function buildLinkedIn(){
+  var role = clean(document.getElementById("li_role").value) || "Founder";
+  var ind = clean(document.getElementById("li_ind").value) || "your industry";
+  var trig = clean(document.getElementById("li_trig").value) || "your recent post about scaling operations";
+  var offer = clean(document.getElementById("li_offer").value) || "automating repetitive workflows";
+
+  var out = "";
+  out += "--- CONNECTION NOTE (<300 char, NO pitch) ---\n";
+  out += "Hi [Nama], saw " + trig + ". As someone working with " + ind + " teams on ops, that really resonated. Would love to connect.\n\n";
+
+  out += "--- FOLLOW-UP 1 (setelah connect) ---\n";
+  out += "Thanks for connecting, [Nama]! Curious \u2014 a lot of " + role + "s in " + ind + " I talk to lose time on manual steps. I help by " + offer + ". No pitch, just genuinely curious how you handle it now?\n\n";
+
+  out += "--- FOLLOW-UP 2 (3-4 hari, lalu STOP) ---\n";
+  out += "Following up once, [Nama]. If useful, I can show a 5-min example of how " + offer + " would look for a team like yours \u2014 zero obligation. Worth a quick call this week? If not, no worries at all.";
+
+  document.getElementById("li_out_body").textContent = out;
+  document.getElementById("li_out").classList.add("show");
+}
+
+/* ====== TOOL 3: DISCOVERY CALL ====== */
+var DC = [
+  { t: "Rapport", sub: "2 menit", sec: 120, q: [
+      "Terima kasih sudah luangkan waktu. Boleh cerita singkat soal bisnis Anda?",
+      "Apa yang membuat Anda mulai cari solusi otomasi sekarang?" ] },
+  { t: "Current Situation", sub: "5 menit", sec: 300, q: [
+      "Coba ceritakan proses ini dari awal sampai akhir, langkah per langkah.",
+      "Siapa yang mengerjakan ini sekarang, dan pakai tool apa?",
+      "Berapa sering proses ini berjalan? (harian/mingguan?)" ] },
+  { t: "Pain & Impact", sub: "5 menit", sec: 300, q: [
+      "Bagian mana yang paling bikin frustrasi atau makan waktu?",
+      "Kira-kira berapa jam/minggu hilang untuk ini?",
+      "Kalau dibiarkan begini 6 bulan lagi, apa dampaknya ke bisnis?" ] },
+  { t: "Desired Outcome", sub: "3 menit", sec: 180, q: [
+      "Kalau ini berjalan sempurna, seperti apa idealnya buat Anda?",
+      "Metrik apa yang menandakan ini berhasil?" ] },
+  { t: "Budget & Timeline", sub: "3 menit", sec: 180, q: [
+      "Apakah Anda sudah punya kisaran budget untuk menyelesaikan ini?",
+      "Kapan idealnya solusi ini sudah jalan?" ] },
+  { t: "Next Steps", sub: "2 menit", sec: 120, q: [
+      "Saya akan kirim proposal scope + harga dalam 1-2 hari, oke?",
+      "Siapa lagi yang perlu ikut memutuskan dari pihak Anda?" ] }
+];
+var dcIdx = 0, dcLeft = DC[0].sec, dcRun = false, dcTimer = null;
+
+function fmt(s){
+  var m = Math.floor(s / 60), ss = s % 60;
+  return (m < 10 ? "0" : "") + m + ":" + (ss < 10 ? "0" : "") + ss;
+}
+(function buildDC(){
+  var wrap = document.getElementById("dc_sections");
+  var html = "";
+  for (var i = 0; i < DC.length; i++){
+    var s = DC[i];
+    html += '<div class="dc-section">';
+    html += '<div class="dc-head' + (i === 0 ? " active" : "") + '" data-h="' + i + '">';
+    html += '<div class="dt">' + (i + 1) + '. ' + s.t + '<small>' + s.sub + '</small></div>';
+    html += '<div class="dc-timer" id="dctimer' + i + '">' + fmt(s.sec) + '</div></div>';
+    html += '<div class="dc-body' + (i === 0 ? " show" : "") + '" id="dcbody' + i + '"><ul>';
+    for (var k = 0; k < s.q.length; k++){ html += '<li>' + s.q[k] + '</li>'; }
+    html += '</ul></div></div>';
+  }
+  wrap.innerHTML = html;
+  var heads = wrap.querySelectorAll(".dc-head");
+  heads.forEach(function(h){
+    h.onclick = function(){
+      var id = parseInt(h.getAttribute("data-h"), 10);
+      var body = document.getElementById("dcbody" + id);
+      body.classList.toggle("show");
+    };
+  });
+})();
+function dcSelect(i){
+  for (var k = 0; k < DC.length; k++){
+    var head = document.querySelectorAll(".dc-head")[k];
+    var body = document.getElementById("dcbody" + k);
+    if (k === i){ head.classList.add("active"); body.classList.add("show"); }
+    else { head.classList.remove("active"); body.classList.remove("show"); }
+  }
+  document.getElementById("dc_total").textContent =
+    "Total target: 20:00 \u00b7 Section aktif: " + DC[i].t;
+}
+function dcTick(){
+  if (dcLeft > 0){
+    dcLeft--;
+    document.getElementById("dctimer" + dcIdx).textContent = fmt(dcLeft);
+  } else {
+    if (dcIdx < DC.length - 1){ dcNext(); }
+    else { dcToggle(); }
+  }
+}
+function dcToggle(){
+  dcRun = !dcRun;
+  var btn = document.getElementById("dc_play");
+  if (dcRun){
+    btn.innerHTML = "&#10073;&#10073; PAUSE";
+    dcTimer = setInterval(dcTick, 1000);
+  } else {
+    btn.innerHTML = "&#9658; START";
+    clearInterval(dcTimer);
+  }
+}
+function dcNext(){
+  if (dcIdx < DC.length - 1){
+    dcIdx++;
+    dcLeft = DC[dcIdx].sec;
+    document.getElementById("dctimer" + dcIdx).textContent = fmt(dcLeft);
+    dcSelect(dcIdx);
+  }
+}
+function dcReset(){
+  clearInterval(dcTimer); dcRun = false; dcIdx = 0; dcLeft = DC[0].sec;
+  document.getElementById("dc_play").innerHTML = "&#9658; START";
+  for (var i = 0; i < DC.length; i++){
+    document.getElementById("dctimer" + i).textContent = fmt(DC[i].sec);
+  }
+  dcSelect(0);
+}
+
+/* ====== TOOL 4: PRICING ====== */
+function calcPrice(){
+  var wf = parseInt(document.getElementById("pr_wf").value, 10) || 1;
+  var cx = document.getElementById("pr_cx").value;
+  var integ = parseInt(document.getElementById("pr_int").value, 10) || 0;
+  var ai = document.getElementById("pr_ai").value;
+  var sizeMult = parseFloat(document.getElementById("pr_size").value) || 1;
+  var model = document.getElementById("pr_model").value;
+
+  var base = { simple: 200, medium: 500, complex: 1200 }[cx];
+  var sub = base * wf;
+  var integCost = integ * 120;
+  var aiCost = (ai === "yes") ? sub * 0.4 + 250 : 0;
+
+  var raw = (sub + integCost + aiCost) * sizeMult;
+  var low = Math.round(raw * 0.85 / 10) * 10;
+  var high = Math.round(raw * 1.25 / 10) * 10;
+
+  var modelTxt = "Project sekali bayar";
+  if (model === "retainer"){
+    low = Math.round(low * 0.35 / 10) * 10;
+    high = Math.round(high * 0.45 / 10) * 10;
+    modelTxt = "Retainer / bulan (maintenance + perubahan kecil)";
+  }
+
+  document.getElementById("pr_val").textContent = "$" + low + " \u2013 $" + high;
+  document.getElementById("pr_modeltxt").textContent = modelTxt;
+
+  var bd = "";
+  bd += '<div><span>Base x ' + wf + ' workflow (' + cx + ')</span><span>$' + sub + '</span></div>';
+  bd += '<div><span>Integrasi (' + integ + ' x $120)</span><span>$' + integCost + '</span></div>';
+  bd += '<div><span>Komponen AI</span><span>$' + Math.round(aiCost) + '</span></div>';
+  bd += '<div><span>Faktor ukuran klien</span><span>x' + sizeMult + '</span></div>';
+  document.getElementById("pr_break").innerHTML = bd;
+  document.getElementById("pr_out").classList.add("show");
+}
+
+/* ====== TOOL 5: CONTRACT CHECKLIST ====== */
+var CK = [
+  { t: "Scope kerja didefinisikan jelas (apa yang dibangun)", crit: true },
+  { t: "Daftar deliverable konkret (workflow X, dokumentasi Y)", crit: true },
+  { t: "Klausa out-of-scope (apa yang TIDAK termasuk)", crit: true },
+  { t: "Jumlah ronde revisi dibatasi (cth: 2 kali)", crit: true },
+  { t: "Termin pembayaran + deposit di muka (30-50%)", crit: true },
+  { t: "Timeline / milestone dengan tanggal", crit: false },
+  { t: "Kepemilikan / IP setelah lunas", crit: false },
+  { t: "Kanal komunikasi disepakati (Slack/email)", crit: false },
+  { t: "Support pasca-delivery (cth: 7 hari bugfix)", crit: false },
+  { t: "Kill fee / klausa pembatalan", crit: false }
+];
+(function buildCK(){
+  var wrap = document.getElementById("ck_list");
+  var html = "";
+  for (var i = 0; i < CK.length; i++){
+    html += '<div class="check-item" data-c="' + i + '" data-crit="' + (CK[i].crit ? "1" : "0") + '">';
+    html += '<div class="check-box"></div>';
+    html += '<div class="check-txt"><b>' + CK[i].t + '</b>' + (CK[i].crit ? '<span class="crit">[KRITIS]</span>' : '') + '</div>';
+    html += '</div>';
+  }
+  wrap.innerHTML = html;
+  wrap.querySelectorAll(".check-item").forEach(function(it){
+    it.onclick = function(){
+      it.classList.toggle("checked");
+      var box = it.querySelector(".check-box");
+      box.textContent = it.classList.contains("checked") ? "\u2713" : "";
+    };
+  });
+})();
+function validateContract(){
+  var items = document.querySelectorAll("#ck_list .check-item");
+  var missingCrit = 0, missingTotal = 0;
+  items.forEach(function(it){
+    var checked = it.classList.contains("checked");
+    if (!checked){
+      missingTotal++;
+      if (it.getAttribute("data-crit") === "1") missingCrit++;
+    }
+  });
+  var v = document.getElementById("ck_verdict");
+  if (missingCrit > 0){
+    v.className = "check-verdict show warn";
+    v.innerHTML = "\u26a0 BELUM SIAP \u2014 ada " + missingCrit + " item <b>KRITIS</b> yang belum terpenuhi. Jangan mulai kerja sebelum ini beres, terutama deposit &amp; scope.";
+  } else if (missingTotal > 0){
+    v.className = "check-verdict show ok";
+    v.innerHTML = "\u2713 SIAP JALAN. Semua item kritis terpenuhi. " + missingTotal + " item opsional belum dicentang \u2014 disarankan tapi tidak wajib.";
+  } else {
+    v.className = "check-verdict show ok";
+    v.innerHTML = "\u2713 KONTRAK LENGKAP. Semua item terpenuhi \u2014 ini standar profesional. Kirim untuk tanda tangan &amp; minta deposit.";
+  }
+}
+
+/* ====== COPY ====== */
+function copyOut(id){
+  var txt = document.getElementById(id).textContent;
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt);
+  } else {
+    var ta = document.createElement("textarea");
+    ta.value = txt; document.body.appendChild(ta); ta.select();
+    try { document.execCommand("copy"); } catch (e) {}
+    document.body.removeChild(ta);
+  }
+}
+
+/* ====== AI TUTOR ====== */
+var TUTOR = [
+  "Reply rate naik kalau: (1) buka dengan masalah dari job post, bukan dirimu, (2) tunjukkan kamu baca brief-nya dengan restate pain mereka, (3) tutup dengan SATU pertanyaan spesifik. Hindari template generik \u2014 klien lihat puluhan tiap hari.",
+  "Cold outreach diabaikan biasanya karena: connection note langsung jualan, pesan terlalu panjang, atau tidak ada trigger personal. Perbaiki: sebut sesuatu spesifik tentang MEREKA dulu, simpan offer untuk follow-up. Berhenti setelah 2 follow-up.",
+  "Untuk 3 klien pertama: pro bono atau diskon 50-70% demi testimoni. Setelah itu, pakai Pricing Calculator \u2014 per project lebih sehat daripada per jam. Pemula umumnya $200-800 untuk workflow simple-medium. Yang penting harga terikat ke nilai, bukan ke kecepatanmu.",
+  "Revisi tak terbatas = scope creep, mimpi buruk freelancer. Solusi ada di kontrak: batasi ronde revisi (cth 2x), dan tulis klausa out-of-scope. Revisi di luar itu = biaya tambahan. Validasi pakai Contract Checklist sebelum mulai \u2014 ini item KRITIS."
+];
+function toggleTutor(){
+  document.getElementById("tutorPanel").classList.toggle("show");
+}
+function tutorAns(i){
+  var el = document.getElementById("tutorAns");
+  el.textContent = TUTOR[i];
+  el.classList.add("show");
+}
+
+render();
+</script>
+</body>
+</html>
