@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>F-03 Sesi 4 — AI Nodes di n8n</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#080c10; --panel:#0d1f2d; --panel2:#0a0f14;
+    --border:#1e3a4a; --text:#c9d1d9; --bright:#e6edf3;
+    --dim:#6e7681; --mid:#8b949e;
+    --accent:#69db7c; --accent-dim:rgba(105,219,124,.13);
+    --accent-bd:rgba(105,219,124,.4);
+    --cyan:#00e5ff; --yellow:#ffeb3b; --purple:#da77f2;
+    --red:#ff6b6b; --orange:#ff8c42;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:'JetBrains Mono', 'Courier New', monospace;
+    font-size:13px; line-height:1.65;
+  }
+  ::-webkit-scrollbar{width:4px;height:4px;}
+  ::-webkit-scrollbar-track{background:var(--bg);}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+
+  header{
+    position:sticky; top:0; z-index:50;
+    background:linear-gradient(180deg,#0d1f2d 0%,#080c10 100%);
+    border-bottom:1px solid var(--border);
+    padding:16px 18px 12px;
+  }
+  .hdr-tag{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);
+    box-shadow:0 0 8px var(--accent);animation:pulse 2s infinite;}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  @media (prefers-reduced-motion: reduce){ .dot{animation:none} }
+  .hdr-tag span{color:var(--accent);font-size:10px;letter-spacing:3px;}
+  h1{margin:0;font-size:clamp(15px,4vw,20px);font-weight:800;color:var(--bright);letter-spacing:1px;}
+  .hdr-sub{margin:3px 0 0;font-size:10px;color:var(--dim);}
+
+  /* Step nav */
+  .stepnav{
+    display:flex;gap:6px;overflow-x:auto;padding:12px 18px;
+    background:var(--panel2);border-bottom:1px solid var(--border);
+    position:sticky;top:73px;z-index:40;
+  }
+  .stepnav button{
+    flex-shrink:0;padding:6px 11px;border-radius:4px;cursor:pointer;
+    background:var(--panel);border:1px solid var(--border);
+    color:var(--dim);font-family:inherit;font-size:10px;letter-spacing:1px;
+    transition:all .2s;
+  }
+  .stepnav button.active{
+    background:var(--accent-dim);border-color:var(--accent);
+    color:var(--accent);box-shadow:0 0 8px rgba(105,219,124,.3);
+  }
+  .stepnav button.done{color:var(--accent);border-color:var(--accent-bd);}
+  .stepnav button:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
+
+  main{padding:18px 16px 80px;max-width:780px;margin:0 auto;}
+  section.step{display:none;}
+  section.step.show{display:block;animation:fadein .25s ease;}
+  @keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  .eyebrow{font-size:10px;color:var(--accent);letter-spacing:2px;margin-bottom:6px;}
+  h2{margin:0 0 12px;font-size:17px;color:var(--bright);font-weight:800;}
+  h3{margin:22px 0 8px;font-size:13px;color:var(--accent);letter-spacing:1px;}
+  p{margin:0 0 12px;}
+  .hl{color:var(--accent);}
+  .hly{color:var(--yellow);}
+  .hlc{color:var(--cyan);}
+  .hlp{color:var(--purple);}
+  .hlr{color:var(--red);}
+
+  .box{
+    background:var(--panel);border:1px solid var(--border);
+    border-radius:8px;padding:14px;margin:14px 0;
+  }
+  .box .box-tag{font-size:9px;letter-spacing:2px;margin-bottom:8px;}
+  .box.n8n{border-left:3px solid var(--accent);}
+  .box.n8n .box-tag{color:var(--accent);}
+  .box.warn{border-left:3px solid var(--orange);}
+  .box.warn .box-tag{color:var(--orange);}
+  .box.info{border-left:3px solid var(--cyan);}
+  .box.info .box-tag{color:var(--cyan);}
+
+  ul.items{list-style:none;padding:0;margin:0 0 12px;}
+  ul.items li{display:flex;gap:8px;margin-bottom:7px;}
+  ul.items li::before{content:"›";color:var(--accent);flex-shrink:0;}
+
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:11px;}
+  th,td{border:1px solid var(--border);padding:7px 9px;text-align:left;vertical-align:top;}
+  th{background:var(--panel);color:var(--accent);font-size:10px;letter-spacing:1px;}
+  td{background:var(--panel2);}
+
+  /* code blocks */
+  pre.code{
+    background:#05080b;border:1px solid var(--border);border-radius:6px;
+    padding:13px;overflow-x:auto;font-size:11.5px;line-height:1.6;
+    margin:12px 0;
+  }
+  pre.code .cm{color:#546a7a;}        /* comment */
+  pre.code .kw{color:#da77f2;}        /* keyword */
+  pre.code .st{color:#69db7c;}        /* string */
+  pre.code .fn{color:#00e5ff;}        /* function */
+  pre.code .nm{color:#ffb86b;}        /* number */
+  pre.code .pr{color:#ffeb3b;}        /* property */
+  .code-label{font-size:9px;color:var(--dim);letter-spacing:2px;margin:12px 0 -8px;}
+
+  /* flow diagram */
+  .flow{
+    display:flex;flex-wrap:wrap;align-items:center;gap:6px;
+    background:var(--panel2);border:1px dashed var(--border);
+    border-radius:6px;padding:12px;margin:12px 0;font-size:11px;
+  }
+  .flow .node{
+    background:var(--panel);border:1px solid var(--accent-bd);
+    border-radius:4px;padding:5px 9px;color:var(--bright);
+  }
+  .flow .node.alt{border-color:rgba(218,119,242,.5);}
+  .flow .node.io{border-color:rgba(0,229,255,.5);}
+  .flow .arrow{color:var(--accent);}
+
+  /* quiz */
+  .quiz{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:14px;margin:18px 0;}
+  .quiz .q-tag{font-size:9px;color:var(--purple);letter-spacing:2px;margin-bottom:8px;}
+  .quiz .q-text{color:var(--bright);margin-bottom:10px;font-weight:500;}
+  .quiz .opt{
+    display:block;width:100%;text-align:left;margin-bottom:6px;
+    background:var(--panel2);border:1px solid var(--border);border-radius:5px;
+    padding:9px 11px;color:var(--text);font-family:inherit;font-size:12px;
+    cursor:pointer;transition:all .15s;
+  }
+  .quiz .opt:hover{border-color:var(--accent-bd);}
+  .quiz .opt.correct{border-color:var(--accent);background:var(--accent-dim);color:var(--accent);}
+  .quiz .opt.wrong{border-color:var(--red);background:rgba(255,107,107,.08);color:var(--red);}
+  .quiz .feedback{font-size:11px;margin-top:8px;display:none;}
+  .quiz .feedback.show{display:block;}
+
+  /* editor */
+  .editor{border:1px solid var(--border);border-radius:8px;overflow:hidden;margin:14px 0;}
+  .editor .ed-head{
+    display:flex;justify-content:space-between;align-items:center;
+    background:var(--panel);padding:8px 12px;border-bottom:1px solid var(--border);
+  }
+  .editor .ed-head span{font-size:9px;color:var(--dim);letter-spacing:2px;}
+  .editor textarea{
+    width:100%;min-height:170px;background:#05080b;color:var(--bright);
+    border:none;padding:12px;font-family:inherit;font-size:11.5px;line-height:1.6;
+    resize:vertical;outline:none;
+  }
+  .editor .ed-out{
+    background:var(--panel2);border-top:1px solid var(--border);
+    padding:10px 12px;font-size:11.5px;min-height:34px;white-space:pre-wrap;
+    color:var(--mid);
+  }
+  .editor .ed-out.ok{color:var(--accent);}
+  .editor .ed-out.err{color:var(--red);}
+  .btn{
+    background:var(--accent-dim);border:1px solid var(--accent);color:var(--accent);
+    border-radius:4px;padding:6px 14px;font-family:inherit;font-size:10px;
+    letter-spacing:1px;cursor:pointer;transition:all .15s;
+  }
+  .btn:hover{box-shadow:0 0 10px rgba(105,219,124,.35);}
+  .btn.ghost{background:none;border-color:var(--border);color:var(--mid);}
+
+  /* mission */
+  .mission{border:1px solid var(--accent-bd);border-radius:8px;padding:16px;margin:16px 0;background:rgba(105,219,124,.05);}
+  .mission .m-tag{font-size:10px;color:var(--accent);letter-spacing:2px;margin-bottom:8px;}
+  .check-list{list-style:none;padding:0;margin:10px 0;}
+  .check-list li{display:flex;gap:8px;margin-bottom:6px;font-size:11.5px;}
+  .check-list li .ck{flex-shrink:0;}
+  .check-list li.pass .ck{color:var(--accent);}
+  .check-list li.fail .ck{color:var(--dim);}
+
+  /* tutor */
+  .tutor{
+    border:1px solid rgba(218,119,242,.4);border-radius:8px;
+    margin:20px 0;overflow:hidden;
+  }
+  .tutor .t-head{background:rgba(218,119,242,.08);padding:10px 14px;
+    font-size:10px;color:var(--purple);letter-spacing:2px;}
+  .tutor .t-body{padding:12px 14px;}
+  .tutor .t-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
+  .tutor .chip{
+    background:var(--panel);border:1px solid var(--border);color:var(--mid);
+    border-radius:12px;padding:5px 11px;font-size:10px;cursor:pointer;
+    font-family:inherit;transition:all .15s;
+  }
+  .tutor .chip:hover{border-color:var(--purple);color:var(--purple);}
+  .tutor .t-answer{
+    background:var(--panel2);border:1px solid var(--border);border-radius:6px;
+    padding:11px;font-size:11.5px;min-height:30px;color:var(--mid);white-space:pre-wrap;
+  }
+
+  .navbtns{display:flex;gap:10px;margin-top:28px;}
+  .navbtns button{
+    flex:1;padding:11px;border-radius:6px;font-family:inherit;font-size:11px;
+    letter-spacing:1px;cursor:pointer;background:var(--panel);
+    border:1px solid var(--border);color:var(--text);transition:all .2s;
+  }
+  .navbtns button.next{background:var(--accent-dim);border-color:var(--accent-bd);color:var(--accent);}
+  .navbtns button:disabled{color:#3d444d;cursor:default;background:var(--panel2);}
+
+  .progress-wrap{height:3px;background:var(--panel2);}
+  .progress-bar{height:100%;background:var(--accent);width:12.5%;transition:width .3s;box-shadow:0 0 6px var(--accent);}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr-tag"><div class="dot"></div><span>F-03 · N8N MASTERY · SESI 4 / MINGGU 9–12</span></div>
+  <h1>AI NODES DI N8N</h1>
+  <p class="hdr-sub">OpenAI &amp; Anthropic Nodes → AI Agent → Memory → Document Processing → Multi-step AI Workflow</p>
+</header>
+<div class="progress-wrap"><div class="progress-bar" id="pbar"></div></div>
+
+<nav class="stepnav" id="stepnav"></nav>
+
+<main>
+
+<!-- ============ STEP 1 ============ -->
+<section class="step show" id="step-0">
+  <div class="eyebrow">STEP 1 / 8 · ORIENTASI</div>
+  <h2>AI di n8n: Peta Besar Sesi Ini</h2>
+
+  <p>Sampai Sesi 3, semua workflow kamu bersifat <span class="hly">deterministik</span> — setiap node punya input jelas, output jelas, aturan tetap. Sesi 4 menambahkan satu kemampuan baru: node yang bisa <span class="hl">memahami bahasa manusia</span> dan mengambil keputusan dari konteks.</p>
+
+  <div class="flow">
+    <div class="node io">Webhook Trigger</div><span class="arrow">→</span>
+    <div class="node alt">AI Node (LLM)</div><span class="arrow">→</span>
+    <div class="node">IF / Switch</div><span class="arrow">→</span>
+    <div class="node io">Gmail / Slack</div>
+  </div>
+
+  <p>AI node duduk di tengah workflow seperti node lain: menerima item, memprosesnya, mengeluarkan item. Bedanya, "prosesnya" adalah pemanggilan LLM (OpenAI / Anthropic) — dan output-nya berupa teks atau JSON hasil reasoning, bukan hasil rumus tetap.</p>
+
+  <h3>5 Materi Sesi Ini (Sesuai Roadmap)</h3>
+  <ul class="items">
+    <li><span><span class="hl">OpenAI &amp; Anthropic nodes</span> — node LLM dasar: kirim prompt, terima jawaban</span></li>
+    <li><span><span class="hl">AI Agent node</span> — planning &amp; execution: LLM yang bisa memilih dan memakai tools</span></li>
+    <li><span><span class="hl">Memory &amp; context management</span> — supaya percakapan tidak "amnesia" tiap eksekusi</span></li>
+    <li><span><span class="hl">Document processing</span> — PDF &amp; Word masuk workflow, diekstrak, dianalisis AI</span></li>
+    <li><span><span class="hl">Multi-step AI workflow</span> — merangkai beberapa langkah AI jadi satu sistem</span></li>
+  </ul>
+
+  <div class="box n8n">
+    <div class="box-tag">◈ N8N CONTEXT</div>
+    Di n8n, semua node AI berkumpul di kategori <span class="hl">"AI"</span> pada node panel. Ada dua keluarga besar:
+    <br><br>
+    <span class="hly">1. Node mandiri</span> — contoh: <span class="hlc">OpenAI</span> node, langsung dipakai seperti HTTP Request.
+    <br>
+    <span class="hly">2. Node cluster</span> — contoh: <span class="hlc">AI Agent</span>, yang butuh sub-node menempel: Chat Model, Memory, Tools. Sub-node ini disambungkan lewat port khusus di bawah node utama, bukan lewat jalur data biasa.
+  </div>
+
+  <div class="box warn">
+    <div class="box-tag">⚠ MINDSET PENTING</div>
+    Output LLM bersifat <span class="hlr">non-deterministik</span> — input sama bisa menghasilkan output sedikit berbeda. Karena itu semua skill error handling dari Sesi 3 (try/catch di Code Node, error workflow, fallback) jadi <span class="hl">lebih penting</span>, bukan kurang penting, saat AI masuk ke workflow.
+  </div>
+
+  <div class="quiz" data-correct="1">
+    <div class="q-tag">◈ QUIZ CEPAT</div>
+    <div class="q-text">Apa perbedaan mendasar AI node dibanding node n8n biasa (Set, IF, Merge)?</div>
+    <button class="opt">AI node tidak menerima input item seperti node lain</button>
+    <button class="opt">Outputnya non-deterministik — hasil reasoning LLM, bukan aturan tetap</button>
+    <button class="opt">AI node hanya bisa dipakai di n8n self-hosted</button>
+    <div class="feedback"></div>
+  </div>
+
+  <div class="navbtns">
+    <button disabled>← SEBELUMNYA</button>
+    <button class="next" onclick="goStep(1)">LANJUT: OPENAI &amp; ANTHROPIC NODES →</button>
+  </div>
+</section>
+
+<!-- ============ STEP 2 ============ -->
+<section class="step" id="step-1">
+  <div class="eyebrow">STEP 2 / 8 · MATERI 1</div>
+  <h2>OpenAI &amp; Anthropic Nodes</h2>
+
+  <p>Ini node LLM paling dasar: kamu kirim <span class="hl">prompt</span>, node memanggil API (OpenAI atau Anthropic), dan jawaban model kembali sebagai item JSON. Konsepnya persis F-01: request → response. Bedanya, n8n yang mengurus HTTP call, auth header, dan parsing-nya untukmu.</p>
+
+  <h3>Setup Credentials</h3>
+  <ul class="items">
+    <li><span>Buat API key di platform masing-masing (platform.openai.com / console.anthropic.com)</span></li>
+    <li><span>Di n8n: <span class="hlc">Credentials → Add Credential → OpenAI API / Anthropic API</span> → tempel key</span></li>
+    <li><span>Credential disimpan terenkripsi dan dipakai ulang oleh semua node AI — sama polanya dengan credential Google Sheets di Sesi 2</span></li>
+  </ul>
+
+  <h3>Konfigurasi Inti Node</h3>
+  <table>
+    <tr><th>PARAMETER</th><th>FUNGSI</th><th>CONTOH</th></tr>
+    <tr><td><span class="hl">Model</span></td><td>Model LLM yang dipakai</td><td>gpt-4o-mini, claude-sonnet</td></tr>
+    <tr><td><span class="hl">System Prompt</span></td><td>Peran &amp; aturan permanen untuk model</td><td>"Kamu CS toko online, jawab singkat dalam Bahasa Indonesia"</td></tr>
+    <tr><td><span class="hl">User Message</span></td><td>Input dinamis — biasanya dari expression</td><td>{{ $json.body.message }}</td></tr>
+    <tr><td><span class="hl">Temperature</span></td><td>0 = konsisten, 1 = kreatif</td><td>0.2 untuk klasifikasi, 0.8 untuk copywriting</td></tr>
+    <tr><td><span class="hl">Max Tokens</span></td><td>Batas panjang jawaban (kontrol biaya)</td><td>500</td></tr>
+  </table>
+
+  <div class="box n8n">
+    <div class="box-tag">◈ N8N CONTEXT — EXPRESSION DI DALAM PROMPT</div>
+    Kekuatan utama AI node di n8n: prompt bisa <span class="hl">dinamis</span> dengan expression (materi Sesi 3). Contoh prompt di field User Message:
+    <pre class="code">Pelanggan bernama <span class="st">{{ $json.nama }}</span> bertanya:
+<span class="st">{{ $json.body.message }}</span>
+
+Riwayat order terakhir: <span class="st">{{ $json.last_order }}</span></pre>
+    Data dari node sebelumnya (Webhook, Google Sheets) mengalir langsung ke dalam prompt — tanpa Code Node tambahan.
+  </div>
+
+  <h3>Bentuk Output</h3>
+  <p>Jawaban model kembali sebagai item JSON biasa. Strukturnya kira-kira:</p>
+  <pre class="code">{
+  <span class="pr">"message"</span>: {
+    <span class="pr">"role"</span>: <span class="st">"assistant"</span>,
+    <span class="pr">"content"</span>: <span class="st">"Halo! Pesanan #1234 sedang dikirim..."</span>
+  }
+}</pre>
+  <p>Artinya: node berikutnya tinggal ambil <span class="hlc">{{ $json.message.content }}</span> — dan semua skill JSON dari F-01 langsung terpakai.</p>
+
+  <div class="box info">
+    <div class="box-tag">◈ DUA WUJUD NODE LLM</div>
+    <span class="hly">OpenAI node (mandiri)</span>: dipakai langsung di jalur workflow untuk satu kali tanya-jawab.<br>
+    <span class="hly">Chat Model (sub-node)</span>: versi yang <span class="hl">ditempelkan</span> ke AI Agent / Chain sebagai "otak". OpenAI Chat Model dan Anthropic Chat Model sama-sama tersedia — Agent tinggal pilih otaknya. Ini penting untuk Step berikutnya.
+  </div>
+
+  <h3>Latihan: Rakit Payload Prompt</h3>
+  <p>Simulasi kecil — susun struktur messages seperti yang dikirim node ke API. Mock <span class="hlc">$input</span> sudah disediakan (pola Code Node n8n).</p>
+
+  <div class="editor" data-ed="ed1">
+    <div class="ed-head"><span>EDITOR · JS (ASCII)</span><button class="btn" onclick="runEditor('ed1')">▶ RUN</button></div>
+    <textarea id="ed1" spellcheck="false">// Mock item masuk dari Webhook:
+// { nama: "Budi", pesan: "Pesanan saya belum sampai" }
+
+const item = $input.all()[0].json;
+
+const messages = [
+  {
+    role: "system",
+    content: "Kamu CS toko online. Jawab sopan dan singkat."
+  },
+  {
+    role: "user",
+    content: "Pelanggan " + item.nama + " bertanya: " + item.pesan
+  }
+];
+
+console.log(JSON.stringify(messages, null, 2));</textarea>
+    <div class="ed-out" id="ed1-out">Output akan muncul di sini...</div>
+  </div>
+
+  <div class="quiz" data-correct="2">
+    <div class="q-tag">◈ QUIZ</div>
+    <div class="q-text">Kamu ingin AI node mengklasifikasikan email masuk dengan hasil yang konsisten dan bisa diandalkan. Setting paling tepat?</div>
+    <button class="opt">Temperature tinggi (0.9) supaya AI lebih pintar</button>
+    <button class="opt">Max tokens sebesar mungkin supaya jawaban lengkap</button>
+    <button class="opt">Temperature rendah (~0.2) + system prompt yang membatasi format jawaban</button>
+    <div class="feedback"></div>
+  </div>
+
+  <div class="navbtns">
+    <button onclick="goStep(0)">← SEBELUMNYA</button>
+    <button class="next" onclick="goStep(2)">LANJUT: AI AGENT NODE →</button>
+  </div>
+</section>
+
+<!-- ============ STEP 3 ============ -->
+<section class="step" id="step-2">
+  <div class="eyebrow">STEP 3 / 8 · MATERI 2</div>
+  <h2>AI Agent Node: Planning &amp; Execution</h2>
+
+  <p>Node LLM biasa = satu kali tanya, satu kali jawab. <span class="hl">AI Agent</span> berbeda: dia diberi <span class="hly">tujuan</span> dan <span class="hly">tools</span>, lalu dia sendiri yang merencanakan langkah dan mengeksekusinya — bisa beberapa putaran — sampai tujuan tercapai.</p>
+
+  <h3>Siklus Kerja Agent: Plan → Act → Observe</h3>
+  <div class="flow">
+    <div class="node alt">1. PLAN<br><small>model menalar: "tool apa yang kubutuhkan?"</small></div>
+    <span class="arrow">→</span>
+    <div class="node">2. ACT<br><small>panggil tool (HTTP, Sheets, dll)</small></div>
+    <span class="arrow">→</span>
+    <div class="node io">3. OBSERVE<br><small>baca hasil tool</small></div>
+    <span class="arrow">→</span>
+    <div class="node alt">ULANG / SELESAI<br><small>jawab final ke user</small></div>
+  </div>
+
+  <p>Contoh nyata: user bertanya <span class="st">"status order #1234 apa?"</span>. Agent menalar bahwa dia butuh data order → memanggil tool pencarian order → membaca hasilnya → baru menyusun jawaban. Semua itu terjadi <span class="hl">di dalam satu node</span>.</p>
+
+  <h3>Anatomi AI Agent di n8n</h3>
+  <p>AI Agent adalah node cluster — dia butuh sub-node yang ditempelkan ke port bawahnya:</p>
+  <table>
+    <tr><th>SUB-NODE</th><th>PERAN</th><th>WAJIB?</th></tr>
+    <tr><td><span class="hl">Chat Model</span></td><td>Otaknya — OpenAI Chat Model atau Anthropic Chat Model</td><td>Ya</td></tr>
+    <tr><td><span class="hl">Memory</span></td><td>Ingatan percakapan (Step 4)</td><td>Opsional</td></tr>
+    <tr><td><span class="hl">Tools</span></td><td>Tangan-tangannya: HTTP Request Tool, Code Tool, Call n8n Workflow Tool, Google Sheets Tool, dll</td><td>Opsional tapi inilah inti agent</td></tr>
+  </table>
+
+  <div class="box n8n">
+    <div class="box-tag">◈ N8N CONTEXT — TOOL ADALAH WORKFLOW SKILL LAMA-MU</div>
+    Perhatikan daftar tools: <span class="hlc">HTTP Request Tool</span> (= F-01), <span class="hlc">Code Tool</span> (= F-02), <span class="hlc">Call n8n Workflow Tool</span> (= sub-workflow dari Sesi 3). Agent tidak menggantikan skill lamamu — dia <span class="hl">mengonsumsi</span> semuanya. Sub-workflow yang sudah kamu modularisasi di Sesi 3 bisa langsung dijadikan tool untuk agent.
+  </div>
+
+  <h3>System Message: Pagar untuk Agent</h3>
+  <p>Karena agent mengambil keputusan sendiri, <span class="hl">system message</span> jadi alat kontrol utamamu. Pola yang baik:</p>
+  <pre class="code"><span class="cm">// Field "System Message" pada AI Agent</span>
+Kamu agent customer support Toko ABC.
+
+ATURAN:
+- Selalu jawab dalam Bahasa Indonesia.
+- Untuk pertanyaan status order, WAJIB pakai tool "cari_order".
+- Jangan pernah mengarang nomor resi.
+- Jika data tidak ditemukan, katakan jujur dan tawarkan eskalasi.</pre>
+
+  <div class="box warn">
+    <div class="box-tag">⚠ JEBAKAN UMUM</div>
+    Memberi agent terlalu banyak tools tanpa instruksi kapan memakainya → agent jadi lambat, mahal, dan sering salah pilih tool. Mulai dari <span class="hl">1–2 tools</span> dengan deskripsi tool yang sangat jelas, baru tambah bertahap. Deskripsi tool itu dibaca oleh model — tulis seperti dokumentasi API mini (skill F-01 Sesi 3!).
+  </div>
+
+  <div class="quiz" data-correct="0">
+    <div class="q-tag">◈ QUIZ</div>
+    <div class="q-text">Apa yang membedakan AI Agent node dari node OpenAI/Anthropic biasa?</div>
+    <button class="opt">Agent bisa merencanakan langkah dan memanggil tools secara berulang sampai tujuan tercapai</button>
+    <button class="opt">Agent memakai model yang lebih pintar sehingga tidak butuh prompt</button>
+    <button class="opt">Agent hanya bisa dipakai dengan model OpenAI, bukan Anthropic</button>
+    <div class="feedback"></div>
+  </div>
+
+  <div class="navbtns">
+    <button onclick="goStep(1)">← SEBELUMNYA</button>
+    <button class="next" onclick="goStep(3)">LANJUT: MEMORY &amp; CONTEXT →</button>
+  </div>
+</section>
+
+<!-- ============ STEP 4 ============ -->
+<section class="step" id="step-3">
+  <div class="eyebrow">STEP 4 / 8 · MATERI 3</div>
+  <h2>Memory &amp; Context Management</h2>
+
+  <p>Fakta penting: LLM itu <span class="hlr">stateless</span>. Setiap pemanggilan API adalah lembar kosong — model tidak ingat percakapan sebelumnya. Kalau user bilang <span class="st">"ya, yang itu"</span> di pesan kedua, tanpa memory agent tidak tahu "itu" merujuk ke apa.</p>
+
+  <h3>Simple Memory (Window Buffer)</h3>
+  <p>Sub-node memory paling umum di n8n. Cara kerjanya: menyimpan <span class="hl">N pesan terakhir</span> per sesi, lalu menyuntikkannya kembali ke prompt setiap eksekusi.</p>
+
+  <table>
+    <tr><th>PARAMETER</th><th>FUNGSI</th></tr>
+    <tr><td><span class="hl">Session Key</span></td><td>Identitas percakapan — pembeda antara user A dan user B</td></tr>
+    <tr><td><span class="hl">Context Window Length</span></td><td>Berapa pesan terakhir yang diingat (mis. 10)</td></tr>
+  </table>
+
+  <div class="box n8n">
+    <div class="box-tag">◈ N8N CONTEXT — SESSION KEY DARI DATA NYATA</div>
+    Session key diisi dengan expression dari trigger. Contoh:
+    <pre class="code"><span class="cm">// Bot Telegram (integrasi Sesi 2):</span>
+{{ $json.message.chat.id }}
+
+<span class="cm">// Webhook form dengan email:</span>
+{{ $json.body.email }}</pre>
+    Dengan ini, setiap pelanggan punya "ingatan" terpisah — chat Budi tidak bocor ke chat Sari.
+  </div>
+
+  <h3>Context Window = Anggaran Token</h3>
+  <p>Semua yang diingat (system prompt + riwayat + dokumen + pertanyaan baru) harus muat dalam <span class="hly">context window</span> model — dan semuanya dihitung sebagai token berbayar. Konsekuensinya:</p>
+  <ul class="items">
+    <li><span>Window length besar = konteks kaya, tapi <span class="hlr">biaya naik</span> di setiap pesan</span></li>
+    <li><span>Window length kecil = murah, tapi agent cepat "lupa" awal percakapan</span></li>
+    <li><span>Praktik umum CS bot: <span class="hl">5–10 pesan</span> terakhir sudah cukup</span></li>
+  </ul>
+
+  <div class="box warn">
+    <div class="box-tag">⚠ KAPAN TIDAK PERLU MEMORY</div>
+    Workflow satu-arah (klasifikasi email, summarize dokumen, generate laporan harian) <span class="hl">tidak butuh memory</span> — tidak ada percakapan lanjutan. Menambahkan memory di sana hanya menambah biaya dan kompleksitas. Memory hanya untuk interaksi multi-giliran (chatbot, agent percakapan).
+  </div>
+
+  <h3>Latihan: Simulasi Window Buffer</h3>
+  <p>Pahami mekanismenya dengan menulis logikanya sendiri — ambil N pesan terakhir dari riwayat.</p>
+
+  <div class="editor" data-ed="ed2">
+    <div class="ed-head"><span>EDITOR · JS (ASCII)</span><button class="btn" onclick="runEditor('ed2')">▶ RUN</button></div>
+    <textarea id="ed2" spellcheck="false">// Riwayat chat satu sesi (paling lama -> paling baru)
+const history = [
+  { role: "user",      content: "Halo" },
+  { role: "assistant", content: "Halo! Ada yang bisa dibantu?" },
+  { role: "user",      content: "Order #1234 di mana?" },
+  { role: "assistant", content: "Sedang transit di Jakarta." },
+  { role: "user",      content: "Kapan sampainya?" }
+];
+
+const WINDOW = 3; // simpan 3 pesan terakhir saja
+
+// .slice(-N) = ambil N elemen terakhir (skill F-02!)
+const context = history.slice(-WINDOW);
+
+console.log("Dikirim ke model:");
+context.forEach(function (m) {
+  console.log("[" + m.role + "] " + m.content);
+});</textarea>
+    <div class="ed-out" id="ed2-out">Output akan muncul di sini...</div>
+  </div>
+
+  <div class="quiz" data-correct="1">
+    <div class="q-tag">◈ QUIZ</div>
+    <div class="q-text">Bot Telegram-mu mencampur jawaban antar pelanggan — chat Budi muncul di percakapan Sari. Penyebab paling mungkin?</div>
+    <button class="opt">Temperature terlalu tinggi</button>
+    <button class="opt">Session key memory tidak unik per user (mis. nilai statis, bukan chat.id)</button>
+    <button class="opt">Model Anthropic tidak mendukung memory</button>
+    <div class="feedback"></div>
+  </div>
+
+  <div class="navbtns">
+    <button onclick="goStep(2)">← SEBELUMNYA</button>
+    <button class="next" onclick="goStep(4)">LANJUT: DOCUMENT PROCESSING →</button>
+  </div>
+</section>
+
+<!-- ============ STEP 5 ============ -->
+<section class="step" id="step-4">
+  <div class="eyebrow">STEP 5 / 8 · MATERI 4</div>
+  <h2>Document Processing (PDF, Word)</h2>
+
+  <p>Banyak data bisnis hidup di dalam file: invoice PDF, kontrak Word, CV pelamar. LLM tidak bisa membaca file biner langsung — alurnya selalu: <span class="hl">ekstrak teks dulu, baru kirim ke model</span>.</p>
+
+  <div class="flow">
+    <div class="node io">Trigger<br><small>Gmail attachment / Form upload</small></div>
+    <span class="arrow">→</span>
+    <div class="node">Extract from File<br><small>PDF/DOCX → teks</small></div>
+    <span class="arrow">→</span>
+    <div class="node alt">AI Node<br><small>summarize / extract data</small></div>
+    <span class="arrow">→</span>
+    <div class="node io">Sheets / Email</div>
+  </div>
+
+  <h3>Binary Data di n8n</h3>
+  <p>File di n8n mengalir sebagai <span class="hly">binary data</span> — menempel pada item, terpisah dari JSON-nya. Node <span class="hlc">Extract from File</span> membaca binary itu dan menghasilkan field teks di JSON output:</p>
+  <pre class="code"><span class="cm">// Sesudah Extract from File (operation: PDF / DOCX)</span>
+{
+  <span class="pr">"text"</span>: <span class="st">"INVOICE No. 2026-0042\nPT Maju Jaya\nTotal: Rp 12.500.000 ..."</span>,
+  <span class="pr">"numberOfPages"</span>: <span class="nm">2</span>
+}</pre>
+
+  <table>
+    <tr><th>JENIS FILE</th><th>CARA EKSTRAK</th></tr>
+    <tr><td>PDF (teks)</td><td>Extract from File → operation <span class="hl">Extract From PDF</span></td></tr>
+    <tr><td>Word (.docx)</td><td>Extract from File → operation <span class="hl">Extract From DOCX</span> (hasil: teks polos)</td></tr>
+    <tr><td>PDF hasil scan (gambar)</td><td>Teks tidak terbaca extractor biasa — butuh model vision / OCR sebagai jalur khusus</td></tr>
+  </table>
+
+  <h3>Pola Prompt untuk Dokumen</h3>
+  <p>Setelah teks ada di <span class="hlc">$json.text</span>, pola prompt yang efektif untuk ekstraksi data terstruktur:</p>
+  <pre class="code">Berikut isi sebuah invoice:
+---
+<span class="st">{{ $json.text }}</span>
+---
+Ekstrak ke JSON dengan key persis berikut:
+nomor_invoice, nama_vendor, total, tanggal_jatuh_tempo.
+Jawab HANYA dengan JSON valid, tanpa teks lain.</pre>
+  <p>Output JSON-nya lalu di-parse dan dialirkan ke Google Sheets / Airtable — pipeline F-01 + F-02 + F-03 bertemu di satu titik.</p>
+
+  <div class="box warn">
+    <div class="box-tag">⚠ DOKUMEN BESAR = MASALAH TOKEN</div>
+    Dokumen 50 halaman bisa melebihi context window atau membakar biaya. Strategi bertahap:
+    <br>1. <span class="hl">Trim</span> — kalau yang dibutuhkan hanya halaman pertama (mis. invoice), potong teksnya di Code Node: <span class="hlc">text.slice(0, 8000)</span>.
+    <br>2. <span class="hl">Chunking</span> — pecah dokumen jadi beberapa bagian, proses per bagian (pakai loop/batching dari Sesi 3), gabungkan hasilnya.
+  </div>
+
+  <div class="box n8n">
+    <div class="box-tag">◈ N8N CONTEXT — DARI MANA FILE DATANG?</div>
+    Sumber binary paling umum, semuanya sudah kamu kenal: <span class="hlc">Gmail Trigger</span> (download attachments = ON), <span class="hlc">Webhook/Form</span> dengan file upload, <span class="hlc">HTTP Request</span> yang mengunduh file dari URL, dan <span class="hlc">Google Drive</span> node.
+  </div>
+
+  <div class="quiz" data-correct="2">
+    <div class="q-tag">◈ QUIZ</div>
+    <div class="q-text">Invoice PDF masuk via Gmail dan ingin diekstrak datanya oleh AI. Urutan node yang benar?</div>
+    <button class="opt">Gmail Trigger → AI Node (kirim file langsung) → Sheets</button>
+    <button class="opt">Gmail Trigger → Code Node JSON.parse() → Sheets</button>
+    <button class="opt">Gmail Trigger (with attachments) → Extract from File → AI Node → Sheets</button>
+    <div class="feedback"></div>
+  </div>
+
+  <div class="navbtns">
+    <button onclick="goStep(3)">← SEBELUMNYA</button>
+    <button class="next" onclick="goStep(5)">LANJUT: MULTI-STEP AI WORKFLOW →</button>
+  </div>
+</section>
+
+<!-- ============ STEP 6 ============ -->
+<section class="step" id="step-5">
+  <div class="eyebrow">STEP 6 / 8 · MATERI 5</div>
+  <h2>Multi-step AI Workflow</h2>
+
+  <p>Satu prompt raksasa yang disuruh "klasifikasi, lalu jawab, lalu format, lalu nilai sendiri" hasilnya rapuh. Sistem production memecahnya jadi <span class="hl">beberapa langkah AI kecil yang masing-masing punya satu tugas</span> — persis prinsip modularity dari Sesi 3, diterapkan ke AI.</p>
+
+  <h3>Pola Inti: Classify → Route → Specialize → Validate</h3>
+  <div class="flow">
+    <div class="node alt">AI #1: Classify<br><small>temp 0.2 — label intent</small></div>
+    <span class="arrow">→</span>
+    <div class="node">Switch<br><small>route per kategori</small></div>
+    <span class="arrow">→</span>
+    <div class="node alt">AI #2: Generate<br><small>prompt khusus kategori</small></div>
+    <span class="arrow">→</span>
+    <div class="node">Code: Validate<br><small>cek output sebelum kirim</small></div>
+  </div>
+
+  <ul class="items">
+    <li><span><span class="hl">Classify</span> — AI pertama hanya memberi label: <span class="st">"billing"</span> / <span class="st">"teknis"</span> / <span class="st">"umum"</span>. Tugas sempit = akurat.</span></li>
+    <li><span><span class="hl">Route</span> — node Switch (Sesi 1!) mengarahkan item berdasarkan label</span></li>
+    <li><span><span class="hl">Specialize</span> — tiap cabang punya AI dengan system prompt khusus domainnya</span></li>
+    <li><span><span class="hl">Validate</span> — Code Node memeriksa output AI sebelum menyentuh pelanggan / database</span></li>
+  </ul>
+
+  <h3>Validasi Output AI di Code Node</h3>
+  <p>AI yang diminta menjawab JSON kadang "bandel" — menambah teks pembuka atau pagar markdown. Pola defensif standarnya:</p>
+
+  <div class="editor" data-ed="ed3">
+    <div class="ed-head"><span>EDITOR · JS (ASCII)</span><button class="btn" onclick="runEditor('ed3')">▶ RUN</button></div>
+    <textarea id="ed3" spellcheck="false">// Output AI kadang dibungkus pagar markdown:
+const aiOutput = "```json\n{ \"intent\": \"billing\", \"prioritas\": \"tinggi\" }\n```";
+
+// 1. Bersihkan pagar markdown (regex aman, tanpa lookbehind)
+const cleaned = aiOutput.replace(/```json|```/g, "").trim();
+
+// 2. Parse dengan try/catch (skill F-02 Sesi 3)
+try {
+  const data = JSON.parse(cleaned);
+
+  // 3. Validasi field wajib sebelum lanjut
+  if (!data.intent) {
+    throw new Error("Field intent tidak ada");
+  }
+  console.log("VALID -> intent: " + data.intent
+    + ", prioritas: " + data.prioritas);
+} catch (e) {
+  // Di n8n: lempar ke fallback branch / error workflow (Sesi 3)
+  console.log("INVALID -> kirim ke fallback: " + e.message);
+}</textarea>
+    <div class="ed-out" id="ed3-out">Output akan muncul di sini...</div>
+  </div>
+
+  <div class="box n8n">
+    <div class="box-tag">◈ N8N CONTEXT — STRUCTURED OUTPUT PARSER</div>
+    Untuk node berbasis chain/agent, n8n menyediakan sub-node <span class="hlc">Structured Output Parser</span>: kamu definisikan skema JSON yang diharapkan, dan n8n memaksa + memvalidasi output model agar sesuai skema. Ini versi "built-in" dari Code Node validator di atas — pakai yang mana pun, prinsipnya sama: <span class="hl">jangan percaya output AI mentah-mentah</span>.
+  </div>
+
+  <div class="box warn">
+    <div class="box-tag">⚠ ERROR HANDLING UNTUK AI NODES</div>
+    Tiga lapis pertahanan untuk workflow AI production (semua teknik dari Sesi 3):
+    <br>1. Node setting <span class="hl">Retry On Fail</span> — API LLM kadang timeout / rate limit (ingat F-01 Sesi 3)
+    <br>2. <span class="hl">Fallback branch</span> — output invalid → template jawaban aman / eskalasi manusia
+    <br>3. <span class="hl">Error Workflow + logging</span> — semua kegagalan tercatat, seperti CRM-mu di Sesi 3
+  </div>
+
+  <div class="quiz" data-correct="0">
+    <div class="q-tag">◈ QUIZ</div>
+    <div class="q-text">Kenapa memecah tugas AI menjadi beberapa node kecil (classify → generate → validate) lebih baik daripada satu prompt raksasa?</div>
+    <button class="opt">Tiap langkah punya satu tugas sempit sehingga lebih akurat, mudah di-debug, dan bisa divalidasi di antara langkah</button>
+    <button class="opt">Karena n8n membatasi panjang prompt maksimal 100 karakter</button>
+    <button class="opt">Supaya bisa memakai lebih banyak credential</button>
+    <div class="feedback"></div>
+  </div>
+
+  <div class="navbtns">
+    <button onclick="goStep(4)">← SEBELUMNYA</button>
+    <button class="next" onclick="goStep(6)">LANJUT: PROJECT PRAKTIK →</button>
+  </div>
+</section>
+
+<!-- ============ STEP 7 ============ -->
+<section class="step" id="step-6">
+  <div class="eyebrow">STEP 7 / 8 · PROJECT PRAKTIK</div>
+  <h2>AI-Powered Customer Support Workflow</h2>
+
+  <p>Project resmi roadmap Minggu 9–12. Kamu akan merakitnya di n8n Cloud — di sini kita kunci dulu <span class="hl">blueprint-nya</span>, lalu validator akan memeriksa kelengkapan desainmu.</p>
+
+  <div class="mission">
+    <div class="m-tag">◈ MISI</div>
+    Bangun workflow customer support otomatis dengan spesifikasi minimal:
+    <ul class="items" style="margin-top:10px">
+      <li><span><span class="hl">Trigger</span> — pesan pelanggan masuk (Webhook / Telegram / Gmail)</span></li>
+      <li><span><span class="hl">Memory</span> — Simple Memory dengan session key unik per pelanggan</span></li>
+      <li><span><span class="hl">Klasifikasi intent</span> — AI pertama melabel: billing / teknis / umum (temp rendah)</span></li>
+      <li><span><span class="hl">AI Agent + tool</span> — minimal 1 tool nyata (cek order via HTTP/Sheets, atau FAQ lookup)</span></li>
+      <li><span><span class="hl">Document processing</span> — jika pelanggan melampirkan PDF/Word → Extract from File → masuk konteks AI</span></li>
+      <li><span><span class="hl">Validasi + fallback</span> — output dicek; gagal → eskalasi ke manusia (Slack/email)</span></li>
+      <li><span><span class="hl">Balasan + logging</span> — kirim jawaban ke pelanggan, catat semua tiket ke Google Sheets</span></li>
+    </ul>
+  </div>
+
+  <h3>Tulis Blueprint-mu (JSON)</h3>
+  <p>Tulis rencana workflow-mu sebagai JSON: array <span class="hlc">nodes</span> berisi langkah berurutan, masing-masing dengan <span class="hlc">type</span> dan <span class="hlc">tujuan</span>. Template awal sudah disediakan — lengkapi bagian yang masih <span class="st">"..."</span>, lalu klik VALIDASI.</p>
+
+  <div class="editor" data-ed="ed4">
+    <div class="ed-head"><span>BLUEPRINT · JSON</span>
+      <span>
+        <button class="btn ghost" onclick="resetMission()">RESET</button>
+        <button class="btn" onclick="validateMission()">✓ VALIDASI</button>
+      </span>
+    </div>
+    <textarea id="ed4" spellcheck="false" style="min-height:300px">{
+  "nama_workflow": "AI Customer Support - Toko ABC",
+  "nodes": [
+    { "type": "webhook_trigger", "tujuan": "Terima pesan pelanggan dari widget chat" },
+    { "type": "...", "tujuan": "..." }
+  ],
+  "session_key": "...",
+  "fallback": "...",
+  "logging": "..."
+}</textarea>
+    <div class="ed-out" id="ed4-out">Hasil validasi akan muncul di sini...</div>
+  </div>
+
+  <ul class="check-list" id="mission-checks">
+    <li class="fail"><span class="ck">○</span><span>Trigger penerima pesan (webhook / telegram / gmail)</span></li>
+    <li class="fail"><span class="ck">○</span><span>Memory dengan session key dinamis (bukan nilai statis)</span></li>
+    <li class="fail"><span class="ck">○</span><span>Langkah klasifikasi intent (classify / intent)</span></li>
+    <li class="fail"><span class="ck">○</span><span>AI Agent dengan minimal 1 tool</span></li>
+    <li class="fail"><span class="ck">○</span><span>Document processing (extract pdf / docx)</span></li>
+    <li class="fail"><span class="ck">○</span><span>Fallback / eskalasi saat AI gagal</span></li>
+    <li class="fail"><span class="ck">○</span><span>Balasan ke pelanggan + logging ke Sheets</span></li>
+  </ul>
+
+  <div class="box info">
+    <div class="box-tag">◈ SETELAH BLUEPRINT LOLOS</div>
+    Rakit di n8n Cloud dengan urutan aman: (1) trigger + balasan statis dulu → jalan; (2) tambah AI klasifikasi → tes; (3) tambah agent + tool → tes; (4) memory; (5) jalur dokumen; (6) terakhir fallback + logging. Satu lapis, satu tes — pola debugging Sesi 1 tetap raja.
+  </div>
+
+  <div class="navbtns">
+    <button onclick="goStep(5)">← SEBELUMNYA</button>
+    <button class="next" onclick="goStep(7)">LANJUT: REVIEW &amp; CHECKPOINT →</button>
+  </div>
+</section>
+
+<!-- ============ STEP 8 ============ -->
+<section class="step" id="step-7">
+  <div class="eyebrow">STEP 8 / 8 · REVIEW</div>
+  <h2>Checkpoint F-03 Sesi 4</h2>
+
+  <h3>Final Quiz</h3>
+
+  <div class="quiz" data-correct="1">
+    <div class="q-tag">◈ FINAL 1/4</div>
+    <div class="q-text">Sub-node apa saja yang bisa ditempelkan ke AI Agent node?</div>
+    <button class="opt">Hanya Chat Model</button>
+    <button class="opt">Chat Model, Memory, dan Tools</button>
+    <button class="opt">Webhook, Set, dan Merge</button>
+    <div class="feedback"></div>
+  </div>
+
+  <div class="quiz" data-correct="0">
+    <div class="q-tag">◈ FINAL 2/4</div>
+    <div class="q-text">Fungsi session key pada Simple Memory adalah...</div>
+    <button class="opt">Memisahkan riwayat percakapan tiap user agar tidak tercampur</button>
+    <button class="opt">Mengamankan API key dari kebocoran</button>
+    <button class="opt">Menentukan model LLM mana yang dipakai</button>
+    <div class="feedback"></div>
+  </div>
+
+  <div class="quiz" data-correct="2">
+    <div class="q-tag">◈ FINAL 3/4</div>
+    <div class="q-text">Sebelum teks PDF bisa dianalisis AI node, langkah wajibnya adalah...</div>
+    <button class="opt">Mengubah PDF menjadi screenshot</button>
+    <button class="opt">Meng-upload PDF ke Google Drive</button>
+    <button class="opt">Mengekstrak teksnya dengan node Extract from File</button>
+    <div class="feedback"></div>
+  </div>
+
+  <div class="quiz" data-correct="1">
+    <div class="q-tag">◈ FINAL 4/4</div>
+    <div class="q-text">Lapisan pertahanan paling tepat untuk output AI yang kadang tidak valid JSON?</div>
+    <button class="opt">Menaikkan temperature agar AI lebih patuh</button>
+    <button class="opt">Validasi (Structured Output Parser / Code Node try-catch) + fallback branch</button>
+    <button class="opt">Menjalankan workflow dua kali dan membandingkan hasilnya</button>
+    <div class="feedback"></div>
+  </div>
+
+  <h3>Checklist Kelulusan Sesi</h3>
+  <ul class="items">
+    <li><span>Bisa memasang OpenAI / Anthropic node dengan credential + prompt dinamis (expression)</span></li>
+    <li><span>Paham siklus agent Plan → Act → Observe dan bisa memberi agent tool + system message</span></li>
+    <li><span>Bisa memasang Simple Memory dengan session key per user dan paham trade-off window</span></li>
+    <li><span>Bisa membangun pipeline file → Extract from File → AI → output terstruktur</span></li>
+    <li><span>Bisa merangkai multi-step: classify → route → generate → validate dengan fallback</span></li>
+    <li><span>Project customer support workflow dirakit dan berjalan di n8n Cloud</span></li>
+  </ul>
+
+  <div class="box n8n">
+    <div class="box-tag">◈ MILESTONE F-03</div>
+    Dengan selesainya Sesi 4, seluruh materi F-03 n8n Mastery tuntas. Target milestone fase: <span class="hl">5+ production-ready workflow yang bisa ditunjukkan ke klien</span> — dan AI customer support workflow ini adalah kandidat portfolio terkuatmu. Checkpoint review fase dilakukan bersama mentor sebelum masuk F-04.
+  </div>
+
+  <div class="navbtns">
+    <button onclick="goStep(6)">← SEBELUMNYA</button>
+    <button class="next" onclick="goStep(0)">↺ KEMBALI KE AWAL</button>
+  </div>
+</section>
+
+<!-- ============ AI TUTOR ============ -->
+<div class="tutor">
+  <div class="t-head">◈ AI TUTOR — TANYA KONSEP SESI INI</div>
+  <div class="t-body">
+    <div class="t-chips" id="tutor-chips"></div>
+    <div class="t-answer" id="tutor-answer">Pilih pertanyaan di atas untuk melihat penjelasan...</div>
+  </div>
+</div>
+
+</main>
+
+<script>
+// ============ ASCII-only JS ============
+
+// ---- Step navigation ----
+var STEP_LABELS = ["1 INTRO","2 LLM NODES","3 AGENT","4 MEMORY","5 DOCS","6 MULTI-STEP","7 PROJECT","8 REVIEW"];
+var current = 0;
+var visited = {};
+
+function buildNav(){
+  var nav = document.getElementById("stepnav");
+  for (var i = 0; i < STEP_LABELS.length; i++){
+    (function(idx){
+      var b = document.createElement("button");
+      b.textContent = STEP_LABELS[idx];
+      b.id = "navbtn-" + idx;
+      b.onclick = function(){ goStep(idx); };
+      nav.appendChild(b);
+    })(i);
+  }
+}
+
+function goStep(n){
+  var steps = document.querySelectorAll("section.step");
+  for (var i = 0; i < steps.length; i++){ steps[i].classList.remove("show"); }
+  document.getElementById("step-" + n).classList.add("show");
+  visited[current] = true;
+  current = n;
+  for (var j = 0; j < STEP_LABELS.length; j++){
+    var btn = document.getElementById("navbtn-" + j);
+    btn.classList.toggle("active", j === n);
+    btn.classList.toggle("done", !!visited[j] && j !== n);
+  }
+  document.getElementById("pbar").style.width = (((n + 1) / 8) * 100) + "%";
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+buildNav();
+goStep(0);
+
+// ---- Quiz ----
+document.querySelectorAll(".quiz").forEach(function(quiz){
+  var correct = parseInt(quiz.getAttribute("data-correct"), 10);
+  var opts = quiz.querySelectorAll(".opt");
+  var fb = quiz.querySelector(".feedback");
+  opts.forEach(function(opt, idx){
+    opt.addEventListener("click", function(){
+      opts.forEach(function(o){ o.classList.remove("correct","wrong"); });
+      if (idx === correct){
+        opt.classList.add("correct");
+        fb.textContent = "\u2713 Benar! " + (quiz.getAttribute("data-note") || "");
+        fb.style.color = "#69db7c";
+      } else {
+        opt.classList.add("wrong");
+        opts[correct].classList.add("correct");
+        fb.textContent = "\u2717 Belum tepat - jawaban benar ditandai hijau.";
+        fb.style.color = "#ff6b6b";
+      }
+      fb.classList.add("show");
+    });
+  });
+});
+
+// ---- Editor runner ----
+function runEditor(id){
+  var src = document.getElementById(id).value;
+  var out = document.getElementById(id + "-out");
+  var logs = [];
+
+  // Mock n8n Code Node helpers
+  var mockInput = {
+    all: function(){
+      return [ { json: { nama: "Budi", pesan: "Pesanan saya belum sampai" } } ];
+    }
+  };
+  var fakeConsole = {
+    log: function(){
+      var parts = [];
+      for (var i = 0; i < arguments.length; i++){
+        var a = arguments[i];
+        parts.push(typeof a === "object" ? JSON.stringify(a, null, 2) : String(a));
+      }
+      logs.push(parts.join(" "));
+    }
+  };
+
+  try {
+    var fn = new Function("$input", "console", src);
+    fn(mockInput, fakeConsole);
+    out.textContent = logs.length ? logs.join("\n") : "(tidak ada output - pakai console.log)";
+    out.className = "ed-out ok";
+  } catch (e){
+    out.textContent = "ERROR: " + e.message;
+    out.className = "ed-out err";
+  }
+}
+
+// ---- Mission validator ----
+var MISSION_DEFAULT = document.getElementById("ed4").value;
+
+function resetMission(){
+  document.getElementById("ed4").value = MISSION_DEFAULT;
+  document.getElementById("ed4-out").textContent = "Hasil validasi akan muncul di sini...";
+  document.getElementById("ed4-out").className = "ed-out";
+  var items = document.querySelectorAll("#mission-checks li");
+  items.forEach(function(li){
+    li.className = "fail";
+    li.querySelector(".ck").textContent = "\u25CB";
+  });
+}
+
+function validateMission(){
+  var out = document.getElementById("ed4-out");
+  var raw = document.getElementById("ed4").value;
+  var plan;
+
+  try {
+    plan = JSON.parse(raw);
+  } catch (e){
+    out.textContent = "JSON tidak valid: " + e.message + "\nPerbaiki dulu sintaksnya (skill F-01 Sesi 1!).";
+    out.className = "ed-out err";
+    return;
+  }
+
+  var blob = JSON.stringify(plan).toLowerCase();
+  var nodes = Array.isArray(plan.nodes) ? plan.nodes : [];
+  var nodesBlob = JSON.stringify(nodes).toLowerCase();
+  var sessionKey = String(plan.session_key || "").toLowerCase();
+
+  // Regex sederhana & aman (alternation saja, tanpa lookaround)
+  var checks = [
+    /webhook|telegram|gmail|chat trigger/.test(nodesBlob),
+    sessionKey.length > 3 && sessionKey !== "..." &&
+      /\{\{|\$json|chat\.id|email|user/.test(sessionKey),
+    /classify|klasifik|intent/.test(nodesBlob),
+    /agent/.test(nodesBlob) && /tool|http|sheets|faq/.test(blob),
+    /extract|pdf|docx|dokumen|document/.test(blob),
+    /fallback|eskalasi|escalat|error workflow|human/.test(blob),
+    (/balas|reply|kirim|send|email|telegram/.test(nodesBlob)) &&
+      (/sheet|log/.test(blob))
+  ];
+
+  var items = document.querySelectorAll("#mission-checks li");
+  var passed = 0;
+  items.forEach(function(li, i){
+    var ok = checks[i];
+    li.className = ok ? "pass" : "fail";
+    li.querySelector(".ck").textContent = ok ? "\u2713" : "\u25CB";
+    if (ok) passed++;
+  });
+
+  if (passed === checks.length){
+    out.textContent = "\u2713 BLUEPRINT LENGKAP (7/7)!\nLanjut rakit di n8n Cloud - ikuti urutan bertahap di kotak biru.";
+    out.className = "ed-out ok";
+  } else {
+    out.textContent = "Progress: " + passed + "/7 komponen terdeteksi.\nLihat checklist di bawah - yang masih \u25CB perlu ditambahkan ke blueprint.";
+    out.className = "ed-out err";
+  }
+}
+
+// ---- AI Tutor (canned Q&A) ----
+var TUTOR_QA = [
+  {
+    q: "Pilih OpenAI atau Anthropic?",
+    a: "Keduanya first-class di n8n dan polanya identik: credential -> model -> prompt. Yang penting bukan merknya, tapi kebiasaanmu menguji: coba prompt yang sama di keduanya, bandingkan kualitas + biaya untuk use case-mu. Untuk klasifikasi sederhana, model kecil/murah dari mana pun biasanya cukup. Karena Agent menerima Chat Model sebagai sub-node, kamu bisa ganti 'otak' kapan saja tanpa mengubah struktur workflow."
+  },
+  {
+    q: "Kapan pakai Agent vs node LLM biasa?",
+    a: "Aturan praktis: kalau jalur langkahnya bisa kamu gambar pasti dari awal (selalu A -> B -> C), pakai node LLM biasa + node n8n standar - lebih murah, cepat, mudah di-debug. Pakai Agent hanya kalau langkahnya BERGANTUNG pada isi pesan (kadang perlu cek order, kadang perlu FAQ, kadang langsung jawab) sehingga model harus memilih tool sendiri."
+  },
+  {
+    q: "Memory disimpan di mana?",
+    a: "Simple Memory menyimpan riwayat di memori instance n8n - praktis untuk belajar dan bot skala kecil, tapi riwayat bisa hilang saat instance restart. Konsep kuncinya tetap sama di backend mana pun: session key memisahkan percakapan, window length membatasi berapa pesan yang disuntikkan kembali ke prompt."
+  },
+  {
+    q: "PDF hasil scan tidak terbaca?",
+    a: "Extract from File hanya membaca LAYER TEKS. PDF hasil scan isinya gambar, jadi hasil ekstraknya kosong. Solusinya jalur khusus: deteksi (text kosong / sangat pendek) dengan IF node, lalu arahkan ke model vision yang bisa membaca gambar, atau layanan OCR. Selalu uji dengan dokumen nyata dari bisnis target."
+  },
+  {
+    q: "Bagaimana mengontrol biaya AI workflow?",
+    a: "Empat tuas: (1) model kecil untuk tugas sempit seperti klasifikasi, model besar hanya untuk jawaban final; (2) max tokens dibatasi; (3) memory window secukupnya (5-10 pesan); (4) trim/chunk dokumen sebelum masuk prompt. Tambahkan kolom 'token/biaya' di logging Sheets-mu supaya biaya terlihat per tiket - klien sangat menghargai ini."
+  },
+  {
+    q: "Output AI tidak konsisten, gimana?",
+    a: "Berlapis: (1) turunkan temperature; (2) system prompt dengan contoh format persis yang diinginkan; (3) Structured Output Parser atau Code Node try/catch sebagai gerbang validasi; (4) Retry On Fail di node setting; (5) fallback branch ke template aman / eskalasi manusia. Jangan kejar konsistensi 100% dari prompt saja - desain workflow-nya yang membuat sistem aman."
+  }
+];
+
+(function(){
+  var chips = document.getElementById("tutor-chips");
+  var ans = document.getElementById("tutor-answer");
+  TUTOR_QA.forEach(function(qa){
+    var c = document.createElement("button");
+    c.className = "chip";
+    c.textContent = qa.q;
+    c.onclick = function(){ ans.textContent = qa.a; };
+    chips.appendChild(c);
+  });
+})();
+</script>
+</body>
+</html>
