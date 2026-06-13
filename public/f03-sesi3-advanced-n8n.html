@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>F-03 Sesi 3 — Advanced n8n</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080c10;
+    --panel: #0d1f2d;
+    --panel2: #0a0f14;
+    --border: #1e3a4a;
+    --accent: #69db7c;
+    --accent-dim: rgba(105,219,124,0.13);
+    --accent-bdr: rgba(105,219,124,0.4);
+    --text: #c9d1d9;
+    --bright: #e6edf3;
+    --muted: #6e7681;
+    --soft: #8b949e;
+    --err: #ff6b6b;
+    --warn: #ffeb3b;
+    --cyan: #00e5ff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.65;
+    min-height: 100vh;
+  }
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* ===== HEADER ===== */
+  header {
+    position: sticky; top: 0; z-index: 50;
+    background: linear-gradient(180deg, #0d1f2d 0%, #080c10 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 20px 12px;
+  }
+  .hdr-tag { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+  .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent); box-shadow: 0 0 8px var(--accent);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+  @media (prefers-reduced-motion: reduce) { .dot { animation: none; } }
+  .hdr-tag span {
+    color: var(--accent); font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+  }
+  header h1 { font-size: clamp(15px, 4vw, 21px); color: var(--bright); letter-spacing: 1px; }
+  header p { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+  /* ===== PROGRESS / STEP NAV ===== */
+  .stepbar {
+    display: flex; gap: 5px; padding: 12px 20px; flex-wrap: wrap;
+    background: var(--panel2); border-bottom: 1px solid var(--border);
+    position: sticky; top: 86px; z-index: 49;
+  }
+  .stepbtn {
+    flex: 1; min-width: 34px; padding: 7px 4px;
+    background: var(--panel); border: 1px solid var(--border); border-radius: 4px;
+    color: var(--muted); font-family: inherit; font-size: 10px; letter-spacing: 1px;
+    cursor: pointer; transition: all .2s; text-align: center;
+  }
+  .stepbtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .stepbtn.active {
+    color: var(--accent); border-color: var(--accent);
+    background: var(--accent-dim); box-shadow: 0 0 8px rgba(105,219,124,.3);
+  }
+  .stepbtn.done { color: var(--accent); border-color: var(--accent-bdr); }
+  .progress-wrap { padding: 0 20px 4px; background: var(--panel2); }
+  .progress-track { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .progress-fill { height: 100%; width: 0%; background: var(--accent); transition: width .4s; }
+
+  /* ===== MAIN ===== */
+  main { max-width: 860px; margin: 0 auto; padding: 24px 20px 100px; }
+  section.step { display: none; animation: fadein .3s; }
+  section.step.visible { display: block; }
+  @keyframes fadein { from {opacity:0; transform: translateY(6px)} to {opacity:1; transform:none} }
+
+  .eyebrow {
+    font-size: 10px; color: var(--accent); letter-spacing: 3px;
+    text-transform: uppercase; margin-bottom: 6px;
+  }
+  h2 { font-size: 19px; color: var(--bright); margin-bottom: 14px; letter-spacing: .5px; }
+  h3 { font-size: 14px; color: var(--accent); margin: 26px 0 10px; letter-spacing: 1px; }
+  p { margin-bottom: 12px; font-size: 13px; }
+  strong { color: var(--bright); }
+  em { color: var(--warn); font-style: normal; }
+  ul.bullets { list-style: none; margin: 0 0 14px; }
+  ul.bullets li { padding-left: 18px; position: relative; margin-bottom: 7px; font-size: 13px; }
+  ul.bullets li::before { content: "›"; color: var(--accent); position: absolute; left: 0; }
+
+  code.inline {
+    background: var(--panel2); border: 1px solid var(--border); border-radius: 3px;
+    padding: 1px 6px; font-size: 12px; color: var(--warn);
+  }
+
+  /* ===== CODE BLOCKS ===== */
+  .codeblock {
+    background: var(--panel2); border: 1px solid var(--border); border-radius: 6px;
+    margin: 12px 0 18px; overflow: hidden;
+  }
+  .codeblock .cb-title {
+    padding: 6px 12px; font-size: 10px; letter-spacing: 2px; color: var(--muted);
+    border-bottom: 1px solid var(--border); background: var(--panel);
+    text-transform: uppercase;
+  }
+  .codeblock pre {
+    padding: 14px; overflow-x: auto; font-size: 12.5px; line-height: 1.6;
+    font-family: inherit;
+  }
+  .tok-k { color: #ff7b72; }      /* keyword */
+  .tok-s { color: #a5d6ff; }      /* string */
+  .tok-c { color: #6e7681; }      /* comment */
+  .tok-n { color: #79c0ff; }      /* number */
+  .tok-f { color: #d2a8ff; }      /* n8n built-in */
+
+  /* ===== N8N CONTEXT BOX ===== */
+  .n8nbox {
+    background: var(--accent-dim); border: 1px solid var(--accent-bdr);
+    border-left: 3px solid var(--accent); border-radius: 6px;
+    padding: 13px 15px; margin: 16px 0;
+  }
+  .n8nbox .nb-label { font-size: 10px; color: var(--accent); letter-spacing: 2px; margin-bottom: 6px; }
+  .n8nbox p { font-size: 12px; margin-bottom: 6px; }
+  .n8nbox p:last-child { margin-bottom: 0; }
+
+  .warnbox {
+    background: rgba(255,107,107,.07); border: 1px solid rgba(255,107,107,.3);
+    border-left: 3px solid var(--err); border-radius: 6px;
+    padding: 13px 15px; margin: 16px 0;
+  }
+  .warnbox .nb-label { font-size: 10px; color: var(--err); letter-spacing: 2px; margin-bottom: 6px; }
+  .warnbox p { font-size: 12px; margin-bottom: 0; }
+
+  /* ===== EDITOR ===== */
+  .editor {
+    border: 1px solid var(--border); border-radius: 6px; overflow: hidden; margin: 14px 0 18px;
+  }
+  .editor .ed-head {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 7px 12px; background: var(--panel); border-bottom: 1px solid var(--border);
+  }
+  .editor .ed-head span { font-size: 10px; letter-spacing: 2px; color: var(--accent); text-transform: uppercase; }
+  .editor textarea {
+    width: 100%; min-height: 200px; background: var(--panel2); color: var(--text);
+    border: none; padding: 14px; font-family: inherit; font-size: 12.5px; line-height: 1.6;
+    resize: vertical; outline: none;
+  }
+  .editor textarea:focus-visible { box-shadow: inset 0 0 0 1px var(--accent-bdr); }
+  .btn {
+    background: var(--accent-dim); border: 1px solid var(--accent); color: var(--accent);
+    font-family: inherit; font-size: 11px; letter-spacing: 1px; padding: 6px 16px;
+    border-radius: 4px; cursor: pointer; transition: all .2s;
+  }
+  .btn:hover { background: rgba(105,219,124,.25); box-shadow: 0 0 10px rgba(105,219,124,.3); }
+  .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .btn.ghost { background: none; border-color: var(--border); color: var(--soft); }
+  .console {
+    background: #050709; border-top: 1px solid var(--border);
+    padding: 12px 14px; font-size: 12px; min-height: 44px; max-height: 260px;
+    overflow-y: auto; white-space: pre-wrap; word-break: break-word;
+  }
+  .console .c-ok { color: var(--accent); }
+  .console .c-err { color: var(--err); }
+  .console .c-dim { color: var(--muted); }
+
+  /* ===== EXPRESSION PLAYGROUND ===== */
+  .xp-row { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+  .xp-row input {
+    flex: 1; min-width: 220px; background: var(--panel2); border: 1px solid var(--border);
+    border-radius: 4px; color: var(--warn); font-family: inherit; font-size: 12.5px;
+    padding: 9px 12px; outline: none;
+  }
+  .xp-row input:focus-visible { border-color: var(--accent); }
+  .xp-presets { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+  .chip {
+    background: var(--panel); border: 1px solid var(--border); color: var(--soft);
+    font-family: inherit; font-size: 10.5px; padding: 4px 10px; border-radius: 12px;
+    cursor: pointer; transition: all .2s;
+  }
+  .chip:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ===== QUIZ ===== */
+  .quiz {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+    padding: 16px; margin: 22px 0;
+  }
+  .quiz .q-label { font-size: 10px; color: var(--cyan); letter-spacing: 2px; margin-bottom: 10px; }
+  .quiz .q-text { font-size: 13px; color: var(--bright); margin-bottom: 12px; }
+  .quiz .q-opt {
+    display: block; width: 100%; text-align: left; margin-bottom: 7px;
+    background: var(--panel2); border: 1px solid var(--border); border-radius: 5px;
+    color: var(--text); font-family: inherit; font-size: 12.5px; padding: 9px 12px;
+    cursor: pointer; transition: all .15s;
+  }
+  .quiz .q-opt:hover { border-color: var(--accent-bdr); }
+  .quiz .q-opt.correct { border-color: var(--accent); background: var(--accent-dim); color: var(--accent); }
+  .quiz .q-opt.wrong { border-color: var(--err); background: rgba(255,107,107,.08); color: var(--err); }
+  .quiz .q-fb { font-size: 12px; margin-top: 8px; display: none; }
+  .quiz .q-fb.show { display: block; }
+  .quiz .q-fb.good { color: var(--accent); }
+  .quiz .q-fb.bad { color: var(--err); }
+
+  /* ===== MISSION ===== */
+  .mission-head {
+    background: linear-gradient(135deg, rgba(105,219,124,.12), rgba(0,229,255,.05));
+    border: 1px solid var(--accent-bdr); border-radius: 8px; padding: 18px; margin-bottom: 18px;
+  }
+  .mission-head .m-tag { font-size: 10px; color: var(--accent); letter-spacing: 3px; margin-bottom: 6px; }
+  .checklist { list-style: none; margin: 10px 0 0; }
+  .checklist li { font-size: 12px; padding-left: 22px; position: relative; margin-bottom: 6px; }
+  .checklist li::before { content: "[ ]"; color: var(--muted); position: absolute; left: 0; font-size: 11px; }
+  .checklist li.ok::before { content: "[+]"; color: var(--accent); }
+
+  /* ===== SUMMARY ===== */
+  .sum-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin: 16px 0; }
+  @media (min-width: 640px) { .sum-grid { grid-template-columns: 1fr 1fr; } }
+  .sum-card {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 6px; padding: 13px 15px;
+  }
+  .sum-card .s-t { font-size: 11px; color: var(--accent); letter-spacing: 1px; margin-bottom: 5px; }
+  .sum-card p { font-size: 11.5px; margin: 0; color: var(--soft); }
+
+  /* ===== NAV FOOT ===== */
+  .navfoot { display: flex; justify-content: space-between; gap: 10px; margin-top: 36px; }
+  .navfoot .btn { flex: 1; padding: 11px; }
+  .navfoot .btn[disabled] { opacity: .3; cursor: default; }
+
+  /* ===== AI TUTOR ===== */
+  #tutorToggle {
+    position: fixed; bottom: 18px; right: 18px; z-index: 60;
+    background: var(--accent); color: #04140a; border: none; border-radius: 50%;
+    width: 50px; height: 50px; font-size: 19px; cursor: pointer;
+    box-shadow: 0 0 18px rgba(105,219,124,.5); font-family: inherit; font-weight: 700;
+  }
+  #tutorPanel {
+    position: fixed; bottom: 80px; right: 18px; z-index: 60; width: min(340px, calc(100vw - 36px));
+    background: var(--panel); border: 1px solid var(--accent-bdr); border-radius: 10px;
+    padding: 16px; display: none; box-shadow: 0 8px 30px rgba(0,0,0,.6);
+    max-height: 60vh; overflow-y: auto;
+  }
+  #tutorPanel.open { display: block; }
+  #tutorPanel h4 { font-size: 11px; color: var(--accent); letter-spacing: 2px; margin-bottom: 10px; }
+  #tutorPanel p { font-size: 11px; color: var(--soft); }
+  .tutor-q {
+    display: block; width: 100%; text-align: left; background: var(--panel2);
+    border: 1px solid var(--border); border-radius: 5px; color: var(--text);
+    font-family: inherit; font-size: 11px; padding: 8px 10px; margin-bottom: 6px;
+    cursor: pointer; transition: all .15s; line-height: 1.5;
+  }
+  .tutor-q:hover { border-color: var(--accent); }
+
+  table.cmp { width: 100%; border-collapse: collapse; margin: 12px 0 18px; font-size: 12px; }
+  table.cmp th, table.cmp td { border: 1px solid var(--border); padding: 8px 10px; text-align: left; }
+  table.cmp th { background: var(--panel); color: var(--accent); font-size: 11px; letter-spacing: 1px; }
+  table.cmp td { background: var(--panel2); color: var(--text); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr-tag"><div class="dot"></div><span>F-03 &middot; N8N MASTERY &middot; MAIN WEAPON</span></div>
+  <h1>SESI 3 — ADVANCED N8N</h1>
+  <p>Minggu 6–8 &middot; Sub-workflows &middot; Loop &amp; Batching &middot; Expressions &middot; Variables &middot; Production</p>
+</header>
+
+<div class="stepbar" id="stepbar"></div>
+<div class="progress-wrap"><div class="progress-track"><div class="progress-fill" id="pfill"></div></div></div>
+
+<main>
+
+<!-- ============ STEP 1: BRIEFING ============ -->
+<section class="step" id="step-0">
+  <div class="eyebrow">◈ Step 1 / 8 — Briefing</div>
+  <h2>Dari "Workflow Jalan" ke "Workflow Production-Grade"</h2>
+
+  <p>Di Sesi 1 kamu membangun workflow dasar. Di Sesi 2 kamu merakit <strong>lead management system</strong> yang menghubungkan Form → Sheet → Email → Slack. Workflow-mu sudah <em>jalan</em> — tapi "jalan" dan "siap dipakai klien" adalah dua hal berbeda.</p>
+
+  <p>Sesi ini menjawab lima pertanyaan yang membedakan hobbyist dari profesional:</p>
+
+  <ul class="bullets">
+    <li><strong>Sub-workflows &amp; modularity</strong> — bagaimana memecah workflow raksasa jadi modul yang bisa dipakai ulang?</li>
+    <li><strong>Loop &amp; batching</strong> — bagaimana memproses 5.000 baris data tanpa kena rate limit?</li>
+    <li><strong>Expressions &amp; n8n formula</strong> — bagaimana menulis logic langsung di field node tanpa Code Node?</li>
+    <li><strong>Custom variables &amp; environments</strong> — bagaimana memisahkan konfigurasi dev vs production?</li>
+    <li><strong>Deployment &amp; monitoring</strong> — bagaimana tahu workflow-mu gagal jam 3 pagi, sebelum klien yang memberitahumu?</li>
+  </ul>
+
+  <div class="n8nbox">
+    <div class="nb-label">◈ KONEKSI KE SESI SEBELUMNYA</div>
+    <p>Lead management system dari Sesi 2 akan jadi <strong>bahan baku</strong> project sesi ini: kita upgrade jadi CRM automation lengkap dengan error handling &amp; logging — persis seperti yang diminta roadmap.</p>
+  </div>
+
+  <div class="n8nbox">
+    <div class="nb-label">◈ BEKAL DARI F-02 YANG DIPAKAI DI SINI</div>
+    <p><code class="inline">try/catch</code> (Sesi 3 F-02) → pola error handling. <code class="inline">.map()</code> / <code class="inline">.filter()</code> (Sesi 2 F-02) → transformasi data di dalam loop. <code class="inline">Optional chaining ?.</code> → akses data aman di expressions.</p>
+  </div>
+
+  <h3>// PETA SESI</h3>
+  <ul class="bullets">
+    <li>Step 2 — Sub-workflows &amp; Modularity</li>
+    <li>Step 3 — Loop &amp; Batching Data</li>
+    <li>Step 4 — Expressions &amp; n8n Formula <span style="color:var(--muted)">(+ playground interaktif)</span></li>
+    <li>Step 5 — Custom Variables &amp; Environments</li>
+    <li>Step 6 — Production Deployment &amp; Monitoring</li>
+    <li>Step 7 — MISSION: CRM Automation + Error Handling &amp; Logging</li>
+    <li>Step 8 — Debrief &amp; Checkpoint</li>
+  </ul>
+</section>
+
+<!-- ============ STEP 2: SUB-WORKFLOWS ============ -->
+<section class="step" id="step-1">
+  <div class="eyebrow">◈ Step 2 / 8 — Sub-workflows &amp; Modularity</div>
+  <h2>Satu Workflow Raksasa = Satu Bencana Menunggu</h2>
+
+  <p>Bayangkan CRM automation-mu tumbuh jadi 60 node dalam satu canvas. Setiap perubahan kecil berisiko merusak bagian lain, debugging jadi mimpi buruk, dan tidak ada bagian yang bisa dipakai ulang. Solusinya sama seperti <strong>function</strong> di JavaScript: pecah jadi unit kecil yang punya satu tanggung jawab.</p>
+
+  <h3>// DUA NODE KUNCI</h3>
+  <ul class="bullets">
+    <li><strong>Execute Sub-workflow</strong> (di workflow induk/parent) — memanggil workflow lain, mengirim data, dan menunggu hasilnya kembali.</li>
+    <li><strong>Execute Sub-workflow Trigger</strong> (di workflow anak/child) — pintu masuk sub-workflow; menerima data dari parent.</li>
+  </ul>
+
+  <div class="codeblock">
+    <div class="cb-title">Analogi JS — sub-workflow itu function</div>
+    <pre id="code-sub1"></pre>
+  </div>
+
+  <h3>// KAPAN HARUS DIPECAH?</h3>
+  <table class="cmp">
+    <tr><th>Sinyal</th><th>Aksi</th></tr>
+    <tr><td>Blok node yang sama muncul di 2+ workflow</td><td>Ekstrak jadi sub-workflow (DRY principle)</td></tr>
+    <tr><td>Workflow &gt; 20–30 node dan sulit dibaca</td><td>Pecah per tanggung jawab: intake, enrich, notify</td></tr>
+    <tr><td>Ada logic yang ingin dites terpisah</td><td>Sub-workflow bisa dijalankan &amp; di-debug mandiri</td></tr>
+    <tr><td>Tim/klien beda butuh versi berbeda</td><td>Parent beda, child (logic inti) tetap satu</td></tr>
+  </table>
+
+  <h3>// PASSING DATA PARENT ⇄ CHILD</h3>
+  <p>Data mengalir seperti argumen dan return value sebuah function:</p>
+  <ul class="bullets">
+    <li>Parent mengirim <strong>items</strong> ke child lewat node Execute Sub-workflow.</li>
+    <li>Child menerima lewat Execute Sub-workflow Trigger — pilih mode input: <em>Accept all data</em> atau definisikan field spesifik agar kontraknya jelas.</li>
+    <li>Output node <strong>terakhir</strong> di child dikembalikan ke parent sebagai hasil.</li>
+  </ul>
+
+  <div class="n8nbox">
+    <div class="nb-label">◈ N8N CONTEXT — POLA NYATA</div>
+    <p><strong>Sub-workflow "Format &amp; Validate Lead"</strong>: menerima raw lead → validasi email → normalisasi nama → return lead bersih. Dipanggil oleh workflow Form Intake, workflow CSV Import, dan workflow API Webhook. Satu logic, tiga pintu masuk. Ubah validasinya sekali, semua ikut terupdate.</p>
+  </div>
+
+  <div class="warnbox">
+    <div class="nb-label">! JEBAKAN UMUM</div>
+    <p>Sub-workflow yang dipanggil parent <strong>tidak otomatis muncul</strong> di execution list dengan jelas — aktifkan opsi <em>"Save execution data"</em> di setting sub-workflow agar tetap bisa di-debug. Dan hindari rantai terlalu dalam (parent → child → grandchild → ...) karena debugging jadi berlapis.</p>
+  </div>
+
+  <div class="quiz" data-quiz="q-sub"></div>
+</section>
+
+<!-- ============ STEP 3: LOOP & BATCHING ============ -->
+<section class="step" id="step-2">
+  <div class="eyebrow">◈ Step 3 / 8 — Loop &amp; Batching Data</div>
+  <h2>n8n Sudah Looping — Kamu Hanya Perlu Mengendalikannya</h2>
+
+  <p>Fakta yang sering bikin kaget: <strong>kebanyakan node n8n otomatis berjalan sekali per item</strong>. Kirim 50 items ke node Gmail, n8n mengirim 50 email tanpa kamu menulis loop apapun. Jadi kapan butuh loop manual?</p>
+
+  <ul class="bullets">
+    <li>Saat API tujuan punya <strong>rate limit</strong> — kamu harus mengirim per batch + jeda.</li>
+    <li>Saat memanggil API dengan <strong>pagination</strong> — ambil halaman demi halaman sampai habis.</li>
+    <li>Saat satu request harus berisi <strong>sekelompok</strong> item (misal: bulk insert 100 baris sekali kirim).</li>
+  </ul>
+
+  <h3>// NODE LOOP OVER ITEMS (SPLIT IN BATCHES)</h3>
+  <p>Node ini memecah items menjadi batch berukuran N, lalu punya dua output:</p>
+  <ul class="bullets">
+    <li><strong>loop</strong> — batch saat ini, diproses oleh node-node berikutnya, lalu <em>dihubungkan balik</em> ke node Loop untuk batch selanjutnya.</li>
+    <li><strong>done</strong> — jalan setelah semua batch selesai (untuk rekap/notifikasi akhir).</li>
+  </ul>
+
+  <div class="n8nbox">
+    <div class="nb-label">◈ N8N CONTEXT — POLA RATE LIMIT</div>
+    <p>Loop Over Items (batch size 10) → HTTP Request → <strong>Wait node 2 detik</strong> → kembali ke Loop. Hasil: 10 request per ~2 detik, aman dari limit API. Ini pola standar untuk sinkronisasi CRM ↔ mailing list.</p>
+  </div>
+
+  <h3>// SIMULASI BATCHING DI CODE NODE</h3>
+  <p>Pahami mekanikanya dengan JS murni (skill F-02-mu). Jalankan, lalu coba ubah <code class="inline">BATCH_SIZE</code> jadi 2 atau 5:</p>
+
+  <div class="editor">
+    <div class="ed-head"><span>editor — batching.js</span><button class="btn" data-run="ed-batch">&#9654; RUN</button></div>
+    <textarea id="ed-batch" spellcheck="false">// 8 lead masuk, API tujuan hanya kuat 3 request sekaligus
+var leads = ["Andi","Budi","Citra","Dewi","Eka","Fajar","Gita","Hadi"];
+var BATCH_SIZE = 3;
+
+var batches = [];
+for (var i = 0; i < leads.length; i += BATCH_SIZE) {
+  batches.push(leads.slice(i, i + BATCH_SIZE));
+}
+
+batches.forEach(function(batch, idx) {
+  console.log("Batch " + (idx + 1) + " -> kirim " + batch.length + " lead: " + batch.join(", "));
+});
+
+console.log("DONE: " + batches.length + " batch, total " + leads.length + " lead");</textarea>
+    <div class="console" id="out-ed-batch"><span class="c-dim">// output akan muncul di sini...</span></div>
+  </div>
+
+  <h3>// LOOPING DI DALAM CODE NODE N8N</h3>
+  <p>Di n8n Code Node, kamu menerima semua item lewat <code class="inline">$input.all()</code> dan mengembalikan array of items:</p>
+
+  <div class="codeblock">
+    <div class="cb-title">n8n Code Node — proses semua item sekaligus</div>
+    <pre id="code-loop1"></pre>
+  </div>
+
+  <div class="warnbox">
+    <div class="nb-label">! JEBAKAN UMUM</div>
+    <p>Lupa menghubungkan output node terakhir <strong>kembali ke node Loop Over Items</strong> = loop hanya jalan satu batch lalu berhenti. Ini bug #1 pemula di n8n. Output <em>done</em> juga sering tertukar dengan <em>loop</em> — cek label koneksinya.</p>
+  </div>
+
+  <div class="quiz" data-quiz="q-loop"></div>
+</section>
+
+<!-- ============ STEP 4: EXPRESSIONS ============ -->
+<section class="step" id="step-3">
+  <div class="eyebrow">◈ Step 4 / 8 — Expressions &amp; n8n Formula</div>
+  <h2>Logic Tanpa Code Node: Kekuatan {{ }}</h2>
+
+  <p>Setiap field di node n8n bisa diisi <strong>expression</strong> — JavaScript satu baris di antara kurung kurawal ganda. Ini cara tercepat menyisipkan data dinamis tanpa menambah Code Node.</p>
+
+  <div class="codeblock">
+    <div class="cb-title">Contoh expressions di field node</div>
+    <pre id="code-expr1"></pre>
+  </div>
+
+  <h3>// VARIABEL BAWAAN PENTING</h3>
+  <table class="cmp">
+    <tr><th>Variabel</th><th>Isi</th></tr>
+    <tr><td><code class="inline">$json</code></td><td>Data JSON item saat ini (dari node sebelumnya)</td></tr>
+    <tr><td><code class="inline">$('Nama Node')</code></td><td>Akses output node lain: <code class="inline">$('Webhook').item.json.email</code></td></tr>
+    <tr><td><code class="inline">$now</code></td><td>Tanggal &amp; waktu sekarang (objek Luxon DateTime)</td></tr>
+    <tr><td><code class="inline">$itemIndex</code></td><td>Posisi item saat ini (0, 1, 2, ...)</td></tr>
+    <tr><td><code class="inline">$vars</code></td><td>Custom variables (dibahas Step 5)</td></tr>
+    <tr><td><code class="inline">$env</code></td><td>Environment variables (dibahas Step 5)</td></tr>
+  </table>
+
+  <h3>// PLAYGROUND EXPRESSION</h3>
+  <p>Simulasi field n8n. Data <code class="inline">$json</code> yang tersedia:</p>
+
+  <div class="codeblock">
+    <div class="cb-title">$json (item saat ini)</div>
+    <pre id="code-xpjson"></pre>
+  </div>
+
+  <div class="xp-presets">
+    <button class="chip" data-xp="{{ $json.name }}">{{ $json.name }}</button>
+    <button class="chip" data-xp="{{ $json.name.toUpperCase() }}">.toUpperCase()</button>
+    <button class="chip" data-xp="{{ $json.deal.value * 1.11 }}">hitung PPN</button>
+    <button class="chip" data-xp="{{ $json.deal.value > 50000000 ? 'HOT' : 'WARM' }}">ternary</button>
+    <button class="chip" data-xp="{{ $json.phone ?? 'no phone' }}">?? fallback</button>
+    <button class="chip" data-xp="{{ $json.tags.includes('vip') ? 'PRIORITAS' : 'NORMAL' }}">array check</button>
+  </div>
+
+  <div class="xp-row">
+    <input id="xp-input" spellcheck="false" value="{{ $json.name }}" aria-label="Tulis expression n8n">
+    <button class="btn" id="xp-run">&#9654; EVALUATE</button>
+  </div>
+  <div class="console" id="xp-out"><span class="c-dim">// hasil evaluasi muncul di sini...</span></div>
+
+  <div class="n8nbox" style="margin-top:18px">
+    <div class="nb-label">◈ N8N CONTEXT — TERNARY ADALAH SENJATA UTAMA</div>
+    <p>Di Sesi 2 F-02 kamu belajar ternary. Di expressions, ternary menggantikan node IF untuk kasus sederhana: <code class="inline">{{ $json.score > 80 ? 'follow-up hari ini' : 'nurture email' }}</code> — langsung di field, tanpa node tambahan.</p>
+  </div>
+
+  <div class="warnbox">
+    <div class="nb-label">! JEBAKAN UMUM</div>
+    <p>Expression hanya boleh <strong>satu ekspresi</strong>, bukan beberapa statement. Tidak bisa menulis <code class="inline">if</code> blok atau <code class="inline">const x = ...</code> di dalamnya — kalau butuh multi-langkah, itu tugasnya Code Node. Gunakan juga <code class="inline">?.</code> agar field yang kadang kosong tidak meledakkan workflow.</p>
+  </div>
+
+  <div class="quiz" data-quiz="q-expr"></div>
+</section>
+
+<!-- ============ STEP 5: VARIABLES & ENVIRONMENTS ============ -->
+<section class="step" id="step-4">
+  <div class="eyebrow">◈ Step 5 / 8 — Custom Variables &amp; Environments</div>
+  <h2>Hardcode Hari Ini, Menderita Besok</h2>
+
+  <p>Workflow-mu menyebut URL spreadsheet di 7 node berbeda. Klien minta ganti spreadsheet. Kamu edit 7 tempat, lupa 1, dan data bocor ke sheet lama selama seminggu. Inilah kenapa konfigurasi harus <strong>terpusat</strong>.</p>
+
+  <h3>// TIGA LAPIS KONFIGURASI</h3>
+  <table class="cmp">
+    <tr><th>Lapis</th><th>Akses</th><th>Untuk apa</th></tr>
+    <tr><td><strong>Custom Variables</strong></td><td><code class="inline">$vars.namaVar</code></td><td>Nilai bisnis yang dipakai lintas workflow: ID spreadsheet, nama channel Slack, ambang skor lead</td></tr>
+    <tr><td><strong>Environment Variables</strong></td><td><code class="inline">$env.NAMA_VAR</code></td><td>Konfigurasi level instance (self-hosted): base URL, mode, timezone</td></tr>
+    <tr><td><strong>Credentials</strong></td><td>dipasang di node</td><td>Rahasia: API key, token, password — JANGAN pernah taruh di $vars/expression</td></tr>
+  </table>
+
+  <div class="codeblock">
+    <div class="cb-title">Sebelum vs sesudah — refactor ke $vars</div>
+    <pre id="code-vars1"></pre>
+  </div>
+
+  <h3>// DEV vs PRODUCTION ENVIRONMENT</h3>
+  <p>Prinsip profesional: <strong>jangan pernah bereksperimen di workflow yang sedang dipakai klien</strong>. Pola pemisahannya:</p>
+  <ul class="bullets">
+    <li><strong>Duplikat workflow</strong> — versi "(DEV)" non-aktif untuk eksperimen; versi production tetap jalan.</li>
+    <li><strong>Variables per environment</strong> — <code class="inline">$vars.sheetId</code> menunjuk sheet test di dev, sheet asli di production. Workflow-nya identik, datanya beda.</li>
+    <li><strong>Self-hosted: instance terpisah</strong> — n8n dev di lokal/Docker, n8n production di Railway/Render. <code class="inline">$env</code> membedakan keduanya.</li>
+    <li><strong>n8n Environments (fitur Enterprise/Cloud plan tertentu)</strong> — sinkronisasi dev → production via Git. Cukup tahu konsepnya untuk sekarang.</li>
+  </ul>
+
+  <div class="n8nbox">
+    <div class="nb-label">◈ N8N CONTEXT — CHECKLIST SEBELUM "ACTIVATE"</div>
+    <p>1) Semua nilai hardcode sudah pindah ke $vars? 2) Credentials production (bukan akun test)? 3) Webhook URL production (bukan test URL)? 4) Sheet/channel tujuan sudah yang asli? Empat pertanyaan ini menyelamatkanmu dari mengirim email test ke 500 pelanggan asli.</p>
+  </div>
+
+  <div class="warnbox">
+    <div class="nb-label">! KEAMANAN</div>
+    <p>API key di dalam expression atau Code Node akan <strong>terlihat oleh siapapun</strong> yang bisa buka workflow — dan ikut ter-export saat share JSON workflow. Rahasia selalu lewat sistem <em>Credentials</em> n8n yang terenkripsi.</p>
+  </div>
+
+  <div class="quiz" data-quiz="q-vars"></div>
+</section>
+
+<!-- ============ STEP 6: PRODUCTION & MONITORING ============ -->
+<section class="step" id="step-5">
+  <div class="eyebrow">◈ Step 6 / 8 — Production Deployment &amp; Monitoring</div>
+  <h2>Workflow Production: Gagal Itu Pasti, Diam-Diam Gagal Itu Pilihan</h2>
+
+  <p>API down, kuota Google habis, format data berubah — kegagalan <em>pasti</em> terjadi. Yang membedakan automation engineer profesional: sistemnya <strong>tahu dirinya gagal</strong>, memberitahu manusia, dan menyimpan jejak untuk investigasi.</p>
+
+  <h3>// LAPIS 1 — ERROR HANDLING DI LEVEL NODE</h3>
+  <ul class="bullets">
+    <li><strong>Retry On Fail</strong> — node setting; coba ulang otomatis (mis. 3x, jeda 5 detik). Obat ampuh untuk error sementara (timeout, 429, 503).</li>
+    <li><strong>On Error → Continue</strong> — item gagal tidak menghentikan seluruh eksekusi; bisa dialirkan ke jalur error terpisah (<em>Continue using error output</em>).</li>
+    <li><strong>Timeout</strong> — batasi berapa lama node boleh menunggu, agar workflow tidak menggantung selamanya.</li>
+  </ul>
+
+  <h3>// LAPIS 2 — ERROR WORKFLOW (JARING PENGAMAN GLOBAL)</h3>
+  <p>Buat satu workflow khusus berisi node <strong>Error Trigger</strong>. Lalu di setting workflow utama, pilih workflow itu sebagai <em>Error Workflow</em>. Setiap kali workflow utama gagal, error workflow otomatis jalan — membawa data: workflow mana, node mana, pesan error apa, jam berapa.</p>
+
+  <div class="codeblock">
+    <div class="cb-title">Blueprint error workflow standar</div>
+    <pre id="code-prod1"></pre>
+  </div>
+
+  <h3>// LAPIS 3 — LOGGING</h3>
+  <p>Execution log bawaan n8n bagus untuk debug, tapi untuk klien kamu butuh log yang <strong>bisa dibaca non-teknis</strong>: append satu baris ke Google Sheets "Log" setiap run — timestamp, jumlah item diproses, status, pesan error. Skill Sheets dari Sesi 2 langsung terpakai.</p>
+
+  <div class="codeblock">
+    <div class="cb-title">n8n Code Node — menyusun log entry</div>
+    <pre id="code-prod2"></pre>
+  </div>
+
+  <h3>// DEPLOYMENT &amp; MONITORING RUTIN</h3>
+  <ul class="bullets">
+    <li><strong>n8n Cloud</strong> — aktifkan workflow = deployed. Pastikan timezone instance benar agar Schedule Trigger akurat.</li>
+    <li><strong>Self-hosted (Railway/Render + Docker)</strong> — kendali penuh &amp; murah; konsekuensinya kamu yang jaga uptime, update versi, dan backup database workflow.</li>
+    <li><strong>Heartbeat check</strong> — workflow kecil terjadwal yang ping sistem penting tiap jam; kalau gagal → alert. Kamu tahu sistem mati sebelum klien tahu.</li>
+    <li><strong>Audit mingguan</strong> — buka daftar executions, filter status <em>Error</em>, cari pola: node mana paling sering gagal?</li>
+  </ul>
+
+  <div class="n8nbox">
+    <div class="nb-label">◈ N8N CONTEXT — INI YANG DIBAYAR KLIEN</div>
+    <p>Dua freelancer membuat workflow yang sama. Yang satu menyerahkan "workflow-nya jalan". Yang satu menyerahkan workflow + error alert ke Slack + log sheet + dokumentasi recovery. Tebak siapa yang dapat retainer bulanan.</p>
+  </div>
+
+  <div class="quiz" data-quiz="q-prod"></div>
+</section>
+
+<!-- ============ STEP 7: MISSION ============ -->
+<section class="step" id="step-6">
+  <div class="eyebrow">◈ Step 7 / 8 — Practice Mission</div>
+  <h2>MISSION: CRM Automation + Error Handling &amp; Logging</h2>
+
+  <div class="mission-head">
+    <div class="m-tag">◈ PROJECT ROADMAP F-03 MINGGU 6–8</div>
+    <p style="font-size:13px; color:var(--bright); margin-bottom:4px"><strong>"CRM automation lengkap dengan error handling &amp; logging"</strong></p>
+    <p style="font-size:12px; color:var(--soft); margin:0">Dua bagian: (A) rakit arsitekturnya di n8n Cloud, (B) tulis otak Code Node-nya di validator bawah.</p>
+  </div>
+
+  <h3>// BAGIAN A — ARSITEKTUR DI N8N (KERJAKAN DI N8N CLOUD)</h3>
+  <p>Upgrade lead management system Sesi 2 menjadi CRM automation dengan struktur ini:</p>
+  <ul class="checklist" id="archChecklist">
+    <li data-ck>Workflow utama: trigger (Webhook/Schedule) → proses lead → update Sheet "CRM" → notifikasi Slack</li>
+    <li data-ck>Minimal 1 <strong>sub-workflow</strong>: "Validate &amp; Score Lead" dipanggil via Execute Sub-workflow</li>
+    <li data-ck><strong>Loop Over Items</strong> (batch size 5) + Wait untuk update CRM secara aman dari rate limit</li>
+    <li data-ck>Minimal 3 <strong>expressions</strong>: ternary untuk kategori lead, $now untuk timestamp, $vars untuk ID sheet</li>
+    <li data-ck><strong>$vars</strong>: sheetId &amp; slackChannel — nol hardcode di node</li>
+    <li data-ck><strong>Error workflow</strong> dengan Error Trigger → alert berisi nama workflow + pesan error</li>
+    <li data-ck><strong>Log sheet</strong>: setiap run menambah baris log (timestamp, processed, errors, status)</li>
+    <li data-ck>Retry On Fail aktif di node HTTP/Sheets yang kritis</li>
+  </ul>
+  <p style="font-size:11.5px; color:var(--muted)">Klik tiap item untuk menandai progres (checklist tersimpan selama halaman terbuka).</p>
+
+  <h3>// BAGIAN B — VALIDATOR: OTAK CODE NODE</h3>
+  <p>Tulis logic pemrosesan lead CRM. Fungsi <code class="inline">processCRM(leads)</code> harus mengembalikan object dengan tiga kunci:</p>
+  <ul class="bullets">
+    <li><code class="inline">processed</code> — array lead valid (punya <code class="inline">email</code> berisi "@"), masing-masing diberi <code class="inline">status: "synced"</code> dan <code class="inline">category</code>: "HOT" jika <code class="inline">score &gt;= 80</code>, selain itu "WARM"</li>
+    <li><code class="inline">errors</code> — array lead tidak valid, masing-masing diberi <code class="inline">reason</code> (string apapun yang menjelaskan)</li>
+    <li><code class="inline">log</code> — array string, minimal berisi 1 baris ringkasan (mis. jumlah processed &amp; errors)</li>
+  </ul>
+
+  <div class="editor">
+    <div class="ed-head"><span>mission — crm-processor.js</span>
+      <span>
+        <button class="btn ghost" id="btn-hint">HINT</button>
+        <button class="btn" id="btn-validate">&#9654; VALIDATE</button>
+      </span>
+    </div>
+    <textarea id="ed-mission" spellcheck="false">// DATA TEST (jangan diubah - validator pakai data serupa)
+// leads = [
+//   { name: "Andi",  email: "andi@mail.com",  score: 90 },
+//   { name: "Budi",  email: "",               score: 75 },
+//   { name: "Citra", email: "citra@mail.com", score: 60 },
+//   { name: "Dewi",  email: "dewi-tanpa-at",  score: 88 }
+// ]
+
+function processCRM(leads) {
+  var processed = [];
+  var errors = [];
+  var log = [];
+
+  // TODO 1: pisahkan lead valid (email mengandung "@") dan tidak valid
+  // TODO 2: lead valid -> tambah status "synced" + category HOT/WARM (score >= 80 = HOT)
+  // TODO 3: lead tidak valid -> tambah reason
+  // TODO 4: isi log minimal 1 baris ringkasan
+
+  return { processed: processed, errors: errors, log: log };
+}</textarea>
+    <div class="console" id="out-mission"><span class="c-dim">// klik VALIDATE untuk menguji solusimu...</span></div>
+  </div>
+
+  <div class="n8nbox">
+    <div class="nb-label">◈ JEMBATAN KE N8N</div>
+    <p>Logic yang sama di n8n Code Node: ganti parameter <code class="inline">leads</code> dengan <code class="inline">$input.all().map(item =&gt; item.json)</code>, lalu return <code class="inline">processed</code> sebagai items ke node Sheets, dan kirim <code class="inline">log</code> ke node append Log Sheet.</p>
+  </div>
+</section>
+
+<!-- ============ STEP 8: DEBRIEF ============ -->
+<section class="step" id="step-7">
+  <div class="eyebrow">◈ Step 8 / 8 — Debrief &amp; Checkpoint</div>
+  <h2>Status: Advanced n8n — Unlocked</h2>
+
+  <div class="sum-grid">
+    <div class="sum-card"><div class="s-t">SUB-WORKFLOWS</div><p>Execute Sub-workflow + trigger-nya = function untuk workflow. Satu logic, banyak pemanggil. Pecah saat &gt;20-30 node atau ada duplikasi.</p></div>
+    <div class="sum-card"><div class="s-t">LOOP &amp; BATCHING</div><p>Node berjalan per item secara default. Loop Over Items + Wait = senjata melawan rate limit. Jangan lupa sambungkan balik ke node Loop.</p></div>
+    <div class="sum-card"><div class="s-t">EXPRESSIONS</div><p>{{ }} = JS satu baris di field node. $json, $('Node'), $now, $vars. Ternary &amp; ?. menggantikan banyak node IF sederhana.</p></div>
+    <div class="sum-card"><div class="s-t">VARIABLES &amp; ENV</div><p>$vars untuk konfigurasi bisnis, $env untuk level instance, Credentials untuk rahasia. Dev dan production tidak pernah bercampur.</p></div>
+    <div class="sum-card"><div class="s-t">PRODUCTION</div><p>Retry On Fail → error output → Error Workflow global → log sheet → heartbeat. Sistem yang tahu dirinya gagal = sistem yang dibayar mahal.</p></div>
+    <div class="sum-card"><div class="s-t">PROJECT</div><p>CRM automation lengkap dengan error handling &amp; logging — arsitektur dirakit di n8n Cloud, otak Code Node lolos validator.</p></div>
+  </div>
+
+  <h3>// CHECKPOINT SEBELUM LANJUT</h3>
+  <ul class="bullets">
+    <li>Semua quiz di Step 2–6 terjawab benar</li>
+    <li>Checklist arsitektur Bagian A selesai dirakit di n8n Cloud</li>
+    <li>Validator Bagian B menampilkan MISSION COMPLETE</li>
+    <li>Workflow CRM sudah punya error workflow + log sheet yang terbukti terisi</li>
+  </ul>
+
+  <div class="n8nbox">
+    <div class="nb-label">◈ SESI BERIKUTNYA — F-03 SESI 4 (MINGGU 9–12)</div>
+    <p><strong>AI Nodes di n8n</strong>: OpenAI &amp; Anthropic nodes, AI Agent node, memory &amp; context management, document processing, multi-step AI workflow. Project: AI-powered customer support workflow otomatis. Di sinilah F-03 bertemu masa depanmu di F-04.</p>
+  </div>
+
+  <p style="font-size:11px; color:var(--muted); margin-top:24px; border-top:1px solid var(--border); padding-top:14px">
+    F-03 &middot; n8n Mastery &middot; Sesi 3 — Advanced n8n &middot; Roadmap AI Automation &middot; aksen #69db7c
+  </p>
+</section>
+
+<div class="navfoot">
+  <button class="btn ghost" id="navPrev">&larr; SEBELUMNYA</button>
+  <button class="btn" id="navNext">BERIKUTNYA &rarr;</button>
+</div>
+
+</main>
+
+<!-- AI TUTOR -->
+<button id="tutorToggle" aria-label="Buka AI Tutor">AI</button>
+<div id="tutorPanel">
+  <h4>◈ AI TUTOR — TANYA CLAUDE</h4>
+  <p style="margin-bottom:10px">Klik untuk menyalin prompt, lalu paste ke chat Claude di project roadmap-mu:</p>
+  <div id="tutorList"></div>
+  <p id="tutorCopied" style="display:none; color:var(--accent); margin-top:6px">[+] Prompt tersalin!</p>
+</div>
+
+<script>
+"use strict";
+
+/* ================= STEP NAVIGATION ================= */
+var TOTAL = 8;
+var current = 0;
+var visited = [true, false, false, false, false, false, false, false];
+var stepNames = ["BRIEF", "SUB-WF", "LOOP", "EXPR", "VARS", "PROD", "MISSION", "DEBRIEF"];
+
+var stepbar = document.getElementById("stepbar");
+for (var s = 0; s < TOTAL; s++) {
+  var b = document.createElement("button");
+  b.className = "stepbtn";
+  b.textContent = (s + 1) + " " + stepNames[s];
+  b.setAttribute("data-step", String(s));
+  b.addEventListener("click", function () {
+    goTo(parseInt(this.getAttribute("data-step"), 10));
+  });
+  stepbar.appendChild(b);
+}
+
+function goTo(n) {
+  if (n < 0 || n >= TOTAL) return;
+  current = n;
+  visited[n] = true;
+  var i;
+  for (i = 0; i < TOTAL; i++) {
+    document.getElementById("step-" + i).classList.toggle("visible", i === n);
+  }
+  var btns = stepbar.querySelectorAll(".stepbtn");
+  for (i = 0; i < btns.length; i++) {
+    btns[i].classList.toggle("active", i === n);
+    btns[i].classList.toggle("done", visited[i] && i !== n);
+  }
+  var pct = Math.round(((n + 1) / TOTAL) * 100);
+  document.getElementById("pfill").style.width = pct + "%";
+  document.getElementById("navPrev").disabled = (n === 0);
+  document.getElementById("navNext").disabled = (n === TOTAL - 1);
+  window.scrollTo(0, 0);
+}
+document.getElementById("navPrev").addEventListener("click", function () { goTo(current - 1); });
+document.getElementById("navNext").addEventListener("click", function () { goTo(current + 1); });
+
+/* ================= SYNTAX HIGHLIGHT ================= */
+function esc(t) {
+  return t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+function highlight(code) {
+  var out = esc(code);
+  // urutan: comment -> string -> n8n builtin -> keyword -> number
+  out = out.replace(/(\/\/[^\n]*)/g, "\u0001$1\u0002");
+  out = out.replace(/("[^"\n]*"|'[^'\n]*')/g, "\u0003$1\u0004");
+  out = out.replace(/(\$json|\$input|\$vars|\$env|\$now|\$itemIndex|\$node)/g, "\u0005$1\u0006");
+  out = out.replace(/\b(const|let|var|function|return|if|else|for|while|try|catch|throw|new|true|false|null|typeof)\b/g, "\u0007$1\u0008");
+  out = out.replace(/\b(\d+)\b/g, '<span class="tok-n">$1</span>');
+  out = out.split("\u0001").join('<span class="tok-c">').split("\u0002").join("</span>");
+  out = out.split("\u0003").join('<span class="tok-s">').split("\u0004").join("</span>");
+  out = out.split("\u0005").join('<span class="tok-f">').split("\u0006").join("</span>");
+  out = out.split("\u0007").join('<span class="tok-k">').split("\u0008").join("</span>");
+  return out;
+}
+function setCode(id, code) {
+  document.getElementById(id).innerHTML = highlight(code);
+}
+
+/* ===== CODE BLOCK CONTENTS (ASCII only) ===== */
+setCode("code-sub1",
+'// Konsep yang sama persis:\n' +
+'function validateLead(lead) {        // <- ini "sub-workflow"\n' +
+'  // logic validasi terpusat\n' +
+'  return cleanLead;\n' +
+'}\n' +
+'\n' +
+'validateLead(fromForm);    // parent 1: workflow Form Intake\n' +
+'validateLead(fromCSV);     // parent 2: workflow CSV Import\n' +
+'validateLead(fromAPI);     // parent 3: workflow API Webhook\n' +
+'\n' +
+'// Di n8n:\n' +
+'// parent  = node "Execute Sub-workflow"\n' +
+'// child   = workflow dengan "Execute Sub-workflow Trigger"\n' +
+'// return  = output node TERAKHIR di child');
+
+setCode("code-loop1",
+'// Code Node: terima semua item, transform, kembalikan\n' +
+'var items = $input.all();\n' +
+'\n' +
+'var results = items.map(function (item) {\n' +
+'  var lead = item.json;\n' +
+'  return {\n' +
+'    json: {\n' +
+'      name: lead.name,\n' +
+'      email: (lead.email || "").toLowerCase(),\n' +
+'      isHot: lead.score >= 80\n' +
+'    }\n' +
+'  };\n' +
+'});\n' +
+'\n' +
+'return results; // n8n meneruskan tiap object sebagai 1 item');
+
+setCode("code-expr1",
+'// Field "Subject" di node Gmail:\n' +
+'{{ "Follow-up: " + $json.name }}\n' +
+'\n' +
+'// Field "Text" di node Slack:\n' +
+'{{ $json.deal.value > 50000000 ? "HOT LEAD masuk!" : "Lead baru" }}\n' +
+'\n' +
+'// Field tanggal di node Sheets:\n' +
+'{{ $now.toFormat("yyyy-MM-dd HH:mm") }}\n' +
+'\n' +
+'// Ambil data dari node lain (bukan node sebelumnya):\n' +
+'{{ $(\'Webhook\').item.json.body.email }}');
+
+setCode("code-xpjson",
+'{\n' +
+'  "name": "Sinta Dewi",\n' +
+'  "email": "sinta@perusahaan.id",\n' +
+'  "phone": null,\n' +
+'  "tags": ["vip", "jakarta"],\n' +
+'  "deal": { "value": 75000000, "stage": "negotiation" }\n' +
+'}');
+
+setCode("code-vars1",
+'// SEBELUM - hardcode di 7 node berbeda:\n' +
+'// Sheet ID: "1AbC...XyZ"  (ditulis manual di tiap node)\n' +
+'\n' +
+'// SESUDAH - Custom Variable (Admin Panel > Variables):\n' +
+'// key: sheetId   value: 1AbC...XyZ\n' +
+'\n' +
+'// Semua node memakai expression yang sama:\n' +
+'{{ $vars.sheetId }}\n' +
+'\n' +
+'// Ganti spreadsheet = ubah 1 tempat, 7 node ikut berubah.\n' +
+'// Environment variable (self-hosted, via Docker/host):\n' +
+'{{ $env.N8N_MODE }}   // contoh: "dev" atau "production"');
+
+setCode("code-prod1",
+'// WORKFLOW: "GLOBAL ERROR HANDLER"\n' +
+'//\n' +
+'// [Error Trigger]\n' +
+'//   data yang diterima otomatis:\n' +
+'//   - workflow.name   -> workflow mana yang gagal\n' +
+'//   - execution.url   -> link langsung ke execution\n' +
+'//   - error message   -> node mana + kenapa\n' +
+'//        |\n' +
+'// [Slack: kirim alert ke #automation-alerts]\n' +
+'//   "WORKFLOW GAGAL: {{ $json.workflow.name }}"\n' +
+'//        |\n' +
+'// [Sheets: append baris ke tab "ErrorLog"]\n' +
+'//\n' +
+'// Lalu di SETIAP workflow production:\n' +
+'// Settings -> Error Workflow -> pilih "GLOBAL ERROR HANDLER"');
+
+setCode("code-prod2",
+'// Code Node di akhir workflow: susun ringkasan run\n' +
+'var items = $input.all();\n' +
+'var ok = items.filter(function (i) { return i.json.status === "synced"; });\n' +
+'var fail = items.filter(function (i) { return i.json.status === "error"; });\n' +
+'\n' +
+'return [{\n' +
+'  json: {\n' +
+'    timestamp: new Date().toISOString(),\n' +
+'    processed: ok.length,\n' +
+'    errors: fail.length,\n' +
+'    status: fail.length === 0 ? "SUCCESS" : "PARTIAL",\n' +
+'    detail: fail.map(function (i) { return i.json.name; }).join(", ")\n' +
+'  }\n' +
+'}];\n' +
+'// -> node berikutnya: Google Sheets "Append Row" ke tab Log');
+
+/* ================= RUNNABLE EDITORS ================= */
+function runEditor(taId, outId) {
+  var codeEl = document.getElementById(taId);
+  var outEl = document.getElementById(outId);
+  var logs = [];
+  var fakeConsole = {
+    log: function () {
+      var parts = [];
+      for (var i = 0; i < arguments.length; i++) {
+        var a = arguments[i];
+        parts.push(typeof a === "object" ? JSON.stringify(a) : String(a));
+      }
+      logs.push(parts.join(" "));
+    }
+  };
+  try {
+    var fn = new Function("console", codeEl.value);
+    fn(fakeConsole);
+    if (logs.length === 0) logs.push("(tidak ada output - pakai console.log untuk melihat hasil)");
+    outEl.innerHTML = '<span class="c-ok">' + esc(logs.join("\n")) + "</span>";
+  } catch (e) {
+    outEl.innerHTML = '<span class="c-err">ERROR: ' + esc(String(e.message)) + "</span>";
+  }
+}
+var runBtns = document.querySelectorAll("[data-run]");
+for (var rb = 0; rb < runBtns.length; rb++) {
+  runBtns[rb].addEventListener("click", function () {
+    var id = this.getAttribute("data-run");
+    runEditor(id, "out-" + id);
+  });
+}
+
+/* ================= EXPRESSION PLAYGROUND ================= */
+var XP_JSON = {
+  name: "Sinta Dewi",
+  email: "sinta@perusahaan.id",
+  phone: null,
+  tags: ["vip", "jakarta"],
+  deal: { value: 75000000, stage: "negotiation" }
+};
+var XP_VARS = { sheetId: "1AbC-demo-XyZ", slackChannel: "#crm-alerts" };
+
+function evalExpression() {
+  var raw = document.getElementById("xp-input").value;
+  var outEl = document.getElementById("xp-out");
+  var open = raw.indexOf("{{");
+  var close = raw.lastIndexOf("}}");
+  if (open === -1 || close === -1 || close <= open) {
+    outEl.innerHTML = '<span class="c-err">ERROR: expression harus dibungkus {{ ... }}</span>';
+    return;
+  }
+  var body = raw.substring(open + 2, close).trim();
+  if (body.length === 0) {
+    outEl.innerHTML = '<span class="c-err">ERROR: expression kosong</span>';
+    return;
+  }
+  try {
+    var nowStr = new Date().toISOString();
+    var $now = { toFormat: function () { return nowStr; }, toString: function () { return nowStr; } };
+    var fn = new Function("$json", "$vars", "$env", "$now", "$itemIndex", "return (" + body + ");");
+    var result = fn(XP_JSON, XP_VARS, { N8N_MODE: "dev" }, $now, 0);
+    var shown = (typeof result === "object" && result !== null) ? JSON.stringify(result) : String(result);
+    outEl.innerHTML = '<span class="c-dim">=&gt; </span><span class="c-ok">' + esc(shown) + "</span>";
+  } catch (e) {
+    outEl.innerHTML = '<span class="c-err">ERROR: ' + esc(String(e.message)) + "</span>";
+  }
+}
+document.getElementById("xp-run").addEventListener("click", evalExpression);
+document.getElementById("xp-input").addEventListener("keydown", function (e) {
+  if (e.key === "Enter") evalExpression();
+});
+var chips = document.querySelectorAll(".chip[data-xp]");
+for (var ch = 0; ch < chips.length; ch++) {
+  chips[ch].addEventListener("click", function () {
+    document.getElementById("xp-input").value = this.getAttribute("data-xp");
+    evalExpression();
+  });
+}
+
+/* ================= QUIZZES ================= */
+var QUIZZES = {
+  "q-sub": [
+    {
+      q: "Sub-workflow di n8n paling tepat dianalogikan sebagai apa di JavaScript?",
+      opts: ["Variable global", "Function yang bisa dipanggil banyak tempat", "Comment dokumentasi", "File konfigurasi"],
+      a: 1,
+      fb: "Tepat. Execute Sub-workflow = memanggil function; output node terakhir child = return value."
+    },
+    {
+      q: "Logic validasi lead yang sama dipakai di 3 workflow berbeda. Apa langkah paling profesional?",
+      opts: ["Copy-paste node ke 3 workflow", "Ekstrak jadi 1 sub-workflow yang dipanggil ketiganya", "Gabungkan ketiga workflow jadi satu raksasa", "Tulis ulang manual tiap kali"],
+      a: 1,
+      fb: "Benar - prinsip DRY. Ubah validasi sekali, ketiga workflow langsung ikut terupdate."
+    }
+  ],
+  "q-loop": [
+    {
+      q: "50 items masuk ke node Gmail TANPA node loop apapun. Apa yang terjadi?",
+      opts: ["Hanya item pertama dikirim", "Error karena tidak ada loop", "n8n mengirim 50 email - node berjalan per item secara default", "Semua item digabung jadi 1 email"],
+      a: 2,
+      fb: "Betul. Mayoritas node n8n otomatis berjalan sekali per item. Loop manual hanya untuk batching/pagination/rate-limit."
+    },
+    {
+      q: "Untuk menghormati rate limit API, pola yang benar adalah:",
+      opts: ["Loop Over Items -> proses -> Wait -> sambung balik ke Loop", "Kirim semua sekaligus lalu berdoa", "Pakai 10 node HTTP paralel", "Set timeout jadi 0"],
+      a: 0,
+      fb: "Tepat. Batch kecil + jeda Wait + koneksi balik ke node Loop = pola standar anti rate-limit."
+    }
+  ],
+  "q-expr": [
+    {
+      q: "Expression yang VALID untuk fallback saat phone bernilai null:",
+      opts: ["{{ if ($json.phone) ... }}", "{{ const p = $json.phone }}", "{{ $json.phone ?? 'no phone' }}", "{{ for (p of phones) }}"],
+      a: 2,
+      fb: "Benar. Expression = SATU ekspresi. if-blok dan deklarasi variabel tidak boleh - itu wilayah Code Node."
+    },
+    {
+      q: "Cara mengambil email dari output node 'Webhook' (bukan node tepat sebelumnya):",
+      opts: ["{{ $json.Webhook.email }}", "{{ $('Webhook').item.json.body.email }}", "{{ $env.Webhook.email }}", "{{ $vars.Webhook }}"],
+      a: 1,
+      fb: "Tepat. $('Nama Node') menjangkau output node manapun dalam workflow."
+    }
+  ],
+  "q-vars": [
+    {
+      q: "Di mana tempat yang BENAR untuk menyimpan API key?",
+      opts: ["$vars.apiKey", "Langsung di expression field", "Sistem Credentials n8n", "Comment di Code Node"],
+      a: 2,
+      fb: "Benar. Credentials terenkripsi dan tidak ikut bocor saat workflow di-share/export. $vars hanya untuk nilai non-rahasia."
+    },
+    {
+      q: "Manfaat utama memindahkan sheet ID dari 7 node ke $vars.sheetId:",
+      opts: ["Workflow jadi lebih cepat", "Ubah 1 tempat, semua node ikut berubah", "Sheet jadi terenkripsi", "Tidak perlu credentials lagi"],
+      a: 1,
+      fb: "Tepat - konfigurasi terpusat. Ganti klien/spreadsheet tanpa menyentuh isi workflow."
+    }
+  ],
+  "q-prod": [
+    {
+      q: "Error sementara (timeout / HTTP 429) paling efisien ditangani dengan:",
+      opts: ["Menghapus node yang error", "Retry On Fail di setting node", "Menjalankan ulang manual tiap pagi", "Mengabaikannya"],
+      a: 1,
+      fb: "Benar. Retry otomatis menyelesaikan mayoritas error transien tanpa campur tangan manusia."
+    },
+    {
+      q: "Fungsi node Error Trigger adalah:",
+      opts: ["Membuat error untuk testing", "Menghentikan workflow yang error", "Pintu masuk error workflow - jalan otomatis saat workflow lain gagal", "Menghapus log error"],
+      a: 2,
+      fb: "Tepat. Satu error workflow global bisa jadi jaring pengaman untuk SEMUA workflow production-mu."
+    }
+  ]
+};
+
+var quizHolders = document.querySelectorAll("[data-quiz]");
+for (var qh = 0; qh < quizHolders.length; qh++) {
+  buildQuiz(quizHolders[qh]);
+}
+function buildQuiz(holder) {
+  var key = holder.getAttribute("data-quiz");
+  var items = QUIZZES[key];
+  var html = '<div class="q-label">&#9670; QUIZ CHECKPOINT</div>';
+  for (var i = 0; i < items.length; i++) {
+    html += '<div class="q-item" data-qi="' + i + '">';
+    html += '<div class="q-text">' + (i + 1) + ". " + esc(items[i].q) + "</div>";
+    for (var j = 0; j < items[i].opts.length; j++) {
+      html += '<button class="q-opt" data-q="' + key + '" data-i="' + i + '" data-j="' + j + '">' +
+        esc(items[i].opts[j]) + "</button>";
+    }
+    html += '<div class="q-fb" id="fb-' + key + "-" + i + '"></div></div>';
+    if (i < items.length - 1) html += '<div style="height:14px"></div>';
+  }
+  holder.innerHTML = html;
+  var opts = holder.querySelectorAll(".q-opt");
+  for (var o = 0; o < opts.length; o++) {
+    opts[o].addEventListener("click", onQuizClick);
+  }
+}
+function onQuizClick() {
+  var key = this.getAttribute("data-q");
+  var qi = parseInt(this.getAttribute("data-i"), 10);
+  var oj = parseInt(this.getAttribute("data-j"), 10);
+  var item = QUIZZES[key][qi];
+  var fb = document.getElementById("fb-" + key + "-" + qi);
+  var siblings = this.parentNode.querySelectorAll(".q-opt");
+  for (var i = 0; i < siblings.length; i++) {
+    siblings[i].classList.remove("correct", "wrong");
+  }
+  if (oj === item.a) {
+    this.classList.add("correct");
+    fb.className = "q-fb show good";
+    fb.textContent = "[+] " + item.fb;
+  } else {
+    this.classList.add("wrong");
+    fb.className = "q-fb show bad";
+    fb.textContent = "[x] Belum tepat - baca lagi bagian di atas, lalu coba opsi lain.";
+  }
+}
+
+/* ================= MISSION CHECKLIST ================= */
+var ckItems = document.querySelectorAll("#archChecklist [data-ck]");
+for (var ci = 0; ci < ckItems.length; ci++) {
+  ckItems[ci].style.cursor = "pointer";
+  ckItems[ci].addEventListener("click", function () {
+    this.classList.toggle("ok");
+  });
+}
+
+/* ================= MISSION VALIDATOR ================= */
+document.getElementById("btn-hint").addEventListener("click", function () {
+  var outEl = document.getElementById("out-mission");
+  outEl.innerHTML = '<span class="c-dim">HINT:\n' +
+    '1) var valid = leads.filter(function(l){ return (l.email || "").indexOf("@") !== -1; });\n' +
+    '2) processed = valid.map(...) -> salin field lead + status + category (pakai ternary)\n' +
+    '3) errors = leads.filter(...) kebalikannya -> map untuk menambah reason\n' +
+    '4) log.push("Processed: " + processed.length + ", Errors: " + errors.length);</span>';
+});
+
+document.getElementById("btn-validate").addEventListener("click", function () {
+  var outEl = document.getElementById("out-mission");
+  var code = document.getElementById("ed-mission").value;
+  var TEST = [
+    { name: "Andi", email: "andi@mail.com", score: 90 },
+    { name: "Budi", email: "", score: 75 },
+    { name: "Citra", email: "citra@mail.com", score: 60 },
+    { name: "Dewi", email: "dewi-tanpa-at", score: 88 }
+  ];
+  var lines = [];
+  var pass = 0;
+  var totalChecks = 6;
+
+  function check(ok, label) {
+    if (ok) { pass++; lines.push('<span class="c-ok">[+] ' + esc(label) + "</span>"); }
+    else { lines.push('<span class="c-err">[x] ' + esc(label) + "</span>"); }
+  }
+
+  try {
+    var fn = new Function(code + "\n;return processCRM;");
+    var processCRM = fn();
+    if (typeof processCRM !== "function") throw new Error("processCRM tidak ditemukan");
+    var r = processCRM(JSON.parse(JSON.stringify(TEST)));
+
+    var shapeOk = r && typeof r === "object" &&
+      Object.prototype.toString.call(r.processed) === "[object Array]" &&
+      Object.prototype.toString.call(r.errors) === "[object Array]" &&
+      Object.prototype.toString.call(r.log) === "[object Array]";
+    check(shapeOk, "Return object berisi processed, errors, log (semua array)");
+
+    if (shapeOk) {
+      check(r.processed.length === 2, "processed berisi 2 lead valid (Andi & Citra)");
+
+      var statusOk = r.processed.length > 0;
+      var catOk = r.processed.length === 2;
+      for (var i = 0; i < r.processed.length; i++) {
+        var p = r.processed[i];
+        if (!p || p.status !== "synced") statusOk = false;
+      }
+      if (catOk) {
+        var hot = null, warm = null;
+        for (var k = 0; k < r.processed.length; k++) {
+          if (r.processed[k].name === "Andi") hot = r.processed[k].category;
+          if (r.processed[k].name === "Citra") warm = r.processed[k].category;
+        }
+        catOk = (hot === "HOT" && warm === "WARM");
+      }
+      check(statusOk, 'Setiap lead valid punya status "synced"');
+      check(catOk, 'Kategori benar: Andi (90) = HOT, Citra (60) = WARM');
+
+      var errOk = r.errors.length === 2;
+      if (errOk) {
+        for (var e2 = 0; e2 < r.errors.length; e2++) {
+          var er = r.errors[e2];
+          if (!er || typeof er.reason !== "string" || er.reason.length === 0) errOk = false;
+        }
+      }
+      check(errOk, "errors berisi 2 lead tidak valid, masing-masing dengan reason");
+
+      var logOk = r.log.length >= 1 && typeof r.log[0] === "string" && r.log[0].length > 0;
+      check(logOk, "log berisi minimal 1 baris ringkasan (string)");
+    } else {
+      lines.push('<span class="c-dim">(cek lanjutan dilewati sampai struktur return benar)</span>');
+    }
+  } catch (err) {
+    lines.push('<span class="c-err">RUNTIME ERROR: ' + esc(String(err.message)) + "</span>");
+  }
+
+  if (pass === totalChecks) {
+    lines.push("");
+    lines.push('<span class="c-ok">==================================</span>');
+    lines.push('<span class="c-ok">  MISSION COMPLETE - ' + pass + "/" + totalChecks + " CHECKS</span>");
+    lines.push('<span class="c-ok">  Otak CRM-mu siap dipindah ke n8n Code Node.</span>');
+    lines.push('<span class="c-ok">==================================</span>');
+  } else {
+    lines.push("");
+    lines.push('<span class="c-dim">Skor: ' + pass + "/" + totalChecks + " - perbaiki yang [x], lalu VALIDATE lagi. Butuh bantuan? Klik HINT.</span>");
+  }
+  outEl.innerHTML = lines.join("\n");
+});
+
+/* ================= AI TUTOR ================= */
+var TUTOR_PROMPTS = [
+  "Jelaskan lagi perbedaan output 'loop' dan 'done' pada node Loop Over Items dengan contoh kasus CRM.",
+  "Review desain sub-workflow saya: [tempel deskripsi parent & child]. Apakah pembagian tanggung jawabnya sudah tepat?",
+  "Saya dapat error ini di expression n8n: [tempel error]. Apa penyebab umum dan cara memperbaikinya?",
+  "Bantu saya merancang error workflow global untuk 3 workflow production: apa saja yang harus dicatat di log sheet?",
+  "Kode processCRM saya gagal di check kategori HOT/WARM: [tempel kode]. Di mana salahnya? Beri petunjuk dulu, jangan jawaban langsung.",
+  "Apa checklist deployment n8n self-hosted di Railway untuk pemula, sesuai konteks F-03 roadmap saya?"
+];
+var tutorList = document.getElementById("tutorList");
+for (var tp = 0; tp < TUTOR_PROMPTS.length; tp++) {
+  var tq = document.createElement("button");
+  tq.className = "tutor-q";
+  tq.textContent = TUTOR_PROMPTS[tp];
+  tq.addEventListener("click", function () {
+    var text = this.textContent;
+    var done = function () {
+      var msg = document.getElementById("tutorCopied");
+      msg.style.display = "block";
+      setTimeout(function () { msg.style.display = "none"; }, 1600);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, done);
+    } else {
+      done();
+    }
+  });
+  tutorList.appendChild(tq);
+}
+document.getElementById("tutorToggle").addEventListener("click", function () {
+  document.getElementById("tutorPanel").classList.toggle("open");
+});
+
+/* init */
+goTo(0);
+</script>
+</body>
+</html>
