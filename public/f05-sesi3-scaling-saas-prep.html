@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>F-05 Sesi 3 — Scaling & SaaS Prep</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#080c10;
+    --bg2:#0d1f2d;
+    --bg3:#0a0f14;
+    --line:#1e3a4a;
+    --txt:#c9d1d9;
+    --txt2:#8b949e;
+    --txt3:#6e7681;
+    --head:#e6edf3;
+    --accent:#ff8c42;       /* F-05 orange */
+    --accent-dim:#ff8c4222;
+    --accent-line:#ff8c4244;
+    --green:#3fb950;
+    --cyan:#00e5ff;
+    --red:#ff6b6b;
+    --yellow:#ffeb3b;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--txt);
+    font-family:'JetBrains Mono',monospace;
+    font-size:14px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--accent);}
+  ::selection{background:var(--accent-dim);}
+  ::-webkit-scrollbar{width:6px;height:6px;}
+  ::-webkit-scrollbar-track{background:var(--bg);}
+  ::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px;}
+
+  .wrap{max-width:860px;margin:0 auto;padding:0 16px 80px;}
+
+  /* Header */
+  header{
+    border-bottom:1px solid var(--line);
+    padding:20px 24px 16px;
+    background:linear-gradient(180deg,#1a1208 0%,var(--bg) 100%);
+    position:sticky;top:0;z-index:100;
+    backdrop-filter:blur(4px);
+  }
+  .hdr-inner{max-width:860px;margin:0 auto;}
+  .eyebrow{display:flex;align-items:center;gap:10px;margin-bottom:4px;}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);
+       box-shadow:0 0 8px var(--accent);animation:pulse 2s infinite;}
+  .eyebrow span{color:var(--accent);font-size:10px;letter-spacing:3px;text-transform:uppercase;}
+  header h1{margin:0;font-size:clamp(15px,4vw,21px);font-weight:700;color:var(--head);letter-spacing:1px;}
+  header p{margin:4px 0 0;font-size:11px;color:var(--txt3);}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+
+  /* Progress / stepper */
+  .stepper{
+    display:flex;gap:4px;margin:16px 0 8px;flex-wrap:wrap;
+  }
+  .step-pill{
+    flex:1;min-width:34px;height:6px;border-radius:3px;
+    background:var(--line);cursor:pointer;transition:all .25s;
+  }
+  .step-pill.done{background:var(--accent);opacity:.5;}
+  .step-pill.active{background:var(--accent);box-shadow:0 0 8px var(--accent);}
+  .step-meta{display:flex;justify-content:space-between;font-size:10px;color:var(--txt3);
+             letter-spacing:1px;margin-bottom:18px;}
+  .step-meta b{color:var(--accent);}
+
+  /* Step panels */
+  .step{display:none;animation:fade .35s ease;}
+  .step.active{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+  .kicker{font-size:10px;color:var(--accent);letter-spacing:2px;margin-bottom:6px;text-transform:uppercase;}
+  h2.title{font-size:clamp(18px,5vw,24px);color:var(--head);margin:0 0 4px;font-weight:700;letter-spacing:.5px;}
+  .lead{color:var(--txt2);font-size:13px;margin:0 0 20px;}
+
+  h3{font-size:14px;color:var(--head);margin:26px 0 10px;letter-spacing:.5px;}
+  p{margin:0 0 12px;}
+  .muted{color:var(--txt2);}
+  strong{color:var(--head);}
+  .hl{color:var(--accent);}
+  .hl-y{color:var(--yellow);}
+  .hl-g{color:var(--green);}
+  .hl-c{color:var(--cyan);}
+
+  /* Cards */
+  .card{background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:16px;margin:14px 0;}
+  .card.accent{border-color:var(--accent-line);background:var(--accent-dim);}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  @media(max-width:600px){.grid2{grid-template-columns:1fr;}}
+
+  /* Context box (automation/SaaS) */
+  .ctx{
+    background:#0d2a1a;border:1px solid #2ea04326;border-left:3px solid var(--green);
+    border-radius:6px;padding:12px 14px;margin:14px 0;
+  }
+  .ctx .lbl{font-size:9px;color:var(--green);letter-spacing:2px;margin-bottom:6px;}
+  .ctx p{margin:0;font-size:12px;color:var(--txt);}
+
+  .warn{
+    background:#2a1a0d;border:1px solid var(--accent-line);border-left:3px solid var(--accent);
+    border-radius:6px;padding:12px 14px;margin:14px 0;
+  }
+  .warn .lbl{font-size:9px;color:var(--accent);letter-spacing:2px;margin-bottom:6px;}
+  .warn p{margin:0;font-size:12px;color:var(--txt);}
+
+  /* Lists */
+  ul.clean{list-style:none;padding:0;margin:8px 0;}
+  ul.clean li{display:flex;gap:8px;margin-bottom:7px;font-size:12.5px;color:var(--txt);line-height:1.5;}
+  ul.clean li::before{content:"\203A";color:var(--accent);flex-shrink:0;font-weight:700;}
+
+  /* Code */
+  pre{background:var(--bg3);border:1px solid var(--line);border-radius:6px;padding:14px;overflow-x:auto;
+      font-size:12px;line-height:1.6;margin:12px 0;}
+  code{color:var(--txt);}
+  .c-key{color:var(--accent);}
+  .c-str{color:var(--green);}
+  .c-num{color:var(--cyan);}
+  .c-com{color:var(--txt3);font-style:italic;}
+  .c-fn{color:var(--yellow);}
+
+  /* Tool blocks */
+  .tool{background:var(--bg3);border:1px solid var(--accent-line);border-radius:8px;padding:16px;margin:18px 0;}
+  .tool-hd{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+  .tool-hd .tag{font-size:9px;background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent-line);
+                padding:2px 8px;border-radius:4px;letter-spacing:1px;}
+  .tool-hd h4{margin:0;font-size:14px;color:var(--head);}
+  .tool-sub{font-size:11px;color:var(--txt3);margin:0 0 14px;}
+
+  label.fld{display:block;font-size:10px;color:var(--txt2);letter-spacing:1px;margin:10px 0 4px;text-transform:uppercase;}
+  input[type=text],input[type=number],textarea,select{
+    width:100%;background:var(--bg);border:1px solid var(--line);border-radius:5px;
+    color:var(--txt);font-family:inherit;font-size:13px;padding:9px 11px;outline:none;transition:border .2s;
+  }
+  input:focus,textarea:focus,select:focus{border-color:var(--accent);}
+  textarea{resize:vertical;min-height:64px;}
+
+  button.run{
+    margin-top:14px;background:var(--accent-dim);border:1px solid var(--accent);color:var(--accent);
+    font-family:inherit;font-size:12px;letter-spacing:1px;padding:9px 18px;border-radius:6px;cursor:pointer;
+    transition:all .2s;text-transform:uppercase;
+  }
+  button.run:hover{background:var(--accent);color:var(--bg);}
+  button.ghost{
+    background:transparent;border:1px solid var(--line);color:var(--txt2);
+    font-family:inherit;font-size:11px;padding:8px 14px;border-radius:6px;cursor:pointer;transition:all .2s;
+  }
+  button.ghost:hover{border-color:var(--accent);color:var(--accent);}
+
+  .out{margin-top:14px;background:var(--bg);border:1px dashed var(--accent-line);border-radius:6px;
+       padding:14px;font-size:12px;white-space:pre-wrap;word-break:break-word;min-height:20px;color:var(--txt);}
+  .out:empty{display:none;}
+
+  .verdict{font-size:13px;font-weight:700;margin-bottom:8px;}
+  .bar{height:10px;border-radius:5px;background:var(--line);overflow:hidden;margin:6px 0 4px;}
+  .bar > i{display:block;height:100%;border-radius:5px;background:var(--accent);transition:width .5s ease;}
+
+  /* package builder */
+  .pkg-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px;}
+  @media(max-width:600px){.pkg-grid{grid-template-columns:1fr;}}
+  .pkg{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:12px;}
+  .pkg.mid{border-color:var(--accent);box-shadow:0 0 12px var(--accent-dim);}
+  .pkg .pn{font-size:11px;color:var(--accent);letter-spacing:1px;text-transform:uppercase;}
+  .pkg .pp{font-size:20px;color:var(--head);font-weight:700;margin:4px 0;}
+  .pkg .pp small{font-size:11px;color:var(--txt3);font-weight:400;}
+
+  /* checklist */
+  .chk{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);cursor:pointer;}
+  .chk:last-child{border-bottom:none;}
+  .chk .box{width:18px;height:18px;border:1.5px solid var(--accent);border-radius:4px;flex-shrink:0;
+            display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--bg);
+            transition:all .15s;margin-top:1px;}
+  .chk.on .box{background:var(--accent);}
+  .chk .ctxt{font-size:12.5px;color:var(--txt);line-height:1.45;}
+  .chk.on .ctxt{color:var(--head);}
+
+  /* quiz */
+  .quiz{background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:16px;margin:18px 0;}
+  .quiz .q{font-size:13px;color:var(--head);margin-bottom:10px;}
+  .opt{display:block;width:100%;text-align:left;background:var(--bg3);border:1px solid var(--line);
+       color:var(--txt);font-family:inherit;font-size:12.5px;padding:10px 12px;border-radius:6px;margin-bottom:7px;
+       cursor:pointer;transition:all .15s;}
+  .opt:hover{border-color:var(--accent);}
+  .opt.correct{border-color:var(--green);background:#0d2a1a;color:var(--green);}
+  .opt.wrong{border-color:var(--red);background:#2a0d0d;color:var(--red);}
+  .quiz .fb{font-size:11.5px;margin-top:8px;color:var(--txt2);min-height:16px;}
+
+  /* AI Tutor */
+  .tutor{background:linear-gradient(180deg,#1a1208,#0a0f14);border:1px solid var(--accent-line);
+         border-radius:8px;padding:14px;margin:18px 0;}
+  .tutor-hd{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+  .tutor-hd .ic{width:22px;height:22px;border-radius:50%;background:var(--accent-dim);
+                border:1px solid var(--accent);display:flex;align-items:center;justify-content:center;
+                font-size:11px;color:var(--accent);}
+  .tutor-hd b{font-size:11px;color:var(--accent);letter-spacing:1px;}
+  .tutor .qrow{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
+  .tutor .qrow button{font-size:10.5px;background:var(--bg);border:1px solid var(--line);color:var(--txt2);
+                      padding:6px 10px;border-radius:14px;cursor:pointer;font-family:inherit;transition:all .2s;}
+  .tutor .qrow button:hover{border-color:var(--accent);color:var(--accent);}
+  .tutor .ans{font-size:12px;color:var(--txt);background:var(--bg);border:1px solid var(--line);
+              border-radius:6px;padding:12px;min-height:20px;line-height:1.55;}
+
+  /* nav */
+  .nav{display:flex;justify-content:space-between;gap:10px;margin-top:30px;}
+  .nav button{flex:1;padding:11px;border-radius:6px;font-family:inherit;font-size:11px;letter-spacing:1px;cursor:pointer;}
+  .nav .prev{background:var(--bg2);border:1px solid var(--line);color:var(--txt);}
+  .nav .prev:disabled{color:#3d444d;cursor:default;}
+  .nav .next{background:var(--accent-dim);border:1px solid var(--accent);color:var(--accent);}
+  .nav .next:hover{background:var(--accent);color:var(--bg);}
+
+  .seq{font-size:11px;color:var(--txt3);margin:18px 0 6px;letter-spacing:1px;}
+  .divider{height:1px;background:var(--line);margin:22px 0;}
+
+  /* graduation */
+  .grad{text-align:center;padding:24px 16px;background:var(--accent-dim);border:1px solid var(--accent);
+        border-radius:10px;margin:20px 0;}
+  .grad .big{font-size:30px;margin-bottom:6px;}
+  .grad h3{color:var(--accent);margin:6px 0;}
+  .badge-row{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:14px;}
+  .badge{font-size:10px;padding:4px 10px;border:1px solid var(--accent-line);color:var(--accent);
+         border-radius:14px;background:var(--bg);}
+</style>
+</head>
+<body>
+<header>
+  <div class="hdr-inner">
+    <div class="eyebrow"><span class="dot"></span><span>AI Automation Bootcamp &middot; F-05</span></div>
+    <h1>SESI 3 &mdash; SCALING &amp; SAAS PREP</h1>
+    <p>Bulan 15&ndash;18 &middot; Penutup Roadmap &middot; Dari layanan ke produk</p>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="stepper" id="stepper"></div>
+  <div class="step-meta"><span id="stepLabel"></span><span>STEP <b id="stepNum">1</b> / 8</span></div>
+
+  <!-- ===================== STEP 1 ===================== -->
+  <section class="step active" data-label="INTRO">
+    <div class="kicker">F-05 &middot; Bulan 15&ndash;18 &middot; Monetize</div>
+    <h2 class="title">Scaling &amp; SaaS Prep</h2>
+    <p class="lead">Kamu sudah punya skill (F-01&rarr;F-04) dan klien pertama (Sesi 1&ndash;2). Sesi ini bukan soal teknis baru &mdash; ini soal mengubah cara kerjamu dari <span class="hl">tukang jasa per-jam</span> jadi <span class="hl">aset yang menghasilkan berulang</span>, dan menyiapkan lompatan ke produk SaaS.</p>
+
+    <div class="card accent">
+      <p style="margin:0;font-size:12.5px;"><strong>Inti sesi:</strong> income yang stabil &amp; bisa diprediksi &gt; income besar tapi acak. Setiap modul di sini mendorong ke arah itu &mdash; retainer, paket terstandar, delegasi, lalu validasi ide SaaS sebelum nekat ngoding.</p>
+    </div>
+
+    <h3>5 hal yang dikunci sesi ini</h3>
+    <ul class="clean">
+      <li><strong>Retainer vs project-based</strong> &mdash; kapan tagih bulanan, kapan tagih per proyek.</li>
+      <li><strong>Productized service</strong> &mdash; berhenti jual jam, mulai jual paket bernama.</li>
+      <li><strong>Dokumentasi untuk tim / VA</strong> &mdash; supaya kamu bukan satu-satunya yang bisa jalanin.</li>
+      <li><strong>Identifikasi pain point untuk SaaS</strong> &mdash; menemukan masalah berulang yang layak jadi produk.</li>
+      <li><strong>MVP planning</strong> &mdash; validasi dulu, baru bangun.</li>
+    </ul>
+
+    <div class="ctx">
+      <div class="lbl">&#9670; KENAPA INI PENTING</div>
+      <p>Automation engineer yang stuck di "satu klien = satu proyek selesai = cari lagi dari nol" tidak pernah scale. Yang naik kelas adalah yang ubah workflow n8n-nya jadi <span class="hl-g">layanan berlangganan</span>, lalu sadar pola yang sama dipakai 10 klien &mdash; itulah benih SaaS.</p>
+    </div>
+
+    <div class="seq">URUTAN SESI &mdash; 8 langkah</div>
+    <ul class="clean" style="font-size:12px;">
+      <li>1. Intro &middot; 2. Retainer vs Project (+kalkulator) &middot; 3. Productized Service (+builder)</li>
+      <li>4. Dokumentasi VA (+SOP generator) &middot; 5. SaaS Pain Point (+validator)</li>
+      <li>6. MVP Planning (+scorecard) &middot; 7. Project: Rencana Bisnis SaaS &middot; 8. Recap &amp; Wisuda</li>
+    </ul>
+  </section>
+
+  <!-- ===================== STEP 2 ===================== -->
+  <section class="step" data-label="RETAINER vs PROJECT">
+    <div class="kicker">Modul 1 / 5</div>
+    <h2 class="title">Retainer vs Project-based</h2>
+    <p class="lead">Dua model menagih. Salah pilih = income naik-turun tiap bulan, susah scale.</p>
+
+    <div class="grid2">
+      <div class="card">
+        <div class="hl" style="font-size:12px;letter-spacing:1px;">PROJECT-BASED</div>
+        <ul class="clean" style="margin-top:8px;">
+          <li>Bayar sekali untuk satu deliverable (mis. "build 1 workflow").</li>
+          <li>Cocok untuk one-off, klien baru, scope jelas &amp; berakhir.</li>
+          <li>Risiko: selesai = income berhenti, harus cari klien lagi.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="hl-g" style="font-size:12px;letter-spacing:1px;">RETAINER</div>
+        <ul class="clean" style="margin-top:8px;">
+          <li>Bayar bulanan untuk akses berkelanjutan (maintenance, update, monitoring, jam kerja).</li>
+          <li>Cocok setelah workflow live &amp; butuh dijaga.</li>
+          <li>Untung: <span class="hl-g">MRR</span> &mdash; pemasukan stabil &amp; bisa diprediksi.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="ctx">
+      <div class="lbl">&#9670; POLA KONVERSI YANG SEHAT</div>
+      <p>Jual <strong>project</strong> dulu untuk bangun trust (mis. lead-management workflow), lalu tawarkan <strong>retainer</strong> untuk merawatnya: "Rp X/bulan untuk monitoring error, update node, dan 4 jam improvement." Satu proyek berubah jadi pendapatan berulang.</p>
+    </div>
+
+    <h3>MRR &mdash; metrik yang kamu kejar</h3>
+    <p class="muted">Monthly Recurring Revenue = total income berulang per bulan. 5 klien retainer @ $400 = <span class="hl-g">$2.000 MRR</span> &mdash; itu target milestone F-05, dan datang tanpa harus jualan ulang tiap bulan.</p>
+
+    <!-- TOOL 1 -->
+    <div class="tool">
+      <div class="tool-hd"><span class="tag">TOOL 01</span><h4>Retainer vs Project Calculator</h4></div>
+      <p class="tool-sub">Bandingkan pendapatan project sekali jalan vs MRR retainer dalam 12 bulan.</p>
+
+      <div class="grid2">
+        <div>
+          <label class="fld">Jumlah klien</label>
+          <input type="number" id="rc-clients" value="5" min="1" />
+        </div>
+        <div>
+          <label class="fld">Rate per jam ($)</label>
+          <input type="number" id="rc-rate" value="35" min="1" />
+        </div>
+      </div>
+      <div class="grid2">
+        <div>
+          <label class="fld">Jam / proyek (sekali)</label>
+          <input type="number" id="rc-proj-hours" value="40" min="1" />
+        </div>
+        <div>
+          <label class="fld">Jam retainer / bln per klien</label>
+          <input type="number" id="rc-ret-hours" value="6" min="1" />
+        </div>
+      </div>
+      <button class="run" onclick="calcRetainer()">Bandingkan 12 Bulan</button>
+      <div class="out" id="rc-out"></div>
+    </div>
+
+    <div class="quiz" data-correct="1">
+      <div class="q">Klien minta kamu rawat workflow n8n yang sudah live: pantau error, update node tiap ada API berubah. Model paling tepat?</div>
+      <button class="opt" onclick="answer(this,0)">Project-based satu kali, lalu lepas</button>
+      <button class="opt" onclick="answer(this,1)">Retainer bulanan</button>
+      <button class="opt" onclick="answer(this,2)">Gratis, biar dapat testimoni</button>
+      <div class="fb"></div>
+    </div>
+
+    <div class="tutor" data-topic="retainer">
+      <div class="tutor-hd"><span class="ic">AI</span><b>AI TUTOR</b></div>
+      <div class="qrow">
+        <button onclick="tutor(this)">Cara pitch retainer ke klien lama?</button>
+        <button onclick="tutor(this)">Berapa harga retainer yang wajar?</button>
+        <button onclick="tutor(this)">Klien nolak retainer, gimana?</button>
+      </div>
+      <div class="ans" id="ans-retainer">Pilih pertanyaan di atas.</div>
+    </div>
+  </section>
+
+  <!-- ===================== STEP 3 ===================== -->
+  <section class="step" data-label="PRODUCTIZED SERVICE">
+    <div class="kicker">Modul 2 / 5</div>
+    <h2 class="title">Productized Service: Paket Standar</h2>
+    <p class="lead">Berhenti jawab "tergantung, nanti saya hitung". Jual paket bernama dengan scope &amp; harga tetap &mdash; klien lebih cepat bilang ya, kamu lebih mudah delegasi &amp; scale.</p>
+
+    <h3>Jasa biasa vs productized</h3>
+    <div class="grid2">
+      <div class="card">
+        <div style="font-size:11px;color:var(--txt3);letter-spacing:1px;">JASA CUSTOM</div>
+        <ul class="clean" style="margin-top:8px;">
+          <li>Scope beda tiap klien, quote dari nol tiap kali.</li>
+          <li>Susah didelegasikan, susah diiklankan.</li>
+          <li>Kamu jual <span class="hl">waktu</span>.</li>
+        </ul>
+      </div>
+      <div class="card accent">
+        <div style="font-size:11px;color:var(--accent);letter-spacing:1px;">PRODUCTIZED</div>
+        <ul class="clean" style="margin-top:8px;">
+          <li>Scope &amp; harga tetap, 3 tier yang jelas.</li>
+          <li>Bisa dikasih ke VA via SOP, bisa dipasang di landing page.</li>
+          <li>Kamu jual <span class="hl">hasil</span>.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="ctx">
+      <div class="lbl">&#9670; ANATOMI 3-TIER (Good / Better / Best)</div>
+      <p><strong>Starter</strong> = pancingan, scope kecil, harga rendah. <strong>Growth</strong> = paket "kebanyakan orang ambil ini" (anchor, dibikin paling menarik). <strong>Pro</strong> = premium, bikin Growth terlihat masuk akal. Tiga harga membantu klien memilih, bukan memutuskan ya/tidak.</p>
+    </div>
+
+    <!-- TOOL 2 -->
+    <div class="tool">
+      <div class="tool-hd"><span class="tag">TOOL 02</span><h4>Productized Service Builder</h4></div>
+      <p class="tool-sub">Susun 3 paket standar untuk jasa automation-mu. Isi nama jasa, scope, dan harga tiap tier.</p>
+
+      <label class="fld">Nama layanan</label>
+      <input type="text" id="ps-name" value="n8n Lead Automation" />
+
+      <div class="grid2">
+        <div>
+          <label class="fld">Starter &mdash; scope (1 baris)</label>
+          <input type="text" id="ps-s-scope" value="1 workflow, 1 integrasi, handoff" />
+          <label class="fld">Starter &mdash; harga ($)</label>
+          <input type="number" id="ps-s-price" value="300" />
+        </div>
+        <div>
+          <label class="fld">Growth &mdash; scope (1 baris)</label>
+          <input type="text" id="ps-g-scope" value="3 workflow, 3 integrasi, error handling" />
+          <label class="fld">Growth &mdash; harga ($)</label>
+          <input type="number" id="ps-g-price" value="800" />
+        </div>
+      </div>
+      <label class="fld">Pro &mdash; scope (1 baris)</label>
+      <input type="text" id="ps-p-scope" value="Workflow unlimited + retainer 6 jam/bln + monitoring" />
+      <label class="fld">Pro &mdash; harga ($ / bln)</label>
+      <input type="number" id="ps-p-price" value="1500" />
+
+      <button class="run" onclick="buildPackages()">Susun Paket</button>
+      <div id="ps-out"></div>
+    </div>
+
+    <div class="quiz" data-correct="2">
+      <div class="q">Fungsi utama tier <span class="hl">Pro</span> (premium) dalam strategi 3-paket?</div>
+      <button class="opt" onclick="answer(this,0)">Supaya paling banyak dibeli</button>
+      <button class="opt" onclick="answer(this,1)">Untuk klien yang pelit</button>
+      <button class="opt" onclick="answer(this,2)">Jadi pembanding harga agar Growth terlihat masuk akal</button>
+      <div class="fb"></div>
+    </div>
+  </section>
+
+  <!-- ===================== STEP 4 ===================== -->
+  <section class="step" data-label="DOKUMENTASI / VA">
+    <div class="kicker">Modul 3 / 5</div>
+    <h2 class="title">Dokumentasi untuk Tim / VA</h2>
+    <p class="lead">Kalau cuma kamu yang ngerti workflow-nya, kamu adalah bottleneck. SOP yang jelas = pekerjaan bisa diserahkan ke VA / tim, kamu fokus jual &amp; bangun produk.</p>
+
+    <h3>SOP yang baik = bisa dijalankan tanpa nanya kamu</h3>
+    <ul class="clean">
+      <li><strong>Tujuan</strong> &mdash; workflow ini menyelesaikan masalah apa, untuk klien siapa.</li>
+      <li><strong>Trigger &amp; jadwal</strong> &mdash; kapan jalan (webhook / schedule / manual).</li>
+      <li><strong>Langkah node demi node</strong> &mdash; urutan, input, output yang diharapkan.</li>
+      <li><strong>Jika error</strong> &mdash; gejala umum + langkah perbaikan (ini yang paling sering lupa ditulis).</li>
+      <li><strong>Kredensial &amp; akses</strong> &mdash; di mana disimpan, siapa boleh akses (jangan tulis password-nya).</li>
+    </ul>
+
+    <div class="warn">
+      <div class="lbl">&#9888; PRINSIP DELEGASI</div>
+      <p>Jangan delegasikan tugas yang ada di kepalamu &mdash; delegasikan tugas yang sudah <strong>didokumentasikan</strong>. SOP dulu, baru rekrut VA. Tanpa SOP, kamu cuma memindahkan kebingungan.</p>
+    </div>
+
+    <!-- TOOL 3 -->
+    <div class="tool">
+      <div class="tool-hd"><span class="tag">TOOL 03</span><h4>SOP / Delegation Doc Generator</h4></div>
+      <p class="tool-sub">Isi detail workflow &rarr; dapat dokumen handoff siap copy untuk VA / tim.</p>
+
+      <label class="fld">Nama workflow</label>
+      <input type="text" id="sop-name" value="Lead Intake to Slack" />
+      <div class="grid2">
+        <div>
+          <label class="fld">Tujuan</label>
+          <input type="text" id="sop-goal" value="Form leads masuk Sheet lalu notif tim" />
+        </div>
+        <div>
+          <label class="fld">Trigger</label>
+          <select id="sop-trigger">
+            <option>Webhook (form submit)</option>
+            <option>Schedule (cron)</option>
+            <option>Manual</option>
+          </select>
+        </div>
+      </div>
+      <label class="fld">Langkah node (satu per baris)</label>
+      <textarea id="sop-steps">Webhook terima data form
+Set node rapikan field nama, email, sumber
+Google Sheets append baris baru
+Slack kirim notif ke channel sales</textarea>
+      <label class="fld">Gejala error umum + perbaikan (satu per baris)</label>
+      <textarea id="sop-errors">Slack tidak terkirim: cek token credential masih valid
+Baris dobel di Sheet: cek webhook tidak ke-trigger 2x</textarea>
+      <label class="fld">Penanggung jawab</label>
+      <input type="text" id="sop-owner" value="VA Operations" />
+
+      <button class="run" onclick="genSOP()">Generate SOP</button>
+      <button class="ghost" onclick="copySOP()">Salin</button>
+      <div class="out" id="sop-out"></div>
+    </div>
+
+    <div class="tutor" data-topic="va">
+      <div class="tutor-hd"><span class="ic">AI</span><b>AI TUTOR</b></div>
+      <div class="qrow">
+        <button onclick="tutor(this)">Tugas apa yang aman didelegasikan duluan?</button>
+        <button onclick="tutor(this)">Cara amankan kredensial klien saat pakai VA?</button>
+      </div>
+      <div class="ans" id="ans-va">Pilih pertanyaan di atas.</div>
+    </div>
+  </section>
+
+  <!-- ===================== STEP 5 ===================== -->
+  <section class="step" data-label="SAAS PAIN POINT">
+    <div class="kicker">Modul 4 / 5</div>
+    <h2 class="title">Identifikasi Pain Point untuk SaaS</h2>
+    <p class="lead">SaaS terbaik lahir dari pola yang kamu lihat berulang di banyak klien. Bukan ide brilian dari langit &mdash; tapi keluhan yang sama yang kamu selesaikan manual lagi dan lagi.</p>
+
+    <h3>Sinyal sebuah pain layak jadi produk</h3>
+    <ul class="clean">
+      <li><strong>Frekuensi</strong> &mdash; muncul di banyak klien, bukan kasus satu orang.</li>
+      <li><strong>Willingness to pay</strong> &mdash; mereka sudah bayar (kamu / tool lain) untuk menyelesaikannya.</li>
+      <li><strong>Ukuran pasar</strong> &mdash; cukup banyak bisnis sejenis yang punya masalah sama.</li>
+      <li><strong>Bisa diproduktkan</strong> &mdash; solusinya berpola, tidak harus selalu custom.</li>
+    </ul>
+
+    <div class="ctx">
+      <div class="lbl">&#9670; DARI WORKFLOW KE PRODUK</div>
+      <p>Contoh: kamu bikin workflow "scrape review &rarr; ringkas pakai AI &rarr; kirim laporan" untuk 6 klien restoran. Itu bukan 6 proyek &mdash; itu satu produk yang belum kamu kemas. Pain berulang = peta jalan SaaS-mu.</p>
+    </div>
+
+    <!-- TOOL 4 -->
+    <div class="tool">
+      <div class="tool-hd"><span class="tag">TOOL 04</span><h4>SaaS Pain Point Validator</h4></div>
+      <p class="tool-sub">Masukkan pain berulang dari klien &rarr; skor potensi SaaS (frekuensi, willingness to pay, ukuran pasar, produktabilitas).</p>
+
+      <label class="fld">Deskripsi pain</label>
+      <input type="text" id="pp-desc" value="Klien capek rekap lead manual dari banyak form" />
+
+      <label class="fld">Frekuensi &mdash; muncul di berapa klien?</label>
+      <select id="pp-freq">
+        <option value="1">1 klien (kasus tunggal)</option>
+        <option value="2">2&ndash;3 klien</option>
+        <option value="3" selected>4&ndash;7 klien</option>
+        <option value="4">8+ klien</option>
+      </select>
+
+      <label class="fld">Willingness to pay &mdash; sudah ada yang bayar untuk solusi ini?</label>
+      <select id="pp-wtp">
+        <option value="1">Belum, cuma keluhan</option>
+        <option value="2">Bayar sekali ke saya</option>
+        <option value="3" selected>Bayar berulang (saya / tool lain)</option>
+        <option value="4">Bayar mahal &amp; rutin</option>
+      </select>
+
+      <label class="fld">Ukuran pasar &mdash; seberapa banyak bisnis sejenis?</label>
+      <select id="pp-market">
+        <option value="1">Niche sangat sempit</option>
+        <option value="2">Sedang, satu industri</option>
+        <option value="3" selected>Luas, lintas industri</option>
+        <option value="4">Sangat luas / global</option>
+      </select>
+
+      <label class="fld">Produktabilitas &mdash; seberapa berpola solusinya?</label>
+      <select id="pp-prod">
+        <option value="1">Selalu custom tiap klien</option>
+        <option value="2">Sebagian berpola</option>
+        <option value="3" selected>Mostly sama, sedikit config</option>
+        <option value="4">Identik, tinggal aktifkan</option>
+      </select>
+
+      <button class="run" onclick="validatePain()">Skor Potensi SaaS</button>
+      <div class="out" id="pp-out"></div>
+    </div>
+
+    <div class="quiz" data-correct="1">
+      <div class="q">Mana sinyal <span class="hl">paling kuat</span> bahwa sebuah pain layak jadi SaaS?</div>
+      <button class="opt" onclick="answer(this,0)">Idenya terdengar keren dan baru</button>
+      <button class="opt" onclick="answer(this,1)">Banyak klien punya masalah sama dan sudah bayar untuk diselesaikan</button>
+      <button class="opt" onclick="answer(this,2)">Kamu pribadi tertarik bikin</button>
+      <div class="fb"></div>
+    </div>
+  </section>
+
+  <!-- ===================== STEP 6 ===================== -->
+  <section class="step" data-label="MVP VALIDATION">
+    <div class="kicker">Modul 5 / 5</div>
+    <h2 class="title">MVP Planning: Validasi Sebelum Build</h2>
+    <p class="lead">Kesalahan termahal pemula SaaS: ngoding berbulan-bulan sebelum tahu ada yang mau bayar. Aturannya dibalik &mdash; <span class="hl">validasi dulu, build belakangan</span>.</p>
+
+    <h3>Validasi bertingkat (murah &rarr; mahal)</h3>
+    <ul class="clean">
+      <li><strong>Problem-solution fit</strong> &mdash; ngobrol dengan calon user, pastikan masalahnya nyata &amp; menyakitkan.</li>
+      <li><strong>Sinyal demand</strong> &mdash; landing page + waitlist, lihat siapa daftar.</li>
+      <li><strong>Pre-sell</strong> &mdash; ada yang mau bayar/DP sebelum produk jadi? Sinyal terkuat.</li>
+      <li><strong>Concierge MVP</strong> &mdash; layani manual (pakai n8n di belakang layar) sebelum bikin software full.</li>
+    </ul>
+
+    <div class="warn">
+      <div class="lbl">&#9888; URUTAN YANG BENAR</div>
+      <p>Jangan bangun aplikasi dulu. Mulai dari <strong>concierge MVP</strong>: jalankan layanannya secara manual / pakai workflow n8n-mu, tagih beneran. Kalau orang bayar untuk versi manual, baru otomatiskan jadi produk. Hemat bulanan kerja sia-sia.</p>
+    </div>
+
+    <!-- TOOL 5 -->
+    <div class="tool">
+      <div class="tool-hd"><span class="tag">TOOL 05</span><h4>MVP Validation Scorecard</h4></div>
+      <p class="tool-sub">Centang yang sudah kamu validasi. Skor menentukan: lanjut build, atau validasi lagi dulu.</p>
+
+      <div id="mvp-list">
+        <div class="chk" data-w="2" onclick="toggleChk(this)"><div class="box">&#10003;</div><div class="ctxt">Sudah ngobrol &ge;5 calon user dan masalahnya dikonfirmasi nyata</div></div>
+        <div class="chk" data-w="2" onclick="toggleChk(this)"><div class="box">&#10003;</div><div class="ctxt">Calon user menyebut sudah keluar uang/waktu untuk masalah ini (willingness to pay)</div></div>
+        <div class="chk" data-w="2" onclick="toggleChk(this)"><div class="box">&#10003;</div><div class="ctxt">Ada landing page / waitlist dan mulai ada yang daftar (sinyal demand)</div></div>
+        <div class="chk" data-w="3" onclick="toggleChk(this)"><div class="box">&#10003;</div><div class="ctxt">Minimal 1 orang bersedia pre-sell / bayar DP sebelum produk jadi</div></div>
+        <div class="chk" data-w="2" onclick="toggleChk(this)"><div class="box">&#10003;</div><div class="ctxt">Sudah jalankan versi manual / concierge (n8n di belakang) untuk &ge;1 klien</div></div>
+        <div class="chk" data-w="1" onclick="toggleChk(this)"><div class="box">&#10003;</div><div class="ctxt">Tahu siapa kompetitor &amp; kenapa solusimu beda / lebih baik</div></div>
+        <div class="chk" data-w="1" onclick="toggleChk(this)"><div class="box">&#10003;</div><div class="ctxt">Scope MVP didefinisikan kecil &mdash; 1 fitur inti, bukan semuanya</div></div>
+        <div class="chk" data-w="1" onclick="toggleChk(this)"><div class="box">&#10003;</div><div class="ctxt">Punya metrik sukses jelas untuk MVP (mis. 10 paying user dalam 60 hari)</div></div>
+      </div>
+
+      <button class="run" onclick="scoreMVP()">Hitung Kesiapan Build</button>
+      <div class="out" id="mvp-out"></div>
+    </div>
+  </section>
+
+  <!-- ===================== STEP 7 ===================== -->
+  <section class="step" data-label="PROJECT CAPSTONE">
+    <div class="kicker">Project Praktik &middot; Capstone Roadmap</div>
+    <h2 class="title">Rencana Bisnis SaaS dari Pengalaman Klien</h2>
+    <p class="lead">Misi penutup roadmap. Gabungkan semua tool sesi ini jadi satu dokumen rencana SaaS yang berakar pada pengalaman nyata melayani klien &mdash; bukan ide kosong.</p>
+
+    <div class="card accent">
+      <div style="font-size:10px;color:var(--accent);letter-spacing:2px;margin-bottom:8px;">&#9670; MISI</div>
+      <p style="margin:0;font-size:12.5px;">Pilih <strong>satu pain berulang</strong> dari klien nyata (atau skenario realistis), lalu bangun rencana bisnis SaaS ringkas yang lolos validasi &mdash; lengkap dengan model harga, jalur dari layanan ke produk, dan rencana MVP.</p>
+    </div>
+
+    <h3>Kerangka yang harus diisi</h3>
+    <ul class="clean">
+      <li><strong>1. Pain &amp; sumbernya</strong> &mdash; masalah apa, dari klien mana, seberapa sering muncul (pakai <span class="hl">Tool 04</span>).</li>
+      <li><strong>2. Solusi sekarang</strong> &mdash; workflow n8n apa yang kamu pakai menyelesaikannya manual.</li>
+      <li><strong>3. Produk yang diusulkan</strong> &mdash; versi terkemas dari workflow itu, target user.</li>
+      <li><strong>4. Model income</strong> &mdash; productized tier &amp; retainer (pakai <span class="hl">Tool 01 &amp; 02</span>).</li>
+      <li><strong>5. Rencana validasi MVP</strong> &mdash; langkah concierge &rarr; pre-sell &rarr; build (pakai <span class="hl">Tool 05</span>).</li>
+      <li><strong>6. Operasional</strong> &mdash; apa yang didelegasikan ke VA (pakai <span class="hl">Tool 03</span>).</li>
+    </ul>
+
+    <!-- VALIDATOR -->
+    <div class="tool">
+      <div class="tool-hd"><span class="tag">VALIDATOR</span><h4>Pengecek Kelengkapan Rencana</h4></div>
+      <p class="tool-sub">Tempel ringkasan rencana SaaS-mu. Validator cek apakah 6 komponen inti sudah tercakup.</p>
+      <label class="fld">Ringkasan rencana SaaS</label>
+      <textarea id="cap-in" style="min-height:140px;" placeholder="Tulis rencana yang menyebut: pain, solusi/workflow, produk, harga (retainer/paket), validasi MVP (pre-sell/concierge), delegasi VA..."></textarea>
+      <button class="run" onclick="validateCapstone()">Validasi Rencana</button>
+      <div class="out" id="cap-out"></div>
+    </div>
+
+    <div class="ctx">
+      <div class="lbl">&#9670; KRITERIA LULUS</div>
+      <p>Rencana dianggap lengkap jika menyentuh keenam komponen di atas. Tidak perlu sempurna &mdash; yang penting menunjukkan jalur masuk akal dari <span class="hl-g">pengalaman klien &rarr; produk tervalidasi</span>.</p>
+    </div>
+  </section>
+
+  <!-- ===================== STEP 8 ===================== -->
+  <section class="step" data-label="RECAP &amp; WISUDA">
+    <div class="kicker">Penutup F-05 &middot; Penutup Roadmap</div>
+    <h2 class="title">Recap &amp; Wisuda</h2>
+    <p class="lead">Sesi terakhir. Ini menutup F-05 sekaligus seluruh perjalanan F-01 &rarr; F-05.</p>
+
+    <h3>Yang dikunci di Sesi 3</h3>
+    <ul class="clean">
+      <li><span class="hl">Retainer &gt; project</span> untuk income stabil &mdash; kejar MRR, bukan proyek lepas.</li>
+      <li><span class="hl">Productized service</span> &mdash; jual paket bernama, bukan jam.</li>
+      <li><span class="hl">SOP &amp; delegasi</span> &mdash; dokumentasikan dulu, baru serahkan ke VA.</li>
+      <li><span class="hl">Pain berulang</span> = peta jalan SaaS; validasi dengan 4 sinyal.</li>
+      <li><span class="hl">Validasi sebelum build</span> &mdash; concierge &rarr; pre-sell &rarr; baru ngoding.</li>
+    </ul>
+
+    <div class="quiz" data-correct="0">
+      <div class="q">Prinsip kunci urutan membangun SaaS dari sesi ini?</div>
+      <button class="opt" onclick="answer(this,0)">Validasi demand dulu (concierge / pre-sell), build belakangan</button>
+      <button class="opt" onclick="answer(this,1)">Build full produk dulu agar terlihat profesional</button>
+      <button class="opt" onclick="answer(this,2)">Cari investor sebelum punya user</button>
+      <div class="fb"></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="grad">
+      <div class="big">&#127881;</div>
+      <h3>ROADMAP SELESAI</h3>
+      <p style="font-size:12.5px;color:var(--txt);margin:6px 0 0;">Dari background non-IT &rarr; AI Automation Expert dengan jalur income remote &amp; rencana SaaS tervalidasi. Kamu sudah melewati kelima fase.</p>
+      <div class="badge-row">
+        <span class="badge">F-01 Data &amp; API</span>
+        <span class="badge">F-02 JavaScript</span>
+        <span class="badge">F-03 n8n Mastery</span>
+        <span class="badge">F-04 AI Integration</span>
+        <span class="badge">F-05 Market &amp; Income</span>
+      </div>
+    </div>
+
+    <div class="ctx">
+      <div class="lbl">&#9670; LANGKAH NYATA SETELAH INI</div>
+      <p>Roadmap selesai bukan berarti belajar berhenti &mdash; tapi sekarang fokusnya eksekusi: ambil klien, kumpulkan pain berulang, jalankan concierge MVP. Skill sudah lengkap; sisanya jam terbang di pasar nyata.</p>
+    </div>
+  </section>
+
+  <!-- NAV -->
+  <div class="nav">
+    <button class="prev" id="prevBtn" onclick="go(-1)">&larr; SEBELUMNYA</button>
+    <button class="next" id="nextBtn" onclick="go(1)">LANJUT &rarr;</button>
+  </div>
+</div>
+
+<script>
+/* ---------- pure ASCII JS, safe regex ---------- */
+var steps = document.querySelectorAll('.step');
+var cur = 0;
+var stepper = document.getElementById('stepper');
+var total = steps.length;
+
+for (var i = 0; i < total; i++) {
+  var pill = document.createElement('div');
+  pill.className = 'step-pill';
+  pill.setAttribute('data-i', i);
+  pill.onclick = (function(idx){ return function(){ jump(idx); }; })(i);
+  stepper.appendChild(pill);
+}
+
+function render() {
+  for (var i = 0; i < total; i++) {
+    steps[i].classList.toggle('active', i === cur);
+    var pills = stepper.children;
+    pills[i].classList.remove('done','active');
+    if (i < cur) pills[i].classList.add('done');
+    if (i === cur) pills[i].classList.add('active');
+  }
+  document.getElementById('stepNum').textContent = (cur + 1);
+  document.getElementById('stepLabel').innerHTML = steps[cur].getAttribute('data-label');
+  document.getElementById('prevBtn').disabled = (cur === 0);
+  var nb = document.getElementById('nextBtn');
+  nb.innerHTML = (cur === total - 1) ? 'SELESAI' : 'LANJUT &rarr;';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function go(d) {
+  var n = cur + d;
+  if (n < 0 || n >= total) return;
+  cur = n; render();
+}
+function jump(i) { cur = i; render(); }
+render();
+
+/* ---------- quiz ---------- */
+function answer(btn, idx) {
+  var quiz = btn.closest('.quiz');
+  var correct = parseInt(quiz.getAttribute('data-correct'), 10);
+  var opts = quiz.querySelectorAll('.opt');
+  for (var i = 0; i < opts.length; i++) { opts[i].disabled = true; opts[i].classList.remove('correct','wrong'); }
+  opts[correct].classList.add('correct');
+  var fb = quiz.querySelector('.fb');
+  if (idx === correct) {
+    fb.textContent = 'Benar.';
+    fb.style.color = '#3fb950';
+  } else {
+    opts[idx].classList.add('wrong');
+    fb.textContent = 'Belum tepat. Jawaban yang benar ditandai hijau.';
+    fb.style.color = '#ff6b6b';
+  }
+}
+
+/* ---------- Tool 01: Retainer vs Project ---------- */
+function calcRetainer() {
+  var clients = num('rc-clients');
+  var rate = num('rc-rate');
+  var pHours = num('rc-proj-hours');
+  var rHours = num('rc-ret-hours');
+
+  var projectTotal = clients * rate * pHours;           // one-time, paid once
+  var mrr = clients * rate * rHours;                     // per month
+  var retainerYear = mrr * 12;                           // 12 months
+  var diff = retainerYear - projectTotal;
+
+  var out = document.getElementById('rc-out');
+  var lines = [];
+  lines.push('=== PROJECT-BASED (sekali jalan) ===');
+  lines.push('Total pendapatan      : $' + fmt(projectTotal));
+  lines.push('Bulan 2-12            : $0 (harus cari klien lagi)');
+  lines.push('Total 12 bulan        : $' + fmt(projectTotal));
+  lines.push('');
+  lines.push('=== RETAINER (bulanan) ===');
+  lines.push('MRR                   : $' + fmt(mrr) + ' / bulan');
+  lines.push('Total 12 bulan        : $' + fmt(retainerYear));
+  lines.push('');
+  lines.push('Selisih 12 bln        : ' + (diff >= 0 ? '+$' + fmt(diff) + ' untuk retainer' : '-$' + fmt(Math.abs(diff)) + ' untuk retainer'));
+  lines.push('');
+  if (mrr >= 2000) {
+    lines.push('>> MRR sudah >= $2.000 = milestone F-05 tercapai dari retainer saja.');
+  } else {
+    var need = Math.ceil((2000 - mrr) / (rate * rHours));
+    lines.push('>> Butuh ~' + need + ' klien retainer lagi (pada rate ini) untuk tembus $2.000 MRR.');
+  }
+  out.textContent = lines.join('\n');
+}
+
+/* ---------- Tool 02: Package Builder ---------- */
+function buildPackages() {
+  var name = val('ps-name') || 'Layanan';
+  var data = [
+    { tier:'STARTER', scope: val('ps-s-scope'), price: num('ps-s-price'), suf:'sekali', mid:false },
+    { tier:'GROWTH',  scope: val('ps-g-scope'), price: num('ps-g-price'), suf:'sekali', mid:true },
+    { tier:'PRO',     scope: val('ps-p-scope'), price: num('ps-p-price'), suf:'/bln',   mid:false }
+  ];
+  var html = '<div class="pkg-grid">';
+  for (var i = 0; i < data.length; i++) {
+    var d = data[i];
+    html += '<div class="pkg' + (d.mid ? ' mid' : '') + '">';
+    if (d.mid) html += '<div style="font-size:9px;color:var(--accent);margin-bottom:4px;">PALING POPULER</div>';
+    html += '<div class="pn">' + esc(d.tier) + '</div>';
+    html += '<div class="pp">$' + fmt(d.price) + ' <small>' + d.suf + '</small></div>';
+    html += '<div style="font-size:11.5px;color:var(--txt2);line-height:1.5;">' + esc(d.scope || '-') + '</div>';
+    html += '</div>';
+  }
+  html += '</div>';
+
+  var s = num('ps-s-price'), g = num('ps-g-price'), p = num('ps-p-price');
+  var tip = '';
+  if (!(s < g)) tip += 'Catatan: Starter sebaiknya lebih murah dari Growth. ';
+  if (g >= p && p > 0) tip += 'Catatan: Pro (premium) idealnya jadi harga tertinggi sebagai anchor. ';
+  if (tip === '') tip = 'Struktur harga sehat: naik bertahap, Growth jadi pilihan tengah yang menarik.';
+  html += '<div class="ctx" style="margin-top:14px;"><div class="lbl">&#9670; CEK STRUKTUR</div><p>' + esc(tip) + '</p></div>';
+
+  document.getElementById('ps-out').innerHTML = html;
+}
+
+/* ---------- Tool 03: SOP Generator ---------- */
+var lastSOP = '';
+function genSOP() {
+  var name = val('sop-name') || 'Workflow';
+  var goal = val('sop-goal') || '-';
+  var trig = val('sop-trigger');
+  var owner = val('sop-owner') || '-';
+  var steps = linesOf('sop-steps');
+  var errs = linesOf('sop-errors');
+
+  var o = [];
+  o.push('==================================================');
+  o.push('  SOP / HANDOFF DOC : ' + name.toUpperCase());
+  o.push('==================================================');
+  o.push('Tujuan        : ' + goal);
+  o.push('Trigger       : ' + trig);
+  o.push('Penanggung jwb: ' + owner);
+  o.push('');
+  o.push('--- LANGKAH NODE ---');
+  if (steps.length === 0) { o.push('  (belum diisi)'); }
+  for (var i = 0; i < steps.length; i++) { o.push('  ' + (i+1) + '. ' + steps[i]); }
+  o.push('');
+  o.push('--- JIKA ERROR ---');
+  if (errs.length === 0) { o.push('  (belum diisi)'); }
+  for (var j = 0; j < errs.length; j++) { o.push('  [!] ' + errs[j]); }
+  o.push('');
+  o.push('--- KREDENSIAL ---');
+  o.push('  Simpan di n8n Credentials. JANGAN tulis password di doc ini.');
+  o.push('  Akses dibatasi ke penanggung jawab di atas.');
+  o.push('==================================================');
+
+  lastSOP = o.join('\n');
+  document.getElementById('sop-out').textContent = lastSOP;
+}
+function copySOP() {
+  if (!lastSOP) { genSOP(); }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(lastSOP);
+  }
+  var o = document.getElementById('sop-out');
+  var prev = o.textContent;
+  o.textContent = '[ Tersalin ke clipboard ]\n\n' + prev;
+  setTimeout(function(){ o.textContent = prev; }, 1200);
+}
+
+/* ---------- Tool 04: Pain Validator ---------- */
+function validatePain() {
+  var f = num('pp-freq'), w = num('pp-wtp'), m = num('pp-market'), p = num('pp-prod');
+  var raw = f + w + m + p;            // 4..16
+  var pct = Math.round(((raw - 4) / 12) * 100);
+  if (pct < 0) pct = 0; if (pct > 100) pct = 100;
+
+  var label, color, advice;
+  if (pct >= 75) { label = 'POTENSI TINGGI'; color = '#3fb950'; advice = 'Pain ini kandidat SaaS kuat. Lanjut ke validasi MVP (Step 6).'; }
+  else if (pct >= 50) { label = 'POTENSI SEDANG'; color = '#ff8c42'; advice = 'Menjanjikan, tapi perkuat sinyal terlemah dulu sebelum investasi.'; }
+  else { label = 'POTENSI RENDAH'; color = '#ff6b6b'; advice = 'Belum layak jadi produk. Lebih cocok tetap sebagai jasa custom untuk sekarang.'; }
+
+  // weakest signal
+  var names = ['Frekuensi','Willingness to pay','Ukuran pasar','Produktabilitas'];
+  var vals = [f, w, m, p];
+  var minIdx = 0;
+  for (var i = 1; i < 4; i++) { if (vals[i] < vals[minIdx]) minIdx = i; }
+
+  var desc = val('pp-desc') || '(tanpa deskripsi)';
+  var html = '';
+  html += '<div class="verdict" style="color:' + color + ';">' + label + ' &mdash; ' + pct + '%</div>';
+  html += '<div class="bar"><i style="width:' + pct + '%;background:' + color + ';"></i></div>';
+  html += '<div style="font-size:11px;color:var(--txt3);margin-bottom:8px;">Pain: ' + esc(desc) + '</div>';
+  html += 'Frekuensi: ' + stars(f) + '   |   Willingness: ' + stars(w) + '\n';
+  html += 'Pasar    : ' + stars(m) + '   |   Produktabilitas: ' + stars(p) + '\n\n';
+  html += 'Sinyal terlemah: ' + names[minIdx] + ' -> perkuat ini dulu.\n\n';
+  html += '>> ' + advice;
+
+  document.getElementById('pp-out').innerHTML = html;
+}
+function stars(n) {
+  var s = '';
+  for (var i = 0; i < 4; i++) { s += (i < n) ? '#' : '.'; }
+  return '[' + s + ']';
+}
+
+/* ---------- Tool 05: MVP Scorecard ---------- */
+function toggleChk(el) { el.classList.toggle('on'); }
+function scoreMVP() {
+  var items = document.querySelectorAll('#mvp-list .chk');
+  var got = 0, max = 0;
+  for (var i = 0; i < items.length; i++) {
+    var w = parseInt(items[i].getAttribute('data-w'), 10);
+    max += w;
+    if (items[i].classList.contains('on')) got += w;
+  }
+  var pct = Math.round((got / max) * 100);
+  var label, color, advice;
+  if (pct >= 70) { label = 'SIAP BUILD MVP'; color = '#3fb950'; advice = 'Sinyal validasi kuat. Bangun MVP scope kecil sekarang, kejar metrik suksesmu.'; }
+  else if (pct >= 40) { label = 'HAMPIR SIAP'; color = '#ff8c42'; advice = 'Lengkapi item bernilai tinggi (pre-sell & concierge) sebelum mulai ngoding.'; }
+  else { label = 'VALIDASI DULU'; color = '#ff6b6b'; advice = 'Belum cukup bukti. Jangan build dulu - kembali ke problem-solution fit & demand.'; }
+
+  var out = document.getElementById('mvp-out');
+  var html = '';
+  html += '<div class="verdict" style="color:' + color + ';">' + label + ' &mdash; ' + pct + '%</div>';
+  html += '<div class="bar"><i style="width:' + pct + '%;background:' + color + ';"></i></div>';
+  html += 'Skor bobot: ' + got + ' / ' + max + '\n\n>> ' + advice;
+  out.innerHTML = html;
+}
+
+/* ---------- Capstone validator ---------- */
+function validateCapstone() {
+  var raw = val('cap-in');
+  var t = raw.toLowerCase();
+  var checks = [
+    { name:'Pain berulang dari klien', keys:['pain','masalah','keluhan','rekap','manual'] },
+    { name:'Solusi / workflow n8n',    keys:['workflow','n8n','automat','otomat'] },
+    { name:'Produk yang diusulkan',    keys:['produk','saas','tool','aplikasi','platform'] },
+    { name:'Model harga (retainer/paket)', keys:['harga','retainer','paket','tier','mrr','langganan','subscription'] },
+    { name:'Validasi MVP (pre-sell/concierge)', keys:['validasi','mvp','pre-sell','presell','concierge','waitlist'] },
+    { name:'Delegasi / VA',            keys:['va','tim','sop','delegasi','delegate','dokumentasi'] }
+  ];
+  var passed = 0;
+  var report = [];
+  for (var i = 0; i < checks.length; i++) {
+    var hit = false;
+    for (var k = 0; k < checks[i].keys.length; k++) {
+      if (t.indexOf(checks[i].keys[k]) !== -1) { hit = true; break; }
+    }
+    if (hit) passed++;
+    report.push((hit ? '[OK] ' : '[  ] ') + checks[i].name);
+  }
+  var wordCount = raw.trim() === '' ? 0 : raw.trim().split(/\s+/).length;
+
+  var out = document.getElementById('cap-out');
+  var verdict, color;
+  if (passed === 6 && wordCount >= 40) { verdict = 'RENCANA LENGKAP - LULUS'; color = '#3fb950'; }
+  else if (passed >= 4) { verdict = 'HAMPIR LENGKAP'; color = '#ff8c42'; }
+  else { verdict = 'BELUM LENGKAP'; color = '#ff6b6b'; }
+
+  var html = '<div class="verdict" style="color:' + color + ';">' + verdict + ' (' + passed + '/6 komponen)</div>';
+  html += report.join('\n');
+  html += '\n\nJumlah kata: ' + wordCount;
+  if (passed < 6) html += '\n\n>> Tambahkan komponen bertanda [  ] agar rencana utuh.';
+  else if (wordCount < 40) html += '\n\n>> Komponen lengkap, tapi perpanjang sedikit penjelasannya.';
+  else html += '\n\n>> Mantap. Rencana SaaS-mu berakar pada pengalaman klien nyata. Roadmap tuntas!';
+  out.textContent = html.replace(/<[^>]+>/g, function(m){ return ''; }) === html ? html : html;
+  out.innerHTML = '<div class="verdict" style="color:' + color + ';">' + verdict + ' (' + passed + '/6 komponen)</div>' +
+                  '<span style="white-space:pre-wrap;">' + esc(report.join('\n')) +
+                  '\n\nJumlah kata: ' + wordCount +
+                  (passed < 6 ? '\n\n>> Tambahkan komponen bertanda [  ] agar rencana utuh.'
+                   : (wordCount < 40 ? '\n\n>> Komponen lengkap, perpanjang sedikit penjelasannya.'
+                   : '\n\n>> Mantap. Rencana SaaS-mu berakar pada pengalaman klien nyata. Roadmap tuntas!')) +
+                  '</span>';
+}
+
+/* ---------- AI Tutor (static curated answers) ---------- */
+var tutorAns = {
+  'Cara pitch retainer ke klien lama?': 'Bingkai sebagai jaminan ketenangan: "Workflow-nya sudah jalan; retainer memastikan kalau API berubah atau ada error, langsung saya tangani tanpa kamu pusing. Termasuk X jam improvement/bulan." Tekankan biaya downtime, bukan jam kerjamu.',
+  'Berapa harga retainer yang wajar?': 'Patokan umum: 10-20% dari nilai proyek awal per bulan, atau paket jam (mis. 4-6 jam/bln x rate). Pastikan menutup monitoring + buffer perbaikan. Mulai sederhana, naikkan saat nilai terbukti.',
+  'Klien nolak retainer, gimana?': 'Tawarkan tier ringan dulu (mis. "monitoring-only" murah) sebagai pintu masuk, atau pay-as-you-go per insiden. Sebagian klien butuh merasakan nilainya dulu sebelum komit bulanan.',
+  'Tugas apa yang aman didelegasikan duluan?': 'Yang berulang & berpola: data entry, update Sheet, monitoring log harian, balas template email. Tahan dulu hal yang butuh judgment klien atau akses kredensial sensitif sampai SOP & kepercayaan matang.',
+  'Cara amankan kredensial klien saat pakai VA?': 'Jangan pernah kirim password mentah. Pakai n8n Credentials (terenkripsi), beri VA akses lewat akun terbatas/role, aktifkan 2FA, dan rotasi kredensial saat VA selesai. Dokumentasikan SIAPA punya akses ke APA.'
+};
+function tutor(btn) {
+  var panel = btn.closest('.tutor');
+  var topic = panel.getAttribute('data-topic');
+  var ans = tutorAns[btn.textContent] || 'Jawaban belum tersedia.';
+  document.getElementById('ans-' + topic).textContent = ans;
+}
+
+/* ---------- helpers ---------- */
+function num(id){ var v = parseFloat(document.getElementById(id).value); return isNaN(v) ? 0 : v; }
+function val(id){ return (document.getElementById(id).value || '').trim(); }
+function linesOf(id){
+  var raw = document.getElementById(id).value || '';
+  var arr = raw.split('\n');
+  var out = [];
+  for (var i = 0; i < arr.length; i++){ var s = arr[i].replace(/^\s+|\s+$/g,''); if (s !== '') out.push(s); }
+  return out;
+}
+function fmt(n){
+  n = Math.round(n);
+  var s = String(n);
+  var out = '';
+  var c = 0;
+  for (var i = s.length - 1; i >= 0; i--){
+    out = s.charAt(i) + out; c++;
+    if (c % 3 === 0 && i > 0) out = ',' + out;
+  }
+  return out;
+}
+function esc(str){
+  str = String(str);
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+</script>
+</body>
+</html>
